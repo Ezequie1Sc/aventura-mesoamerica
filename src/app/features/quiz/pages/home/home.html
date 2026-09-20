@@ -1,1 +1,93 @@
-<p>home works!</p>
+<main
+  class="relative min-h-dvh overflow-hidden bg-[#0b3d2e] text-white"
+>
+  <!-- Decorative elements -->
+  <div
+    class="absolute -left-20 -top-20 h-56 w-56 rounded-full bg-[#2f8f68]/30 blur-2xl"
+  ></div>
+
+  <div
+    class="absolute -bottom-24 -right-20 h-64 w-64 rounded-full bg-[#e9b949]/20 blur-3xl"
+  ></div>
+
+  <div class="relative mx-auto flex min-h-dvh max-w-md flex-col px-6 py-8">
+
+    <!-- Top -->
+    <header class="flex items-center justify-between">
+      <div class="flex items-center gap-2">
+        <span class="text-2xl">🌿</span>
+
+        <span
+          class="text-xs font-black uppercase tracking-[0.2em] text-[#f4d06f]"
+        >
+          Aventura
+        </span>
+      </div>
+
+      <div
+        class="rounded-full border border-white/10 bg-white/10 px-3 py-1 text-xs font-bold backdrop-blur"
+      >
+        Mesoamérica
+      </div>
+    </header>
+
+    <!-- Hero -->
+    <section
+      class="flex flex-1 flex-col items-center justify-center text-center"
+    >
+
+      <!-- Explorer placeholder -->
+      <div
+        class="mb-7 flex h-36 w-36 items-center justify-center rounded-full border-4 border-[#f4d06f] bg-[#f7e7c6] text-7xl shadow-[0_15px_40px_rgba(0,0,0,0.25)]"
+      >
+        🧭
+      </div>
+
+      <span
+        class="mb-3 rounded-full bg-[#f4d06f] px-4 py-1.5 text-xs font-black uppercase tracking-widest text-[#183c2f]"
+      >
+        ¡Prepárate para explorar!
+      </span>
+
+      <h1
+        class="max-w-sm text-5xl font-black uppercase leading-[0.9] tracking-tight text-[#fff8e7]"
+      >
+        Aventura
+        <span class="block text-[#f4d06f]">
+          Mesoamérica
+        </span>
+      </h1>
+
+      <p
+        class="mt-5 max-w-xs text-sm font-medium leading-6 text-white/75"
+      >
+        Descubre culturas, alimentos, ciudades y secretos de los antiguos
+        pueblos de Mesoamérica.
+      </p>
+
+      <!-- CTA -->
+      <a
+        routerLink="/instrucciones"
+        class="mt-8 flex w-full max-w-xs items-center justify-center gap-3 rounded-2xl bg-[#e9b949] px-6 py-4 text-sm font-black uppercase tracking-wider text-[#183c2f] shadow-[0_8px_0_#b98518] transition-all duration-150 hover:-translate-y-0.5 hover:shadow-[0_10px_0_#b98518] active:translate-y-1 active:shadow-[0_4px_0_#b98518]"
+      >
+        <span>Comenzar aventura</span>
+        <span class="text-lg">➜</span>
+      </a>
+
+      <!-- Secondary action -->
+      <a
+        routerLink="/instrucciones"
+        class="mt-5 text-sm font-bold text-white/70 underline decoration-[#f4d06f] underline-offset-4 transition hover:text-white"
+      >
+        ¿Cómo se juega?
+      </a>
+    </section>
+
+    <!-- Bottom -->
+    <footer class="pb-2 text-center">
+      <p class="text-[10px] font-bold uppercase tracking-[0.2em] text-white/40">
+        Aprende · Explora · Descubre
+      </p>
+    </footer>
+  </div>
+</main>
