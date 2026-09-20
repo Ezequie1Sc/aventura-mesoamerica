@@ -1,136 +1,148 @@
-<main class="home-page">
-  <!-- Background -->
-  <div class="home-page__background"></div>
-  <div class="home-page__overlay"></div>
+<main class="home-page" aria-labelledby="home-title">
+  <!-- Paisaje -->
+  <div class="home-background" aria-hidden="true"></div>
+  <div class="home-overlay" aria-hidden="true"></div>
 
-  <!-- Decorative elements -->
-  <img
-    class="home-page__leaf home-page__leaf--left"
-    src="/assets/nature/leaves.webp"
-    alt=""
-    aria-hidden="true"
-  />
+  <div class="home-content">
+    <!-- Título -->
+    <header class="adventure-header">
+      <img
+        class="title-leaves title-leaves--left"
+        src="/assets/nature/leaves.webp"
+        alt=""
+        aria-hidden="true"
+      />
 
-  <img
-    class="home-page__leaf home-page__leaf--right"
-    src="/assets/nature/leaves.webp"
-    alt=""
-    aria-hidden="true"
-  />
+      <img
+        class="title-leaves title-leaves--right"
+        src="/assets/nature/leaves.webp"
+        alt=""
+        aria-hidden="true"
+      />
 
-  <div class="home-page__glow home-page__glow--top"></div>
-  <div class="home-page__glow home-page__glow--bottom"></div>
+      <div class="wood-sign">
+        <span class="wood-sign__nail wood-sign__nail--left"></span>
+        <span class="wood-sign__nail wood-sign__nail--right"></span>
 
-  <!-- Content -->
-  <div class="home-page__content">
-
-    <!-- Top bar -->
-    <header class="home-header">
-      <div class="home-header__brand">
-        <span class="home-header__brand-icon">✦</span>
-
-        <span class="home-header__brand-text">
-          Aventura
-        </span>
-      </div>
-
-      <div class="home-header__region">
-        Mesoamérica
+        <h1 id="home-title">
+          <span class="wood-sign__small">Aventura</span>
+          <span class="wood-sign__large">Mesoamérica</span>
+        </h1>
       </div>
     </header>
 
-    <!-- Hero -->
-    <section class="home-hero">
+    <!-- Personaje -->
+    <section class="explorer-scene" aria-label="Bienvenida">
+      <div class="explorer-light" aria-hidden="true"></div>
 
-      <!-- Explorer -->
-      <div class="explorer-wrapper">
-        <div class="explorer-glow"></div>
+      <img
+        class="explorer-character"
+        src="/assets/characters/welcome.webp"
+        alt="Explorador mesoamericano saludando"
+        width="1024"
+        height="1536"
+        fetchpriority="high"
+      />
 
-        <div class="explorer-card">
-          <img
-            src="/assets/characters/welcome.webp"
-            alt="Explorador de Aventura Mesoamérica"
-            class="explorer-image"
-          />
-        </div>
+      <img
+        class="scene-leaves scene-leaves--left"
+        src="/assets/nature/leaves.webp"
+        alt=""
+        aria-hidden="true"
+      />
 
-        <img
-          src="/assets/rewards/star.webp"
-          alt=""
-          aria-hidden="true"
-          class="explorer-star explorer-star--one"
-        />
-
-        <img
-          src="/assets/rewards/star.webp"
-          alt=""
-          aria-hidden="true"
-          class="explorer-star explorer-star--two"
-        />
-      </div>
-
-      <!-- Welcome badge -->
-      <div class="welcome-badge">
-        <span class="welcome-badge__dot"></span>
-        <span>Una aventura por descubrir</span>
-      </div>
-
-      <!-- Title -->
-      <h1 class="home-title">
-        Aventura
-        <span>Mesoamérica</span>
-      </h1>
-
-      <!-- Description -->
-      <p class="home-description">
-        Viaja al pasado y descubre las culturas,
-        alimentos, ciudades y secretos de Mesoamérica.
-      </p>
-
-      <!-- Main action -->
-      <a
-        routerLink="/instrucciones"
-        class="start-button"
-      >
-        <span class="start-button__text">
-          Comenzar aventura
-        </span>
-
-        <span class="start-button__icon">
-          →
-        </span>
-      </a>
-
-      <!-- Secondary action -->
-      <a
-        routerLink="/instrucciones"
-        class="instructions-link"
-      >
-        ¿Cómo se juega?
-      </a>
+      <img
+        class="scene-leaves scene-leaves--right"
+        src="/assets/nature/leaves.webp"
+        alt=""
+        aria-hidden="true"
+      />
     </section>
 
-    <!-- Bottom -->
-    <footer class="home-footer">
-      <div class="home-footer__item">
-        <span>✦</span>
-        Aprende
+    <!-- Mensaje y acciones -->
+    <section class="welcome-panel" aria-label="Comienza tu aventura">
+      <div class="parchment">
+        <p>
+          Descubre, aprende y demuestra
+          <strong>cuánto sabes sobre Mesoamérica.</strong>
+        </p>
       </div>
 
-      <div class="home-footer__separator"></div>
+      <a routerLink="/instrucciones" class="start-button">
+        <svg
+          class="start-button__icon"
+          viewBox="0 0 24 24"
+          fill="currentColor"
+          aria-hidden="true"
+        >
+          <path
+            d="M7 4.8c0-1 1.1-1.6 1.9-1.1l12 7.2a1.3 1.3 0 0 1 0 2.2l-12 7.2A1.3 1.3 0 0 1 7 19.2V4.8Z"
+          />
+        </svg>
 
-      <div class="home-footer__item">
-        <span>✦</span>
-        Explora
-      </div>
+        <span>¡Comenzar!</span>
+      </a>
 
-      <div class="home-footer__separator"></div>
-
-      <div class="home-footer__item">
-        <span>✦</span>
-        Descubre
-      </div>
-    </footer>
-
+      <button
+        type="button"
+        class="help-button"
+        (click)="openHelp()"
+      >
+        <span class="help-button__icon" aria-hidden="true">?</span>
+        <span>¿Cómo funciona?</span>
+      </button>
+    </section>
   </div>
+
+  <!-- Instrucciones -->
+  <dialog
+    #helpDialog
+    class="help-dialog"
+    aria-labelledby="help-title"
+    (click)="closeOnBackdrop($event)"
+  >
+    <div class="help-dialog__content">
+      <form method="dialog" class="help-dialog__close-form">
+        <button
+          class="close-button"
+          aria-label="Cerrar instrucciones"
+        >
+          ×
+        </button>
+      </form>
+
+      <span class="help-dialog__symbol" aria-hidden="true">✦</span>
+
+      <h2 id="help-title">¡Vamos a jugar!</h2>
+
+      <p class="help-dialog__intro">
+        Tu aventura tiene 6 preguntas por descubrir.
+      </p>
+
+      <ol class="help-steps">
+        <li>
+          <span aria-hidden="true">1</span>
+          <p>Lee la pregunta con atención.</p>
+        </li>
+
+        <li>
+          <span aria-hidden="true">2</span>
+          <p>Elige la respuesta que creas correcta.</p>
+        </li>
+
+        <li>
+          <span aria-hidden="true">3</span>
+          <p>Gana 10 puntos por cada acierto y sigue aprendiendo.</p>
+        </li>
+      </ol>
+
+      <p class="help-dialog__note">
+        ¡Tómate tu tiempo y disfruta la aventura!
+      </p>
+
+      <form method="dialog">
+        <button class="understood-button">¡Entendido!</button>
+      </form>
+    </div>
+  </dialog>
 </main>
