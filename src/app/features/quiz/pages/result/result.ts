@@ -5,6 +5,7 @@ import { QuizService } from '../../../../core/services/quiz.service';
 
 @Component({
   selector: 'app-result',
+  imports: [RouterLink],
   templateUrl: './result.html',
   styleUrl: './result.scss',
 })
