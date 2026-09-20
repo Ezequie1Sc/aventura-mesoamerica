@@ -1,1 +1,374 @@
-<p>map works!</p>
+<main class="map-page" aria-labelledby="map-title">
+
+  <!-- ========================================= -->
+  <!-- BACKGROUND -->
+  <!-- ========================================= -->
+
+  <div
+    class="map-background"
+    aria-hidden="true"
+  ></div>
+
+  <div
+    class="map-overlay"
+    aria-hidden="true"
+  ></div>
+
+
+  <!-- ========================================= -->
+  <!-- DECORACIÓN -->
+  <!-- ========================================= -->
+
+  <img
+    class="map-decoration map-decoration--left"
+    src="/assets/nature/leaves.webp"
+    alt=""
+    aria-hidden="true"
+  />
+
+  <img
+    class="map-decoration map-decoration--right"
+    src="/assets/nature/leaves.webp"
+    alt=""
+    aria-hidden="true"
+  />
+
+  <img
+    class="map-pyramid"
+    src="/assets/objects/pyramid.webp"
+    alt=""
+    aria-hidden="true"
+  />
+
+
+  <!-- ========================================= -->
+  <!-- CONTENIDO -->
+  <!-- ========================================= -->
+
+  <div class="map-content">
+
+    <!-- Header -->
+
+    <header class="map-header">
+
+      <a
+        routerLink="/instrucciones"
+        class="back-button"
+        aria-label="Volver a instrucciones"
+      >
+        ←
+      </a>
+
+      <div class="map-header__title">
+        <span class="map-header__eyebrow">
+          Tu aventura
+        </span>
+
+        <h1 id="map-title">
+          Mesoamérica
+        </h1>
+      </div>
+
+      <div class="progress-badge">
+        <span class="progress-badge__star">★</span>
+
+        <span>
+          {{ currentQuestionIndex() }}/{{ totalQuestions() }}
+        </span>
+      </div>
+
+    </header>
+
+
+    <!-- ========================================= -->
+    <!-- INTRO -->
+    <!-- ========================================= -->
+
+    <section class="map-intro">
+
+      <div class="map-intro__character">
+
+        <img
+          src="/assets/characters/welcome.webp"
+          alt="Explorador listo para comenzar la aventura"
+        />
+
+      </div>
+
+      <div class="map-intro__text">
+
+        <span class="map-intro__label">
+          ¡Tu viaje comienza!
+        </span>
+
+        <p>
+          Recorre el camino y descubre los secretos
+          de las antiguas culturas mesoamericanas.
+        </p>
+
+      </div>
+
+    </section>
+
+
+    <!-- ========================================= -->
+    <!-- MAPA -->
+    <!-- ========================================= -->
+
+    <section
+      class="adventure-map"
+      aria-label="Mapa de la aventura"
+    >
+
+      <div class="map-path" aria-hidden="true"></div>
+
+
+      <!-- ESTACIÓN 1 -->
+
+      <article
+        class="map-station map-station--one"
+        [class]="getStationClass(0)"
+      >
+
+        <div class="station-marker">
+
+          <span class="station-number">
+            1
+          </span>
+
+          <span class="station-star">
+            ★
+          </span>
+
+        </div>
+
+        <div class="station-info">
+          <span>Pregunta 1</span>
+          <strong>El comienzo</strong>
+        </div>
+
+      </article>
+
+
+      <!-- ESTACIÓN 2 -->
+
+      <article
+        class="map-station map-station--two"
+        [class]="getStationClass(1)"
+      >
+
+        <div class="station-marker">
+
+          <span class="station-number">
+            2
+          </span>
+
+          <span class="station-star">
+            ★
+          </span>
+
+          @if (!isUnlocked(1)) {
+            <span class="station-lock">🔒</span>
+          }
+
+        </div>
+
+        <div class="station-info">
+          <span>Pregunta 2</span>
+          <strong>Las culturas</strong>
+        </div>
+
+      </article>
+
+
+      <!-- ESTACIÓN 3 -->
+
+      <article
+        class="map-station map-station--three"
+        [class]="getStationClass(2)"
+      >
+
+        <div class="station-marker">
+
+          <span class="station-number">
+            3
+          </span>
+
+          <span class="station-star">
+            ★
+          </span>
+
+          @if (!isUnlocked(2)) {
+            <span class="station-lock">🔒</span>
+          }
+
+        </div>
+
+        <div class="station-info">
+          <span>Pregunta 3</span>
+          <strong>El maíz</strong>
+        </div>
+
+      </article>
+
+
+      <!-- ESTACIÓN 4 -->
+
+      <article
+        class="map-station map-station--four"
+        [class]="getStationClass(3)"
+      >
+
+        <div class="station-marker">
+
+          <span class="station-number">
+            4
+          </span>
+
+          <span class="station-star">
+            ★
+          </span>
+
+          @if (!isUnlocked(3)) {
+            <span class="station-lock">🔒</span>
+          }
+
+        </div>
+
+        <div class="station-info">
+          <span>Pregunta 4</span>
+          <strong>Los pueblos</strong>
+        </div>
+
+      </article>
+
+
+      <!-- ESTACIÓN 5 -->
+
+      <article
+        class="map-station map-station--five"
+        [class]="getStationClass(4)"
+      >
+
+        <div class="station-marker">
+
+          <span class="station-number">
+            5
+          </span>
+
+          <span class="station-star">
+            ★
+          </span>
+
+          @if (!isUnlocked(4)) {
+            <span class="station-lock">🔒</span>
+          }
+
+        </div>
+
+        <div class="station-info">
+          <span>Pregunta 5</span>
+          <strong>El cacao</strong>
+        </div>
+
+      </article>
+
+
+      <!-- ESTACIÓN 6 -->
+
+      <article
+        class="map-station map-station--six"
+        [class]="getStationClass(5)"
+      >
+
+        <div class="station-marker">
+
+          <span class="station-number">
+            6
+          </span>
+
+          <span class="station-star">
+            ★
+          </span>
+
+          @if (!isUnlocked(5)) {
+            <span class="station-lock">🔒</span>
+          }
+
+        </div>
+
+        <div class="station-info">
+          <span>Pregunta 6</span>
+          <strong>Los templos</strong>
+        </div>
+
+      </article>
+
+
+      <!-- META -->
+
+      <div class="map-finish">
+
+        <div class="finish-icon">
+          🏆
+        </div>
+
+        <span>
+          Meta de la aventura
+        </span>
+
+      </div>
+
+    </section>
+
+
+    <!-- ========================================= -->
+    <!-- ACCIÓN -->
+    <!-- ========================================= -->
+
+    <section class="map-action">
+
+      <p class="map-action__text">
+        Estás en la estación
+        <strong>{{ currentQuestionIndex() + 1 }}</strong>
+        de
+        <strong>{{ totalQuestions() }}</strong>
+      </p>
+
+      <a
+        routerLink="/quiz"
+        class="continue-button"
+      >
+
+        <span class="continue-button__icon">
+          ▶
+        </span>
+
+        <span>
+          Continuar aventura
+        </span>
+
+      </a>
+
+    </section>
+
+
+    <!-- Footer -->
+
+    <footer class="map-footer">
+
+      <span>Explora</span>
+
+      <i></i>
+
+      <span>Aprende</span>
+
+      <i></i>
+
+      <span>Descubre</span>
+
+    </footer>
+
+  </div>
+
+</main>
