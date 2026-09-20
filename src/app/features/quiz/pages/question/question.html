@@ -1,1 +1,271 @@
-<p>question works!</p>
+<main
+  class="question-page"
+  aria-labelledby="question-title"
+>
+  <!-- ========================================= -->
+  <!-- BACKGROUND -->
+  <!-- ========================================= -->
+
+  <div
+    class="question-background"
+    aria-hidden="true"
+  ></div>
+
+  <div
+    class="question-overlay"
+    aria-hidden="true"
+  ></div>
+
+
+  <!-- ========================================= -->
+  <!-- CONTENT -->
+  <!-- ========================================= -->
+
+  <div class="question-content">
+
+    <!-- ======================================= -->
+    <!-- HEADER -->
+    <!-- ======================================= -->
+
+    <header class="question-header">
+
+      <button
+        type="button"
+        class="back-button"
+        aria-label="Volver al mapa"
+        (click)="router.navigate(['/mapa'])"
+      >
+        ←
+      </button>
+
+      <div class="question-progress">
+
+        <span class="question-progress__label">
+          Pregunta
+        </span>
+
+        <strong>
+          {{ currentQuestionIndex() + 1 }}
+          /
+          {{ totalQuestions() }}
+        </strong>
+
+      </div>
+
+      <div class="score-badge">
+
+        <span class="score-badge__star">
+          ★
+        </span>
+
+        <strong>
+          {{ score() }}
+        </strong>
+
+      </div>
+
+    </header>
+
+
+    <!-- ======================================= -->
+    <!-- PROGRESS BAR -->
+    <!-- ======================================= -->
+
+    <div
+      class="progress-track"
+      aria-hidden="true"
+    >
+      <div
+        class="progress-fill"
+        [style.width.%]="progress()"
+      ></div>
+    </div>
+
+
+    <!-- ======================================= -->
+    <!-- CHARACTER -->
+    <!-- ======================================= -->
+
+    <section
+      class="question-character"
+      aria-label="Explorador"
+    >
+
+      <div
+        class="character-glow"
+        aria-hidden="true"
+      ></div>
+
+      <img
+        [src]="getCharacterImage()"
+        alt="Explorador"
+        width="1024"
+        height="1536"
+      />
+
+    </section>
+
+
+    <!-- ======================================= -->
+    <!-- QUESTION -->
+    <!-- ======================================= -->
+
+    <section class="question-card">
+
+      <span class="question-card__number">
+        DESAFÍO {{ currentQuestionIndex() + 1 }}
+      </span>
+
+      <h1 id="question-title">
+        {{ currentQuestion().question }}
+      </h1>
+
+    </section>
+
+
+    <!-- ======================================= -->
+    <!-- ANSWERS -->
+    <!-- ======================================= -->
+
+    <section
+      class="answers"
+      aria-label="Opciones de respuesta"
+    >
+
+      @for (
+        option of currentQuestion().options;
+        track option.id;
+        let index = $index
+      ) {
+
+        <button
+          type="button"
+          class="answer-card"
+          [class]="getAnswerClass(option.id)"
+          [disabled]="isAnswered()"
+          (click)="answerQuestion(option.id)"
+        >
+
+          <span class="answer-card__letter">
+            {{ ['A', 'B', 'C'][index] }}
+          </span>
+
+          <span class="answer-card__text">
+            {{ option.text }}
+          </span>
+
+          @if (
+            isAnswered() &&
+            isCorrectAnswer(option.id)
+          ) {
+            <span class="answer-card__status">
+              ✓
+            </span>
+          }
+
+          @if (
+            isAnswered() &&
+            selectedAnswer() === option.id &&
+            !isCorrectAnswer(option.id)
+          ) {
+            <span class="answer-card__status">
+              ×
+            </span>
+          }
+
+        </button>
+
+      }
+
+    </section>
+
+
+    <!-- ======================================= -->
+    <!-- FEEDBACK -->
+    <!-- ======================================= -->
+
+    @if (isAnswered()) {
+
+      <section
+        class="feedback"
+        [class.feedback--correct]="
+          isCorrectAnswer(selectedAnswer()!)
+        "
+        [class.feedback--incorrect]="
+          !isCorrectAnswer(selectedAnswer()!)
+        "
+      >
+
+        <div class="feedback__icon">
+          @if (isCorrectAnswer(selectedAnswer()!)) {
+            ✓
+          } @else {
+            !
+          }
+        </div>
+
+        <div class="feedback__content">
+
+          <h2>
+            {{ getFeedbackTitle() }}
+          </h2>
+
+          <p>
+            {{ getFeedbackText() }}
+          </p>
+
+        </div>
+
+      </section>
+
+
+      <!-- Explanation -->
+
+      <section class="explanation">
+
+        <div class="explanation__icon">
+          💡
+        </div>
+
+        <div>
+
+          <span>
+            ¿Sabías que...?
+          </span>
+
+          <p>
+            {{ currentQuestion().explanation }}
+          </p>
+
+        </div>
+
+      </section>
+
+
+      <!-- Next -->
+
+      <button
+        type="button"
+        class="next-button"
+        (click)="nextQuestion()"
+      >
+
+        <span>
+          {{
+            currentQuestionIndex() === totalQuestions() - 1
+              ? 'Ver resultado'
+              : 'Siguiente pregunta'
+          }}
+        </span>
+
+        <span class="next-button__icon">
+          →
+        </span>
+
+      </button>
+
+    }
+
+  </div>
+
+</main>
