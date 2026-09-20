@@ -2,9 +2,10 @@ import { Injectable, computed, signal } from '@angular/core';
 
 import { QUESTIONS } from '../../data/questions';
 import { BADGES } from '../../data/badges';
+import { Badge } from '../models/badge.model';
 import { Question } from '../models/question.model';
 import { QuizResult } from '../models/quiz-result.model';
-import { Badge } from '../models/badge.model';
+import { StorageService } from './storage.service';
 
 @Injectable({
   providedIn: 'root',
@@ -45,6 +46,8 @@ export class QuizService {
     };
   });
 
+  constructor(private readonly storageService: StorageService) {}
+
   startQuiz(): void {
     this.currentQuestionIndex.set(0);
     this.score.set(0);
@@ -84,7 +87,16 @@ export class QuizService {
   }
 
   finishQuiz(): void {
+    if (this.isFinished()) {
+      return;
+    }
+
     this.isFinished.set(true);
+
+    const finalScore = this.score();
+    const badge = this.getBadge(finalScore);
+
+    this.storageService.saveResult(finalScore, badge.id);
   }
 
   restartQuiz(): void {
