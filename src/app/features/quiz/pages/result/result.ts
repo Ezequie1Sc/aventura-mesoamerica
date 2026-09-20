@@ -21,6 +21,29 @@ export class Result {
     return this.quizService.getBadge(this.score());
   }
 
+  getBadgeImage(): string {
+    const badgeId = this.getBadge().id;
+
+    const images: Record<string, string> = {
+      semilla:
+        '/assets/badges/semilla-conocimiento.webp',
+
+      aprendiz:
+        '/assets/badges/aprendiz-mesoamerica.webp',
+
+      explorador:
+        '/assets/badges/explorador-conocimiento.webp',
+
+      'pase-aventura':
+        '/assets/badges/pase-aventura-mesoamerica.webp',
+    };
+
+    return (
+      images[badgeId] ??
+      '/assets/badges/semilla-conocimiento.webp'
+    );
+  }
+
   getCharacterImage(): string {
     const score = this.score();
 
