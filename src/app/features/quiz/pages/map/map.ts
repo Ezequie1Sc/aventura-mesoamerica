@@ -5,6 +5,7 @@ import { QuizService } from '../../../../core/services/quiz.service';
 
 @Component({
   selector: 'app-map',
+  imports: [RouterLink],
   templateUrl: './map.html',
   styleUrl: './map.scss',
 })
