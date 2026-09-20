@@ -35,13 +35,23 @@ export class Badges {
     const badgeId = this.getBadge().id;
 
     const images: Record<string, string> = {
-      semilla: '/assets/badges/semilla-conocimiento.webp',
-      aprendiz: '/assets/badges/aprendiz-mesoamerica.webp',
-      explorador: '/assets/badges/explorador-conocimiento.webp',
-      'pase-aventura': '/assets/badges/pase-aventura-mesoamerica.webp',
+      semilla:
+        '/assets/badges/semilla-conocimiento.webp',
+
+      aprendiz:
+        '/assets/badges/aprendiz-mesoamerica.webp',
+
+      explorador:
+        '/assets/badges/explorador-conocimiento.webp',
+
+      'pase-aventura':
+        '/assets/badges/pase-aventura-mesoamerica.webp',
     };
 
-    return images[badgeId] ?? '/assets/badges/semilla-conocimiento.webp';
+    return (
+      images[badgeId] ??
+      '/assets/badges/semilla-conocimiento.webp'
+    );
   }
 
   getCharacterImage(): string {
@@ -107,26 +117,50 @@ export class Badges {
     gradient.addColorStop(1, '#10291f');
 
     context.fillStyle = gradient;
-    context.fillRect(0, 0, canvas.width, canvas.height);
+    context.fillRect(
+      0,
+      0,
+      canvas.width,
+      canvas.height
+    );
 
     context.fillStyle = 'rgba(244, 198, 72, 0.12)';
     context.beginPath();
-    context.arc(540, 420, 430, 0, Math.PI * 2);
+    context.arc(
+      540,
+      420,
+      430,
+      0,
+      Math.PI * 2
+    );
     context.fill();
 
     context.strokeStyle = '#e6b84b';
     context.lineWidth = 8;
-    context.strokeRect(42, 42, 996, 1266);
+    context.strokeRect(
+      42,
+      42,
+      996,
+      1266
+    );
 
     context.textAlign = 'center';
 
     context.fillStyle = '#f8d875';
     context.font = 'bold 64px Arial';
-    context.fillText('AVENTURA', 540, 125);
+    context.fillText(
+      'AVENTURA',
+      540,
+      125
+    );
 
     context.fillStyle = '#fff4ce';
     context.font = 'bold 72px Arial';
-    context.fillText('MESOAMÉRICA', 540, 205);
+    context.fillText(
+      'MESOAMÉRICA',
+      540,
+      205
+    );
 
     const badgeImage = new Image();
 
@@ -138,8 +172,11 @@ export class Badges {
         maxSize / badgeImage.height
       );
 
-      const width = badgeImage.width * ratio;
-      const height = badgeImage.height * ratio;
+      const width =
+        badgeImage.width * ratio;
+
+      const height =
+        badgeImage.height * ratio;
 
       context.drawImage(
         badgeImage,
@@ -151,15 +188,27 @@ export class Badges {
 
       context.fillStyle = '#f8d875';
       context.font = 'bold 34px Arial';
-      context.fillText('INSIGNIA OBTENIDA', 540, 890);
+      context.fillText(
+        'INSIGNIA OBTENIDA',
+        540,
+        890
+      );
 
       context.fillStyle = '#ffffff';
       context.font = 'bold 48px Arial';
-      context.fillText(badge.name, 540, 960);
+      context.fillText(
+        badge.name,
+        540,
+        960
+      );
 
       context.fillStyle = '#f8d875';
       context.font = 'bold 62px Arial';
-      context.fillText(`${score} / 6`, 540, 1060);
+      context.fillText(
+        `${score} / 6`,
+        540,
+        1060
+      );
 
       context.fillStyle = '#fff4ce';
       context.font = '28px Arial';
@@ -177,10 +226,15 @@ export class Badges {
         1220
       );
 
-      const link = document.createElement('a');
+      const link =
+        document.createElement('a');
 
-      link.download = `${badge.id}-aventura-mesoamerica.png`;
-      link.href = canvas.toDataURL('image/png');
+      link.download =
+        `${badge.id}-aventura-mesoamerica.png`;
+
+      link.href =
+        canvas.toDataURL('image/png');
+
       link.click();
     };
 
