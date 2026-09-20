@@ -1,0 +1,423 @@
+:host {
+  display: block;
+  min-height: 100dvh;
+}
+
+.badges-page {
+  position: relative;
+  min-height: 100dvh;
+  overflow: hidden;
+  background: #17442f;
+  color: #fff4d4;
+}
+
+.badges-background {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(
+      180deg,
+      rgba(10, 43, 29, 0.58),
+      rgba(23, 68, 47, 0.75)
+    ),
+    url('/assets/backgrounds/jungle.webp') center / cover no-repeat;
+  transform: scale(1.04);
+}
+
+.badges-overlay {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(
+      circle at 50% 28%,
+      rgba(245, 198, 71, 0.18),
+      transparent 32%
+    ),
+    linear-gradient(
+      180deg,
+      rgba(7, 32, 22, 0.1),
+      rgba(7, 30, 21, 0.55)
+    );
+}
+
+.badges-content {
+  position: relative;
+  z-index: 2;
+  width: min(100%, 440px);
+  min-height: 100dvh;
+  margin: 0 auto;
+  padding: 18px 18px 28px;
+}
+
+.badges-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.back-button {
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  border: 3px solid #68401f;
+  border-radius: 14px;
+  background: rgba(255, 243, 207, 0.96);
+  color: #5d371b;
+  font-family: 'Lilita One', cursive;
+  font-size: 1.55rem;
+  line-height: 1;
+  text-decoration: none;
+  box-shadow: 0 4px 0 #4a2b18;
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.back-button:active {
+  transform: translateY(3px);
+  box-shadow: 0 1px 0 #4a2b18;
+}
+
+.badges-header__title {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 7px;
+}
+
+.badges-header__title p {
+  margin: 0;
+  color: #fff4cf;
+  font-family: 'Lilita One', cursive;
+  font-size: 0.85rem;
+  letter-spacing: 1px;
+  text-align: center;
+  text-shadow: 0 2px 3px rgba(0, 0, 0, 0.45);
+}
+
+.badges-header__title span {
+  color: #f4c84b;
+}
+
+.achievement-heading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 9px;
+  margin-top: 18px;
+}
+
+.achievement-heading h1 {
+  margin: 0;
+  color: #fff3c9;
+  font-family: 'Lilita One', cursive;
+  font-size: clamp(1.65rem, 8vw, 2.25rem);
+  line-height: 1;
+  text-align: center;
+  text-shadow:
+    0 3px 0 #63391d,
+    0 5px 8px rgba(0, 0, 0, 0.35);
+}
+
+.achievement-heading__star {
+  color: #f7c94c;
+  font-size: 1.15rem;
+}
+
+.badge-showcase {
+  position: relative;
+  width: 100%;
+  height: 255px;
+  margin-top: 8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.badge-showcase__glow {
+  position: absolute;
+  width: 215px;
+  height: 215px;
+  border-radius: 50%;
+  background: rgba(246, 195, 63, 0.2);
+  filter: blur(25px);
+}
+
+.badge-showcase__image {
+  position: relative;
+  z-index: 2;
+  width: 220px;
+  height: 220px;
+  object-fit: contain;
+  filter: drop-shadow(0 9px 7px rgba(0, 0, 0, 0.38));
+  animation: badgeFloat 3s ease-in-out infinite;
+}
+
+.badge-showcase__character {
+  position: absolute;
+  z-index: 3;
+  right: 5px;
+  bottom: 8px;
+  width: 95px;
+  max-height: 110px;
+  object-fit: contain;
+  filter: drop-shadow(0 5px 4px rgba(0, 0, 0, 0.35));
+  animation: characterFloat 3s ease-in-out infinite 0.3s;
+}
+
+@keyframes badgeFloat {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-1deg);
+  }
+
+  50% {
+    transform: translateY(-7px) rotate(1deg);
+  }
+}
+
+@keyframes characterFloat {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+.badge-info {
+  position: relative;
+  padding: 17px 17px 18px;
+  border: 3px solid #70421f;
+  border-radius: 22px;
+  background: rgba(255, 247, 218, 0.97);
+  color: #53351f;
+  text-align: center;
+  box-shadow:
+    0 5px 0 rgba(47, 27, 14, 0.7),
+    inset 0 0 0 2px rgba(255, 255, 255, 0.35);
+}
+
+.badge-info__label {
+  color: #9a641f;
+  font-family: 'Lilita One', cursive;
+  font-size: 0.78rem;
+  letter-spacing: 1.5px;
+}
+
+.badge-info h2 {
+  margin: 5px 0 7px;
+  color: #70401f;
+  font-family: 'Lilita One', cursive;
+  font-size: 1.45rem;
+  line-height: 1.08;
+}
+
+.badge-info > p {
+  margin: 0 auto;
+  max-width: 330px;
+  color: #694c33;
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
+.score-display {
+  width: fit-content;
+  margin: 13px auto 8px;
+  padding: 5px 14px;
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+  border-radius: 14px;
+  background: #f5d269;
+  color: #684018;
+  box-shadow: inset 0 -2px 0 rgba(113, 65, 19, 0.25);
+}
+
+.score-display__star {
+  color: #9c6417;
+}
+
+.score-display strong {
+  font-family: 'Lilita One', cursive;
+  font-size: 1.5rem;
+}
+
+.score-display span:last-child {
+  font-weight: 800;
+}
+
+.score-message {
+  margin-top: 5px !important;
+}
+
+.download-card {
+  margin-top: 14px;
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border: 2px solid rgba(255, 231, 166, 0.45);
+  border-radius: 17px;
+  background: rgba(28, 78, 54, 0.86);
+  box-shadow: 0 4px 0 rgba(8, 32, 21, 0.45);
+}
+
+.download-card__icon {
+  width: 43px;
+  height: 43px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  border-radius: 13px;
+  background: #f5c94b;
+  color: #684018;
+  font-family: 'Lilita One', cursive;
+  font-size: 1.55rem;
+}
+
+.download-card__content {
+  min-width: 0;
+}
+
+.download-card__content h3 {
+  margin: 0;
+  color: #fff0c7;
+  font-family: 'Lilita One', cursive;
+  font-size: 1rem;
+}
+
+.download-card__content p {
+  margin: 2px 0 0;
+  color: #dce9dc;
+  font-size: 0.76rem;
+  line-height: 1.3;
+}
+
+.badge-actions {
+  margin-top: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.download-button,
+.home-button {
+  width: 100%;
+  min-height: 53px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 9px;
+  border-radius: 16px;
+  font-family: 'Lilita One', cursive;
+  font-size: 1.05rem;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.download-button {
+  border: 3px solid #8c5a13;
+  background: linear-gradient(
+    180deg,
+    #ffdc62 0%,
+    #efb932 100%
+  );
+  color: #633a10;
+  box-shadow: 0 5px 0 #75450f;
+}
+
+.home-button {
+  border: 2px solid #71421f;
+  background: rgba(255, 247, 220, 0.96);
+  color: #70411f;
+  box-shadow: 0 4px 0 rgba(62, 35, 17, 0.65);
+}
+
+.download-button:active,
+.home-button:active {
+  transform: translateY(3px);
+}
+
+.badges-footer {
+  margin-top: 15px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  color: #f7e7bd;
+  text-shadow: 0 2px 3px rgba(0, 0, 0, 0.45);
+}
+
+.badges-footer p {
+  margin: 0;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+.badges-footer span {
+  color: #f5c94b;
+}
+
+.badges-leaf {
+  position: absolute;
+  z-index: 3;
+  width: 145px;
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.badges-leaf--left {
+  top: 35px;
+  left: -65px;
+  transform: rotate(-20deg);
+}
+
+.badges-leaf--right {
+  top: 35px;
+  right: -65px;
+  transform: scaleX(-1) rotate(-20deg);
+}
+
+@media (min-width: 600px) {
+  .badges-content {
+    padding-top: 25px;
+    padding-bottom: 40px;
+  }
+
+  .badge-showcase {
+    height: 285px;
+  }
+
+  .badge-showcase__image {
+    width: 245px;
+    height: 245px;
+  }
+
+  .badge-showcase__character {
+    width: 110px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .badge-showcase__image,
+  .badge-showcase__character {
+    animation: none;
+  }
+
+  .download-button,
+  .home-button,
+  .back-button {
+    transition: none;
+  }
+}
