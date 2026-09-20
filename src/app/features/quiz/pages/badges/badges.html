@@ -1,1 +1,120 @@
-<p>badges works!</p>
+<main class="badges-page">
+  <div class="badges-background" aria-hidden="true"></div>
+  <div class="badges-overlay" aria-hidden="true"></div>
+
+  <img
+    class="badges-leaf badges-leaf--left"
+    src="/assets/nature/leaves.webp"
+    alt=""
+    aria-hidden="true"
+  />
+
+  <img
+    class="badges-leaf badges-leaf--right"
+    src="/assets/nature/leaves.webp"
+    alt=""
+    aria-hidden="true"
+  />
+
+  <section class="badges-content">
+    <header class="badges-header">
+      <a
+        routerLink="/"
+        class="back-button"
+        aria-label="Volver al inicio"
+      >
+        ←
+      </a>
+
+      <div class="badges-header__title">
+        <span>✦</span>
+        <p>AVENTURA MESOAMÉRICA</p>
+        <span>✦</span>
+      </div>
+    </header>
+
+    <section class="achievement-heading">
+      <span class="achievement-heading__star">✦</span>
+
+      <h1>¡Insignia obtenida!</h1>
+
+      <span class="achievement-heading__star">✦</span>
+    </section>
+
+    <section class="badge-showcase">
+      <div class="badge-showcase__glow"></div>
+
+      <img
+        class="badge-showcase__image"
+        [src]="getBadgeImage()"
+        [alt]="getBadge().name"
+      />
+
+      <img
+        class="badge-showcase__character"
+        [src]="getCharacterImage()"
+        alt=""
+        aria-hidden="true"
+      />
+    </section>
+
+    <section class="badge-info">
+      <span class="badge-info__label">INSIGNIA OBTENIDA</span>
+
+      <h2>{{ getBadge().name }}</h2>
+
+      <p>{{ getBadge().description }}</p>
+
+      <div class="score-display">
+        <span class="score-display__star">★</span>
+
+        <strong>{{ getCurrentScore() }}</strong>
+
+        <span>/ {{ totalQuestions() }}</span>
+      </div>
+
+      <p class="score-message">
+        {{ getScoreMessage() }}
+      </p>
+    </section>
+
+    <section class="download-card">
+      <div class="download-card__icon">
+        ↓
+      </div>
+
+      <div class="download-card__content">
+        <h3>Guarda tu logro</h3>
+
+        <p>
+          Descarga una tarjeta de tu aventura para conservarla.
+        </p>
+      </div>
+    </section>
+
+    <div class="badge-actions">
+      <button
+        type="button"
+        class="download-button"
+        (click)="downloadCard()"
+      >
+        <span>↓</span>
+        <span>Descargar tarjeta</span>
+      </button>
+
+      <a
+        routerLink="/"
+        class="home-button"
+      >
+        <span>⌂</span>
+        <span>Volver al inicio</span>
+      </a>
+    </div>
+
+    <footer class="badges-footer">
+      <span>🌿</span>
+      <p>¡Sigue explorando y aprendiendo!</p>
+      <span>🌿</span>
+    </footer>
+  </section>
+</main>
