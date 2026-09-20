@@ -1,1 +1,109 @@
-<p>result works!</p>
+<main class="result-page">
+  <div class="result-background" aria-hidden="true"></div>
+  <div class="result-overlay" aria-hidden="true"></div>
+
+  <img
+    class="result-decoration result-decoration--left"
+    src="/assets/nature/leaves.webp"
+    alt=""
+    aria-hidden="true"
+  />
+
+  <img
+    class="result-decoration result-decoration--right"
+    src="/assets/nature/leaves.webp"
+    alt=""
+    aria-hidden="true"
+  />
+
+  <section class="result-content">
+    <header class="result-header">
+      <span class="result-header__icon">✦</span>
+      <p>AVENTURA MESOAMÉRICA</p>
+      <span class="result-header__icon">✦</span>
+    </header>
+
+    <section class="result-hero">
+      <div class="result-title-card">
+        <span class="result-title-card__decoration">✦</span>
+
+        <h1>{{ getResultTitle() }}</h1>
+
+        <span class="result-title-card__decoration">✦</span>
+      </div>
+
+      <img
+        class="result-character"
+        [src]="getCharacterImage()"
+        alt="Explorador celebrando el resultado de la aventura"
+      />
+    </section>
+
+    <section class="score-card" aria-label="Resultado del quiz">
+      <p class="score-card__label">TU RESULTADO</p>
+
+      <div class="score-card__score">
+        <span class="score-card__current">{{ score() }}</span>
+        <span class="score-card__separator">/</span>
+        <span class="score-card__total">{{ totalQuestions() }}</span>
+      </div>
+
+      <div class="score-stars" aria-hidden="true">
+        @for (star of [1, 2, 3, 4, 5, 6]; track star) {
+          <span
+            class="score-star"
+            [class.score-star--active]="star <= score()"
+          >
+            ★
+          </span>
+        }
+      </div>
+
+      <p class="score-card__message">
+        {{ getResultMessage() }}
+      </p>
+    </section>
+
+    <section class="badge-card" aria-labelledby="badge-title">
+      <div class="badge-card__heading">
+        <span>🏆</span>
+        <h2 id="badge-title">¡Ganaste una insignia!</h2>
+        <span>🏆</span>
+      </div>
+
+      <div class="badge-card__seal">
+        <div class="badge-card__seal-inner">
+          <span class="badge-card__seal-icon">★</span>
+          <span class="badge-card__seal-text">LOGRO</span>
+        </div>
+      </div>
+
+      <h3>{{ getBadge().name }}</h3>
+
+      <p>{{ getBadge().description }}</p>
+    </section>
+
+    <div class="result-actions">
+      <a
+        routerLink="/insignias"
+        class="claim-button"
+      >
+        <span class="claim-button__icon">🏅</span>
+        <span>Reclamar insignia</span>
+      </a>
+
+      <button
+        type="button"
+        class="restart-button"
+        (click)="restartQuiz()"
+      >
+        <span>↻</span>
+        <span>Volver a jugar</span>
+      </button>
+    </div>
+
+    <p class="result-footer">
+      ¡Gracias por explorar Mesoamérica!
+    </p>
+  </section>
+</main>
