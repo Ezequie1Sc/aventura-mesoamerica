@@ -1,93 +1,136 @@
-<main
-  class="relative min-h-dvh overflow-hidden bg-[#0b3d2e] text-white"
->
+<main class="home-page">
+  <!-- Background -->
+  <div class="home-page__background"></div>
+  <div class="home-page__overlay"></div>
+
   <!-- Decorative elements -->
-  <div
-    class="absolute -left-20 -top-20 h-56 w-56 rounded-full bg-[#2f8f68]/30 blur-2xl"
-  ></div>
+  <img
+    class="home-page__leaf home-page__leaf--left"
+    src="/assets/nature/leaves.webp"
+    alt=""
+    aria-hidden="true"
+  />
 
-  <div
-    class="absolute -bottom-24 -right-20 h-64 w-64 rounded-full bg-[#e9b949]/20 blur-3xl"
-  ></div>
+  <img
+    class="home-page__leaf home-page__leaf--right"
+    src="/assets/nature/leaves.webp"
+    alt=""
+    aria-hidden="true"
+  />
 
-  <div class="relative mx-auto flex min-h-dvh max-w-md flex-col px-6 py-8">
+  <div class="home-page__glow home-page__glow--top"></div>
+  <div class="home-page__glow home-page__glow--bottom"></div>
 
-    <!-- Top -->
-    <header class="flex items-center justify-between">
-      <div class="flex items-center gap-2">
-        <span class="text-2xl">🌿</span>
+  <!-- Content -->
+  <div class="home-page__content">
 
-        <span
-          class="text-xs font-black uppercase tracking-[0.2em] text-[#f4d06f]"
-        >
+    <!-- Top bar -->
+    <header class="home-header">
+      <div class="home-header__brand">
+        <span class="home-header__brand-icon">✦</span>
+
+        <span class="home-header__brand-text">
           Aventura
         </span>
       </div>
 
-      <div
-        class="rounded-full border border-white/10 bg-white/10 px-3 py-1 text-xs font-bold backdrop-blur"
-      >
+      <div class="home-header__region">
         Mesoamérica
       </div>
     </header>
 
     <!-- Hero -->
-    <section
-      class="flex flex-1 flex-col items-center justify-center text-center"
-    >
+    <section class="home-hero">
 
-      <!-- Explorer placeholder -->
-      <div
-        class="mb-7 flex h-36 w-36 items-center justify-center rounded-full border-4 border-[#f4d06f] bg-[#f7e7c6] text-7xl shadow-[0_15px_40px_rgba(0,0,0,0.25)]"
-      >
-        🧭
+      <!-- Explorer -->
+      <div class="explorer-wrapper">
+        <div class="explorer-glow"></div>
+
+        <div class="explorer-card">
+          <img
+            src="/assets/characters/welcome.webp"
+            alt="Explorador de Aventura Mesoamérica"
+            class="explorer-image"
+          />
+        </div>
+
+        <img
+          src="/assets/rewards/star.webp"
+          alt=""
+          aria-hidden="true"
+          class="explorer-star explorer-star--one"
+        />
+
+        <img
+          src="/assets/rewards/star.webp"
+          alt=""
+          aria-hidden="true"
+          class="explorer-star explorer-star--two"
+        />
       </div>
 
-      <span
-        class="mb-3 rounded-full bg-[#f4d06f] px-4 py-1.5 text-xs font-black uppercase tracking-widest text-[#183c2f]"
-      >
-        ¡Prepárate para explorar!
-      </span>
+      <!-- Welcome badge -->
+      <div class="welcome-badge">
+        <span class="welcome-badge__dot"></span>
+        <span>Una aventura por descubrir</span>
+      </div>
 
-      <h1
-        class="max-w-sm text-5xl font-black uppercase leading-[0.9] tracking-tight text-[#fff8e7]"
-      >
+      <!-- Title -->
+      <h1 class="home-title">
         Aventura
-        <span class="block text-[#f4d06f]">
-          Mesoamérica
-        </span>
+        <span>Mesoamérica</span>
       </h1>
 
-      <p
-        class="mt-5 max-w-xs text-sm font-medium leading-6 text-white/75"
-      >
-        Descubre culturas, alimentos, ciudades y secretos de los antiguos
-        pueblos de Mesoamérica.
+      <!-- Description -->
+      <p class="home-description">
+        Viaja al pasado y descubre las culturas,
+        alimentos, ciudades y secretos de Mesoamérica.
       </p>
 
-      <!-- CTA -->
+      <!-- Main action -->
       <a
         routerLink="/instrucciones"
-        class="mt-8 flex w-full max-w-xs items-center justify-center gap-3 rounded-2xl bg-[#e9b949] px-6 py-4 text-sm font-black uppercase tracking-wider text-[#183c2f] shadow-[0_8px_0_#b98518] transition-all duration-150 hover:-translate-y-0.5 hover:shadow-[0_10px_0_#b98518] active:translate-y-1 active:shadow-[0_4px_0_#b98518]"
+        class="start-button"
       >
-        <span>Comenzar aventura</span>
-        <span class="text-lg">➜</span>
+        <span class="start-button__text">
+          Comenzar aventura
+        </span>
+
+        <span class="start-button__icon">
+          →
+        </span>
       </a>
 
       <!-- Secondary action -->
       <a
         routerLink="/instrucciones"
-        class="mt-5 text-sm font-bold text-white/70 underline decoration-[#f4d06f] underline-offset-4 transition hover:text-white"
+        class="instructions-link"
       >
         ¿Cómo se juega?
       </a>
     </section>
 
     <!-- Bottom -->
-    <footer class="pb-2 text-center">
-      <p class="text-[10px] font-bold uppercase tracking-[0.2em] text-white/40">
-        Aprende · Explora · Descubre
-      </p>
+    <footer class="home-footer">
+      <div class="home-footer__item">
+        <span>✦</span>
+        Aprende
+      </div>
+
+      <div class="home-footer__separator"></div>
+
+      <div class="home-footer__item">
+        <span>✦</span>
+        Explora
+      </div>
+
+      <div class="home-footer__separator"></div>
+
+      <div class="home-footer__item">
+        <span>✦</span>
+        Descubre
+      </div>
     </footer>
+
   </div>
 </main>
