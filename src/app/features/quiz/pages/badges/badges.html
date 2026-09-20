@@ -1,7 +1,19 @@
 <main class="badges-page">
-  <div class="badges-background" aria-hidden="true"></div>
-  <div class="badges-overlay" aria-hidden="true"></div>
+  <!-- ========================================
+       BACKGROUND
+       ======================================== -->
 
+  <div
+    class="badges-background"
+    aria-hidden="true"
+  ></div>
+
+  <div
+    class="badges-overlay"
+    aria-hidden="true"
+  ></div>
+
+  <!-- Decorative leaves -->
   <img
     class="badges-leaf badges-leaf--left"
     src="/assets/nature/leaves.webp"
@@ -16,7 +28,16 @@
     aria-hidden="true"
   />
 
+  <!-- ========================================
+       MAIN CONTENT
+       ======================================== -->
+
   <section class="badges-content">
+
+    <!-- ======================================
+         HEADER
+         ====================================== -->
+
     <header class="badges-header">
       <a
         routerLink="/"
@@ -28,21 +49,45 @@
 
       <div class="badges-header__title">
         <span>✦</span>
+
         <p>AVENTURA MESOAMÉRICA</p>
+
         <span>✦</span>
       </div>
+
+      <div aria-hidden="true"></div>
     </header>
 
+    <!-- ======================================
+         ACHIEVEMENT HEADING
+         ====================================== -->
+
     <section class="achievement-heading">
-      <span class="achievement-heading__star">✦</span>
+      <span class="achievement-heading__star">
+        ✦
+      </span>
 
-      <h1>¡Insignia obtenida!</h1>
+      <h1>
+        ¡Insignia obtenida!
+      </h1>
 
-      <span class="achievement-heading__star">✦</span>
+      <span class="achievement-heading__star">
+        ✦
+      </span>
     </section>
 
-    <section class="badge-showcase">
-      <div class="badge-showcase__glow"></div>
+    <!-- ======================================
+         BADGE SHOWCASE
+         ====================================== -->
+
+    <section
+      class="badge-showcase"
+      aria-label="Insignia obtenida"
+    >
+      <div
+        class="badge-showcase__glow"
+        aria-hidden="true"
+      ></div>
 
       <img
         class="badge-showcase__image"
@@ -58,19 +103,36 @@
       />
     </section>
 
+    <!-- ======================================
+         BADGE INFORMATION
+         ====================================== -->
+
     <section class="badge-info">
-      <span class="badge-info__label">INSIGNIA OBTENIDA</span>
+      <span class="badge-info__label">
+        ✦ INSIGNIA OBTENIDA ✦
+      </span>
 
-      <h2>{{ getBadge().name }}</h2>
+      <h2>
+        {{ getBadge().name }}
+      </h2>
 
-      <p>{{ getBadge().description }}</p>
+      <p>
+        {{ getBadge().description }}
+      </p>
 
+      <!-- Score -->
       <div class="score-display">
-        <span class="score-display__star">★</span>
+        <span class="score-display__star">
+          ★
+        </span>
 
-        <strong>{{ getCurrentScore() }}</strong>
+        <strong>
+          {{ getCurrentScore() }}
+        </strong>
 
-        <span>/ {{ totalQuestions() }}</span>
+        <span>
+          / {{ totalQuestions() }}
+        </span>
       </div>
 
       <p class="score-message">
@@ -78,43 +140,126 @@
       </p>
     </section>
 
+    <!-- ======================================
+         DOWNLOAD INFORMATION
+         ====================================== -->
+
     <section class="download-card">
       <div class="download-card__icon">
         ↓
       </div>
 
       <div class="download-card__content">
-        <h3>Guarda tu logro</h3>
+        <h3>
+          Guarda tu logro
+        </h3>
 
         <p>
-          Descarga una tarjeta de tu aventura para conservarla.
+          Descarga una tarjeta de tu aventura
+          para conservarla.
         </p>
       </div>
     </section>
 
+    <!-- ======================================
+         ACTIONS
+         ====================================== -->
+
     <div class="badge-actions">
+
+      <!-- Download -->
       <button
         type="button"
         class="download-button"
+        [class.download-button--success]="downloadCompleted()"
+        [disabled]="isDownloading()"
         (click)="downloadCard()"
       >
-        <span>↓</span>
-        <span>Descargar tarjeta</span>
+        @if (isDownloading()) {
+          <span class="download-button__icon">
+            ◌
+          </span>
+
+          <span>
+            Preparando tarjeta...
+          </span>
+        } @else if (downloadCompleted()) {
+          <span class="download-button__icon">
+            ✓
+          </span>
+
+          <span>
+            ¡Tarjeta descargada!
+          </span>
+        } @else {
+          <span class="download-button__icon">
+            ↓
+          </span>
+
+          <span>
+            Descargar tarjeta
+          </span>
+        }
       </button>
 
+      <!-- Home -->
       <a
         routerLink="/"
         class="home-button"
       >
-        <span>⌂</span>
-        <span>Volver al inicio</span>
+        <span>
+          ⌂
+        </span>
+
+        <span>
+          Volver al inicio
+        </span>
       </a>
     </div>
 
+    <!-- ======================================
+         DOWNLOAD SUCCESS TOAST
+         ====================================== -->
+
+    @if (downloadCompleted()) {
+      <div
+        class="download-toast"
+        role="status"
+        aria-live="polite"
+      >
+        <div class="download-toast__icon">
+          ✓
+        </div>
+
+        <div class="download-toast__content">
+          <strong>
+            ¡Tarjeta lista!
+          </strong>
+
+          <span>
+            Tu logro se descargó correctamente.
+          </span>
+        </div>
+      </div>
+    }
+
+    <!-- ======================================
+         FOOTER
+         ====================================== -->
+
     <footer class="badges-footer">
-      <span>🌿</span>
-      <p>¡Sigue explorando y aprendiendo!</p>
-      <span>🌿</span>
+      <span>
+        🌿
+      </span>
+
+      <p>
+        ¡Sigue explorando y aprendiendo!
+      </p>
+
+      <span>
+        🌿
+      </span>
     </footer>
+
   </section>
 </main>
