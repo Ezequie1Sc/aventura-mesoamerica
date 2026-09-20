@@ -1,0 +1,1139 @@
+:host {
+  display: block;
+}
+
+.map-page {
+  position: relative;
+
+  min-height: 100dvh;
+
+  overflow: hidden;
+
+  isolation: isolate;
+
+  background: #286c54;
+
+  color: #fff8e5;
+
+  font-family:
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    sans-serif;
+}
+
+
+/* =========================================
+   BACKGROUND
+   ========================================= */
+
+.map-background {
+  position: absolute;
+
+  inset: 0;
+
+  z-index: -5;
+
+  background-image:
+    url('/assets/backgrounds/ancient-city.webp');
+
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+
+  transform: scale(1.04);
+}
+
+.map-overlay {
+  position: absolute;
+
+  inset: 0;
+
+  z-index: -4;
+
+  background:
+    linear-gradient(
+      180deg,
+      rgba(11, 56, 40, 0.74) 0%,
+      rgba(24, 102, 70, 0.55) 35%,
+      rgba(9, 52, 37, 0.9) 100%
+    );
+}
+
+
+/* =========================================
+   DECORATION
+   ========================================= */
+
+.map-decoration {
+  position: absolute;
+
+  z-index: -1;
+
+  width: 155px;
+
+  opacity: 0.9;
+
+  pointer-events: none;
+
+  filter:
+    drop-shadow(
+      0 7px 7px rgba(0, 0, 0, 0.16)
+    );
+}
+
+.map-decoration--left {
+  top: 5px;
+
+  left: -70px;
+
+  transform:
+    rotate(-20deg);
+}
+
+.map-decoration--right {
+  right: -75px;
+
+  bottom: 8%;
+
+  transform:
+    scaleX(-1)
+    rotate(-20deg);
+}
+
+.map-pyramid {
+  position: absolute;
+
+  z-index: -1;
+
+  right: -50px;
+
+  top: 35%;
+
+  width: 180px;
+
+  opacity: 0.24;
+
+  pointer-events: none;
+
+  filter:
+    drop-shadow(
+      0 8px 8px rgba(0, 0, 0, 0.2)
+    );
+}
+
+
+/* =========================================
+   CONTENT
+   ========================================= */
+
+.map-content {
+  position: relative;
+
+  display: flex;
+
+  flex-direction: column;
+
+  width: min(100%, 430px);
+
+  min-height: 100dvh;
+
+  margin: 0 auto;
+
+  padding:
+    15px
+    18px
+    16px;
+}
+
+
+/* =========================================
+   HEADER
+   ========================================= */
+
+.map-header {
+  display: grid;
+
+  grid-template-columns:
+    42px
+    1fr
+    auto;
+
+  align-items: center;
+
+  gap: 10px;
+
+  animation:
+    fade-down
+    0.55s
+    ease-out
+    both;
+}
+
+.back-button {
+  display: grid;
+
+  width: 42px;
+  height: 42px;
+
+  place-items: center;
+
+  border:
+    2px
+    solid
+    rgba(255, 255, 255, 0.2);
+
+  border-radius: 14px;
+
+  background:
+    rgba(255, 255, 255, 0.1);
+
+  color: #fff;
+
+  font-size: 22px;
+
+  font-weight: 800;
+
+  text-decoration: none;
+
+  backdrop-filter: blur(8px);
+
+  transition:
+    transform 0.15s ease,
+    background 0.15s ease;
+}
+
+.back-button:hover {
+  background:
+    rgba(255, 255, 255, 0.18);
+
+  transform:
+    translateX(-2px);
+}
+
+.map-header__title {
+  min-width: 0;
+
+  text-align: center;
+}
+
+.map-header__eyebrow {
+  display: block;
+
+  color:
+    rgba(255, 255, 255, 0.65);
+
+  font-size: 8px;
+
+  font-weight: 900;
+
+  letter-spacing: 0.16em;
+
+  text-transform: uppercase;
+}
+
+.map-header h1 {
+  margin: 1px 0 0;
+
+  font-family:
+    'Lilita One',
+    cursive;
+
+  color: #fff4d1;
+
+  font-size: 1.55rem;
+
+  line-height: 1;
+
+  text-shadow:
+    0 2px 0 rgba(74, 42, 20, 0.35);
+}
+
+.progress-badge {
+  display: flex;
+
+  align-items: center;
+
+  gap: 4px;
+
+  padding:
+    7px
+    9px;
+
+  border:
+    2px
+    solid
+    rgba(230, 185, 73, 0.6);
+
+  border-radius: 999px;
+
+  background:
+    rgba(69, 47, 18, 0.32);
+
+  color: #fff;
+
+  font-size: 10px;
+
+  font-weight: 900;
+
+  backdrop-filter: blur(8px);
+}
+
+.progress-badge__star {
+  color: #ffe15b;
+
+  font-size: 13px;
+}
+
+
+/* =========================================
+   INTRO
+   ========================================= */
+
+.map-intro {
+  display: flex;
+
+  align-items: center;
+
+  gap: 8px;
+
+  margin-top: 7px;
+
+  padding:
+    7px
+    10px;
+
+  border:
+    1px
+    solid
+    rgba(255, 255, 255, 0.12);
+
+  border-radius: 18px;
+
+  background:
+    rgba(255, 248, 220, 0.12);
+
+  backdrop-filter: blur(8px);
+
+  animation:
+    fade-up
+    0.6s
+    0.12s
+    ease-out
+    both;
+}
+
+.map-intro__character {
+  display: flex;
+
+  align-items: flex-end;
+  justify-content: center;
+
+  width: 67px;
+  height: 67px;
+
+  flex: 0 0 auto;
+
+  overflow: hidden;
+
+  border-radius: 50%;
+
+  border:
+    2px
+    solid
+    rgba(244, 208, 111, 0.7);
+
+  background:
+    rgba(244, 208, 111, 0.15);
+}
+
+.map-intro__character img {
+  width: 72px;
+  height: 72px;
+
+  object-fit: contain;
+
+  filter:
+    drop-shadow(
+      0 4px 4px rgba(0, 0, 0, 0.2)
+    );
+}
+
+.map-intro__text {
+  min-width: 0;
+}
+
+.map-intro__label {
+  display: block;
+
+  color: #ffe16a;
+
+  font-family:
+    'Lilita One',
+    cursive;
+
+  font-size: 16px;
+
+  line-height: 1;
+}
+
+.map-intro__text p {
+  margin: 4px 0 0;
+
+  color:
+    rgba(255, 255, 255, 0.78);
+
+  font-size: 9px;
+
+  font-weight: 600;
+
+  line-height: 1.35;
+}
+
+
+/* =========================================
+   ADVENTURE MAP
+   ========================================= */
+
+.adventure-map {
+  position: relative;
+
+  flex: 1;
+
+  min-height: 435px;
+
+  margin-top: 6px;
+
+  overflow: hidden;
+
+  animation:
+    map-enter
+    0.8s
+    0.25s
+    ease-out
+    both;
+}
+
+
+/* =========================================
+   PATH
+   ========================================= */
+
+.map-path {
+  position: absolute;
+
+  top: 20px;
+  bottom: 38px;
+
+  left: 50%;
+
+  width: 13px;
+
+  transform:
+    translateX(-50%);
+
+  border:
+    3px
+    solid
+    rgba(112, 75, 30, 0.65);
+
+  border-radius: 999px;
+
+  background:
+    repeating-linear-gradient(
+      180deg,
+      #e8c982 0,
+      #e8c982 18px,
+      #d4ae61 18px,
+      #d4ae61 34px
+    );
+
+  box-shadow:
+    0 3px 5px rgba(0, 0, 0, 0.2);
+
+  opacity: 0.95;
+}
+
+.map-path::before,
+.map-path::after {
+  content: '';
+
+  position: absolute;
+
+  left: 50%;
+
+  width: 32px;
+  height: 32px;
+
+  transform:
+    translateX(-50%);
+
+  border-radius: 50%;
+
+  background:
+    rgba(255, 240, 182, 0.16);
+}
+
+.map-path::before {
+  top: 18%;
+}
+
+.map-path::after {
+  top: 66%;
+}
+
+
+/* =========================================
+   STATIONS
+   ========================================= */
+
+.map-station {
+  position: absolute;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 8px;
+
+  z-index: 4;
+
+  width: 165px;
+
+  transition:
+    transform 0.2s ease;
+}
+
+.map-station--one {
+  top: 2%;
+
+  left: calc(50% - 82px);
+}
+
+.map-station--two {
+  top: 18%;
+
+  left: calc(50% - 80px);
+
+  transform:
+    translateX(-55px);
+}
+
+.map-station--three {
+  top: 34%;
+
+  left: calc(50% - 82px);
+
+  transform:
+    translateX(3px);
+}
+
+.map-station--four {
+  top: 50%;
+
+  left: calc(50% - 82px);
+
+  transform:
+    translateX(-55px);
+}
+
+.map-station--five {
+  top: 66%;
+
+  left: calc(50% - 82px);
+
+  transform:
+    translateX(3px);
+}
+
+.map-station--six {
+  top: 82%;
+
+  left: calc(50% - 82px);
+
+  transform:
+    translateX(-55px);
+}
+
+.station-marker {
+  position: relative;
+
+  display: grid;
+
+  width: 66px;
+  height: 66px;
+
+  flex: 0 0 auto;
+
+  place-items: center;
+
+  border:
+    4px
+    solid
+    #b9792d;
+
+  border-radius: 50%;
+
+  background:
+    linear-gradient(
+      180deg,
+      #fff1a7,
+      #e9bd4c
+    );
+
+  box-shadow:
+    0 5px 0 #89531f,
+    0 8px 13px rgba(0, 0, 0, 0.25);
+
+  transition:
+    transform 0.2s ease,
+    filter 0.2s ease;
+}
+
+.station-number {
+  position: relative;
+
+  z-index: 2;
+
+  font-family:
+    'Lilita One',
+    cursive;
+
+  color: #5a3517;
+
+  font-size: 25px;
+
+  line-height: 1;
+}
+
+.station-star {
+  position: absolute;
+
+  top: -5px;
+  right: -5px;
+
+  display: grid;
+
+  width: 23px;
+  height: 23px;
+
+  place-items: center;
+
+  border:
+    2px
+    solid
+    #b9781e;
+
+  border-radius: 50%;
+
+  background: #ffe45c;
+
+  color: #8d5917;
+
+  font-size: 11px;
+}
+
+.station-lock {
+  position: absolute;
+
+  right: 3px;
+  bottom: 2px;
+
+  display: grid;
+
+  width: 25px;
+  height: 25px;
+
+  place-items: center;
+
+  border-radius: 50%;
+
+  background:
+    #6a634e;
+
+  font-size: 12px;
+
+  box-shadow:
+    0 2px 3px rgba(0, 0, 0, 0.25);
+}
+
+.station-info {
+  display: flex;
+
+  flex-direction: column;
+
+  min-width: 0;
+
+  padding:
+    7px
+    10px;
+
+  border:
+    2px
+    solid
+    rgba(255, 237, 183, 0.5);
+
+  border-radius: 12px;
+
+  background:
+    rgba(58, 42, 24, 0.52);
+
+  backdrop-filter: blur(5px);
+
+  box-shadow:
+    0 4px 9px rgba(0, 0, 0, 0.12);
+}
+
+.station-info span {
+  color:
+    rgba(255, 240, 193, 0.68);
+
+  font-size: 8px;
+
+  font-weight: 800;
+
+  text-transform: uppercase;
+
+  letter-spacing: 0.05em;
+}
+
+.station-info strong {
+  margin-top: 2px;
+
+  color: #fff4ce;
+
+  font-family:
+    'Lilita One',
+    cursive;
+
+  font-size: 12px;
+
+  line-height: 1.1;
+}
+
+
+/* =========================================
+   CURRENT
+   ========================================= */
+
+.map-station--current {
+  z-index: 7;
+
+  animation:
+    current-station
+    2s
+    ease-in-out
+    infinite;
+}
+
+.map-station--current .station-marker {
+  border-color: #fff0a0;
+
+  box-shadow:
+    0 5px 0 #8d591c,
+    0 0 0 7px rgba(255, 220, 91, 0.18),
+    0 0 24px rgba(255, 224, 97, 0.5),
+    0 8px 15px rgba(0, 0, 0, 0.25);
+}
+
+.map-station--current .station-info {
+  border-color: #ffe477;
+
+  background:
+    rgba(72, 50, 20, 0.72);
+}
+
+
+/* =========================================
+   COMPLETED
+   ========================================= */
+
+.map-station--completed .station-marker {
+  background:
+    linear-gradient(
+      180deg,
+      #9fe08b,
+      #54a96a
+    );
+
+  border-color: #43804f;
+}
+
+.map-station--completed .station-number {
+  color: #194f32;
+}
+
+.map-station--completed .station-info {
+  opacity: 0.86;
+}
+
+
+/* =========================================
+   LOCKED
+   ========================================= */
+
+.map-station--locked {
+  opacity: 0.58;
+
+  filter:
+    grayscale(0.25);
+}
+
+.map-station--locked .station-marker {
+  background:
+    linear-gradient(
+      180deg,
+      #d6d0b9,
+      #9b957e
+    );
+
+  border-color: #77715f;
+
+  box-shadow:
+    0 4px 0 #555142,
+    0 6px 10px rgba(0, 0, 0, 0.2);
+}
+
+.map-station--locked .station-number {
+  color: #514e43;
+}
+
+.map-station--locked .station-star {
+  background: #aaa58f;
+
+  border-color: #77715f;
+
+  color: #5c594e;
+}
+
+.map-station--locked .station-info {
+  background:
+    rgba(48, 46, 39, 0.42);
+}
+
+
+/* =========================================
+   FINISH
+   ========================================= */
+
+.map-finish {
+  position: absolute;
+
+  left: 50%;
+
+  bottom: -1px;
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  gap: 3px;
+
+  transform:
+    translateX(-50%);
+
+  z-index: 6;
+
+  color:
+    rgba(255, 241, 188, 0.78);
+
+  font-family:
+    'Lilita One',
+    cursive;
+
+  font-size: 10px;
+
+  text-align: center;
+}
+
+.finish-icon {
+  display: grid;
+
+  width: 45px;
+  height: 45px;
+
+  place-items: center;
+
+  border:
+    3px
+    solid
+    #b47a2a;
+
+  border-radius: 14px;
+
+  background:
+    linear-gradient(
+      180deg,
+      #ffe47b,
+      #dca42f
+    );
+
+  box-shadow:
+    0 4px 0 #89571e,
+    0 6px 12px rgba(0, 0, 0, 0.2);
+
+  font-size: 23px;
+}
+
+
+/* =========================================
+   ACTION
+   ========================================= */
+
+.map-action {
+  position: relative;
+
+  z-index: 10;
+
+  display: flex;
+
+  flex-direction: column;
+
+  align-items: center;
+
+  animation:
+    fade-up
+    0.7s
+    0.55s
+    ease-out
+    both;
+}
+
+.map-action__text {
+  margin: 0 0 7px;
+
+  color:
+    rgba(255, 255, 255, 0.75);
+
+  font-size: 10px;
+
+  font-weight: 700;
+}
+
+.map-action__text strong {
+  color: #ffe36a;
+
+  font-weight: 900;
+}
+
+.continue-button {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 9px;
+
+  width: min(94%, 350px);
+
+  padding:
+    11px
+    18px;
+
+  border:
+    3px
+    solid
+    #e19a1e;
+
+  border-radius: 999px;
+
+  background:
+    linear-gradient(
+      180deg,
+      #ffe45f 0%,
+      #ffc52e 55%,
+      #f3ad1b 100%
+    );
+
+  box-shadow:
+    0 5px 0 #b96e13,
+    0 9px 18px rgba(0, 0, 0, 0.2);
+
+  color: #4d2b0c;
+
+  font-family:
+    'Lilita One',
+    cursive;
+
+  font-size: 1.25rem;
+
+  text-decoration: none;
+
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.continue-button:hover {
+  transform:
+    translateY(-2px);
+
+  box-shadow:
+    0 7px 0 #b96e13,
+    0 12px 20px rgba(0, 0, 0, 0.23);
+}
+
+.continue-button:active {
+  transform:
+    translateY(4px);
+
+  box-shadow:
+    0 2px 0 #b96e13;
+}
+
+.continue-button__icon {
+  font-size: 15px;
+}
+
+
+/* =========================================
+   FOOTER
+   ========================================= */
+
+.map-footer {
+  display: flex;
+
+  align-items: center;
+
+  justify-content: center;
+
+  gap: 8px;
+
+  padding-top: 9px;
+
+  color:
+    rgba(255, 255, 255, 0.35);
+
+  font-size: 7px;
+
+  font-weight: 900;
+
+  letter-spacing: 0.12em;
+
+  text-transform: uppercase;
+}
+
+.map-footer i {
+  width: 3px;
+  height: 3px;
+
+  border-radius: 50%;
+
+  background:
+    rgba(255, 222, 91, 0.7);
+}
+
+
+/* =========================================
+   ANIMATIONS
+   ========================================= */
+
+@keyframes fade-down {
+  from {
+    opacity: 0;
+
+    transform:
+      translateY(-12px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateY(0);
+  }
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+
+    transform:
+      translateY(12px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateY(0);
+  }
+}
+
+@keyframes map-enter {
+  from {
+    opacity: 0;
+
+    transform:
+      translateY(18px)
+      scale(0.98);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateY(0)
+      scale(1);
+  }
+}
+
+@keyframes current-station {
+  0%,
+  100% {
+    filter:
+      drop-shadow(
+        0 0 0 rgba(255, 224, 97, 0)
+      );
+  }
+
+  50% {
+    filter:
+      drop-shadow(
+        0 0 12px rgba(255, 224, 97, 0.35)
+      );
+  }
+}
+
+
+/* =========================================
+   RESPONSIVE
+   ========================================= */
+
+@media (min-width: 640px) {
+  .map-content {
+    padding-right: 24px;
+    padding-left: 24px;
+  }
+
+  .adventure-map {
+    min-height: 470px;
+  }
+
+  .map-intro {
+    margin-top: 10px;
+  }
+
+  .map-pyramid {
+    width: 220px;
+  }
+}
+
+
+/* =========================================
+   REDUCED MOTION
+   ========================================= */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
