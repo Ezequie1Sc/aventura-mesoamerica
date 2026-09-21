@@ -7,6 +7,7 @@ import {
   inject,
   signal,
 } from '@angular/core';
+
 import { Router, RouterLink } from '@angular/router';
 
 import { QuizService } from '../../../../core/services/quiz.service';
@@ -24,6 +25,8 @@ export class Badges implements OnDestroy {
   private readonly storageService = inject(StorageService);
   private readonly router = inject(Router);
 
+  private readonly nameStorageKey = 'aventura-explorer-name';
+
   @ViewChild('nameDialog')
   private nameDialog!: ElementRef<HTMLDialogElement>;
 
@@ -33,21 +36,16 @@ export class Badges implements OnDestroy {
 
   readonly isDownloading = signal(false);
   readonly downloadCompleted = signal(false);
-
-  /**
-   * El nombre queda guardado durante el intento actual.
-   * Se elimina cuando comienza un nuevo quiz.
-   */
-  readonly explorerName = signal(
-    localStorage.getItem('aventura-explorer-name') ?? '',
-  );
-
   readonly downloadError = signal('');
 
+  readonly explorerName = signal(this.readSavedName());
+
+  // Se limpia para validar y descargar, sin modificar
+  // el texto del campo mientras el usuario está escribiendo.
   readonly cleanName = computed(() =>
     this.explorerName()
       .replace(/\s+/g, ' ')
-      .trim(),
+      .trim()
   );
 
   readonly validName = computed(() => {
@@ -63,9 +61,46 @@ export class Badges implements OnDestroy {
   private downloadResetTimer?: ReturnType<typeof setTimeout>;
   private destroyed = false;
 
-  // =====================================================
+  // ==========================================
+  // NOMBRE GUARDADO
+  // ==========================================
+
+  private readSavedName(): string {
+    try {
+      if (typeof localStorage === 'undefined') {
+        return '';
+      }
+
+      return localStorage.getItem(this.nameStorageKey) ?? '';
+    } catch {
+      return '';
+    }
+  }
+
+  private saveName(name: string): void {
+    try {
+      if (typeof localStorage !== 'undefined') {
+        localStorage.setItem(this.nameStorageKey, name);
+      }
+    } catch {
+      // La descarga funciona aunque el almacenamiento
+      // del navegador no esté disponible.
+    }
+  }
+
+  private removeSavedName(): void {
+    try {
+      if (typeof localStorage !== 'undefined') {
+        localStorage.removeItem(this.nameStorageKey);
+      }
+    } catch {
+      // El estado del componente se reinicia igualmente.
+    }
+  }
+
+  // ==========================================
   // RESULTADO
-  // =====================================================
+  // ==========================================
 
   getCurrentScore(): number {
     return this.isFinished()
@@ -74,9 +109,7 @@ export class Badges implements OnDestroy {
   }
 
   getBadge() {
-    return this.quizService.getBadge(
-      this.getCurrentScore(),
-    );
+    return this.quizService.getBadge(this.getCurrentScore());
   }
 
   getBadgeImage(): string {
@@ -136,62 +169,52 @@ export class Badges implements OnDestroy {
     return 'Toda gran aventura comienza con un primer paso.';
   }
 
-  // =====================================================
+  // ==========================================
   // NUEVA AVENTURA
-  // =====================================================
+  // ==========================================
 
   restartQuiz(): void {
-    /*
-     * Reinicia completamente el intento:
-     * - Pregunta 1
-     * - Puntuación 0
-     * - Estado sin responder
-     * - Quiz no terminado
-     * - Elimina el nombre guardado de la insignia
-     */
-    this.quizService.restartQuiz();
-
-    /*
-     * Después del reinicio regresamos al mapa.
-     * El mapa ahora debe mostrar únicamente
-     * la primera estación como disponible.
-     */
-    void this.router.navigate(['/map']);
-  }
-
-  // =====================================================
-  // DIÁLOGO DEL NOMBRE
-  // =====================================================
-
-  openNameDialog(): void {
     if (this.isDownloading()) {
       return;
     }
 
-    /*
-     * Si ya existe un nombre, significa que esta insignia
-     * ya fue personalizada durante este intento.
-     *
-     * No volvemos a mostrar el diálogo.
-     */
-    if (this.validName()) {
-      void this.downloadCard();
+    this.clearDownloadTimer();
+    this.removeSavedName();
+
+    this.explorerName.set('');
+    this.downloadError.set('');
+    this.downloadCompleted.set(false);
+
+    this.quizService.restartQuiz();
+
+    void this.router.navigate(['/map']);
+  }
+
+  goToHome(): void {
+    void this.router.navigate(['/']);
+  }
+
+  // ==========================================
+  // DIÁLOGO DEL NOMBRE
+  // ==========================================
+
+  openNameDialog(): void {
+    if (this.isDownloading() || this.destroyed) {
       return;
     }
 
     this.downloadError.set('');
     this.downloadCompleted.set(false);
-
-    if (this.downloadResetTimer) {
-      clearTimeout(this.downloadResetTimer);
-      this.downloadResetTimer = undefined;
-    }
+    this.clearDownloadTimer();
 
     const dialog = this.nameDialog.nativeElement;
 
+    // Siempre permitir revisar el nombre antes de descargar.
     if (!dialog.open) {
       dialog.showModal();
     }
+
+    dialog.querySelector<HTMLInputElement>('input')?.focus();
   }
 
   closeNameDialog(): void {
@@ -209,11 +232,9 @@ export class Badges implements OnDestroy {
   }
 
   updateName(value: string): void {
-    /*
-     * Si ya existe un nombre guardado no permitimos
-     * modificarlo desde el formulario.
-     */
-    if (this.validName()) {
+    // No bloquear al escribir la primera letra.
+    // Solo bloquear durante la generación de la imagen.
+    if (this.isDownloading()) {
       return;
     }
 
@@ -224,117 +245,86 @@ export class Badges implements OnDestroy {
   confirmDownload(event: Event): void {
     event.preventDefault();
 
-    void this.downloadCard();
-  }
-
-  // =====================================================
-  // DESCARGA
-  // =====================================================
-
-  async downloadCard(): Promise<void> {
-    if (
-      this.isDownloading() ||
-      this.destroyed
-    ) {
+    if (this.isDownloading()) {
       return;
     }
 
-    /*
-     * Si no hay nombre todavía, primero mostramos
-     * el diálogo.
-     */
+    if (!this.validName()) {
+      this.downloadError.set(
+        'Escribe tu nombre, con un máximo de 60 caracteres.'
+      );
+      return;
+    }
+
+    void this.downloadCard();
+  }
+
+  // ==========================================
+  // GENERAR Y DESCARGAR TARJETA
+  // ==========================================
+
+  async downloadCard(): Promise<void> {
+    if (this.isDownloading() || this.destroyed) {
+      return;
+    }
+
+    // Protección adicional, aunque se llame al método
+    // directamente.
     if (!this.validName()) {
       this.openNameDialog();
 
       this.downloadError.set(
-        'Escribe tu nombre para descargar la insignia.',
+        'Escribe tu nombre para descargar la insignia.'
       );
 
       return;
     }
 
+    // Capturar el nombre completo confirmado.
     const name = this.cleanName();
     const badge = this.getBadge();
     const score = this.getCurrentScore();
     const total = this.totalQuestions();
     const imageUrl = this.getBadgeImage();
 
-    /*
-     * Guardamos el nombre ANTES de generar la tarjeta.
-     * Así queda asociado al intento actual.
-     */
-    localStorage.setItem(
-      'aventura-explorer-name',
-      name,
-    );
-
-    this.explorerName.set(name);
-
     this.isDownloading.set(true);
     this.downloadCompleted.set(false);
     this.downloadError.set('');
 
-    if (this.downloadResetTimer) {
-      clearTimeout(this.downloadResetTimer);
-      this.downloadResetTimer = undefined;
-    }
+    this.clearDownloadTimer();
 
     try {
-      const badgeImage =
-        await this.loadImage(imageUrl);
+      const badgeImage = await this.loadImage(imageUrl);
 
       if (this.destroyed) {
         return;
       }
 
-      // =================================================
-      // CANVAS
-      // =================================================
-
-      const canvas =
-        document.createElement('canvas');
+      const canvas = document.createElement('canvas');
 
       canvas.width = 1080;
       canvas.height = 1350;
 
-      const context =
-        canvas.getContext('2d');
+      const context = canvas.getContext('2d');
 
       if (!context) {
-        throw new Error(
-          'No se pudo crear la imagen.',
-        );
+        throw new Error('No se pudo crear la imagen.');
       }
 
       context.textAlign = 'center';
       context.textBaseline = 'middle';
 
-      // =================================================
-      // FONDO
-      // =================================================
-
-      const gradient =
-        context.createLinearGradient(
-          0,
-          0,
-          0,
-          canvas.height,
-        );
-
-      gradient.addColorStop(
+      // Fondo.
+      const gradient = context.createLinearGradient(
         0,
-        '#173f2d',
+        0,
+        0,
+        canvas.height
       );
 
-      gradient.addColorStop(
-        0.55,
-        '#276047',
-      );
-
-      gradient.addColorStop(
-        1,
-        '#10291f',
-      );
+      gradient.addColorStop(0, '#173f2d');
+      gradient.addColorStop(0.55, '#276047');
+      gradient.addColorStop(1, '#10291f');
 
       context.fillStyle = gradient;
 
@@ -342,54 +332,28 @@ export class Badges implements OnDestroy {
         0,
         0,
         canvas.width,
-        canvas.height,
+        canvas.height
       );
 
-      // =================================================
-      // RESPLANDOR
-      // =================================================
-
-      context.fillStyle =
-        'rgba(244, 198, 72, 0.12)';
+      // Resplandor.
+      context.fillStyle = 'rgba(244, 198, 72, 0.12)';
 
       context.beginPath();
-
-      context.arc(
-        540,
-        430,
-        390,
-        0,
-        Math.PI * 2,
-      );
-
+      context.arc(540, 430, 390, 0, Math.PI * 2);
       context.fill();
 
-      // =================================================
-      // MARCO
-      // =================================================
-
-      context.strokeStyle =
-        '#e6b84b';
-
+      // Marco.
+      context.strokeStyle = '#e6b84b';
       context.lineWidth = 8;
+      context.strokeRect(42, 42, 996, 1266);
 
-      context.strokeRect(
-        42,
-        42,
-        996,
-        1266,
-      );
-
-      // =================================================
-      // TÍTULO
-      // =================================================
-
+      // Encabezado.
       this.drawFittedText(
         context,
         'AVENTURA',
         115,
         62,
-        '#f8d875',
+        '#f8d875'
       );
 
       this.drawFittedText(
@@ -397,115 +361,82 @@ export class Badges implements OnDestroy {
         'MESOAMÉRICA',
         190,
         72,
-        '#fff4ce',
+        '#fff4ce'
       );
 
-      // =================================================
-      // INSIGNIA
-      // =================================================
-
+      // Insignia, conservando sus proporciones.
       const maxWidth = 580;
       const maxHeight = 500;
 
       const ratio = Math.min(
-        maxWidth /
-          badgeImage.naturalWidth,
-        maxHeight /
-          badgeImage.naturalHeight,
+        maxWidth / badgeImage.naturalWidth,
+        maxHeight / badgeImage.naturalHeight
       );
 
-      const width =
-        badgeImage.naturalWidth * ratio;
-
-      const height =
-        badgeImage.naturalHeight * ratio;
+      const width = badgeImage.naturalWidth * ratio;
+      const height = badgeImage.naturalHeight * ratio;
 
       context.drawImage(
         badgeImage,
         (canvas.width - width) / 2,
-        245 +
-          (maxHeight - height) / 2,
+        245 + (maxHeight - height) / 2,
         width,
-        height,
+        height
       );
-
-      // =================================================
-      // ETIQUETA
-      // =================================================
 
       this.drawFittedText(
         context,
         'INSIGNIA OBTENIDA',
         790,
         30,
-        '#f8d875',
+        '#f8d875'
       );
-
-      // =================================================
-      // NOMBRE DE INSIGNIA
-      // =================================================
 
       this.drawFittedText(
         context,
         badge.name,
         850,
         48,
-        '#ffffff',
+        '#ffffff'
       );
 
-      // =================================================
-      // NOMBRE DEL EXPLORADOR
-      // =================================================
-
-      context.fillStyle =
-        '#fff4d8';
-
-      context.fillRect(
-        100,
-        905,
-        880,
-        150,
-      );
+      // Recuadro del nombre.
+      context.fillStyle = '#fff4d8';
+      context.fillRect(100, 905, 880, 150);
 
       this.drawFittedText(
         context,
         'OTORGADA A',
         942,
         25,
-        '#426044',
+        '#426044'
       );
 
+      // Dibujar el nombre completo en la imagen.
       this.drawFittedText(
         context,
         name,
         1000,
         54,
         '#173f2d',
-        800,
+        800
       );
 
-      // =================================================
-      // PUNTUACIÓN
-      // =================================================
-
+      // Puntuación.
       this.drawFittedText(
         context,
         `${score} / ${total}`,
         1120,
         62,
-        '#f8d875',
+        '#f8d875'
       );
-
-      // =================================================
-      // MENSAJE
-      // =================================================
 
       this.drawFittedText(
         context,
         '¡Tu aventura continúa!',
         1200,
         30,
-        '#fff4ce',
+        '#fff4ce'
       );
 
       this.drawFittedText(
@@ -513,47 +444,48 @@ export class Badges implements OnDestroy {
         'Aventura Mesoamérica',
         1250,
         24,
-        '#c9e2d0',
+        '#c9e2d0'
       );
 
-      // =================================================
-      // DESCARGAR
-      // =================================================
-
-      const link =
-        document.createElement('a');
+      // Preparar descarga.
+      const imageData = canvas.toDataURL('image/png');
+      const link = document.createElement('a');
 
       link.download =
         `${badge.id}-aventura-mesoamerica.png`;
 
-      link.href =
-        canvas.toDataURL('image/png');
+      link.href = imageData;
 
       document.body.appendChild(link);
 
-      link.click();
-
-      link.remove();
-
-      // =================================================
-      // CERRAR DIÁLOGO
-      // =================================================
-
-      if (this.nameDialog?.nativeElement) {
-        this.nameDialog.nativeElement.close();
+      try {
+        link.click();
+      } finally {
+        link.remove();
       }
 
+      // Guardar únicamente después de generar la tarjeta.
+      this.saveName(name);
+      this.explorerName.set(name);
+
+      this.nameDialog.nativeElement.close();
       this.downloadCompleted.set(true);
 
-      this.downloadResetTimer =
-        setTimeout(() => {
-          this.downloadCompleted.set(false);
-        }, 3500);
-
+      this.downloadResetTimer = setTimeout(() => {
+        this.downloadCompleted.set(false);
+        this.downloadResetTimer = undefined;
+      }, 3500);
     } catch {
       if (!this.destroyed) {
+        // Mantener visible el formulario y su error.
+        const dialog = this.nameDialog.nativeElement;
+
+        if (!dialog.open) {
+          dialog.showModal();
+        }
+
         this.downloadError.set(
-          'No pudimos preparar tu insignia. Inténtalo de nuevo.',
+          'No pudimos preparar tu insignia. Inténtalo de nuevo.'
         );
       }
     } finally {
@@ -561,60 +493,60 @@ export class Badges implements OnDestroy {
     }
   }
 
-  // =====================================================
+  // ==========================================
   // CARGAR IMAGEN
-  // =====================================================
+  // ==========================================
 
   private loadImage(
-    src: string,
+    src: string
   ): Promise<HTMLImageElement> {
-    return new Promise(
-      (resolve, reject) => {
-        const image =
-          new Image();
+    return new Promise((resolve, reject) => {
+      const image = new Image();
 
-        const timeout =
-          setTimeout(() => {
-            image.onload = null;
-            image.onerror = null;
+      const timeout = setTimeout(() => {
+        image.onload = null;
+        image.onerror = null;
 
-            reject(
-              new Error(
-                'La imagen tardó demasiado en cargar.',
-              ),
-            );
-          }, 15000);
+        reject(
+          new Error('La imagen tardó demasiado en cargar.')
+        );
+      }, 15000);
 
-        image.onload = () => {
-          clearTimeout(timeout);
+      image.onload = () => {
+        clearTimeout(timeout);
 
-          image.onload = null;
-          image.onerror = null;
+        image.onload = null;
+        image.onerror = null;
 
-          resolve(image);
-        };
+        if (
+          image.naturalWidth === 0 ||
+          image.naturalHeight === 0
+        ) {
+          reject(new Error('La imagen no tiene un tamaño válido.'));
+          return;
+        }
 
-        image.onerror = () => {
-          clearTimeout(timeout);
+        resolve(image);
+      };
 
-          image.onload = null;
-          image.onerror = null;
+      image.onerror = () => {
+        clearTimeout(timeout);
 
-          reject(
-            new Error(
-              'No se pudo cargar la insignia.',
-            ),
-          );
-        };
+        image.onload = null;
+        image.onerror = null;
 
-        image.src = src;
-      },
-    );
+        reject(
+          new Error('No se pudo cargar la insignia.')
+        );
+      };
+
+      image.src = src;
+    });
   }
 
-  // =====================================================
-  // TEXTO DEL CANVAS
-  // =====================================================
+  // ==========================================
+  // AJUSTAR TEXTO AL ANCHO DISPONIBLE
+  // ==========================================
 
   private drawFittedText(
     context: CanvasRenderingContext2D,
@@ -622,20 +554,20 @@ export class Badges implements OnDestroy {
     y: number,
     initialSize: number,
     color: string,
-    maxWidth = 880,
+    maxWidth = 880
   ): void {
     let size = initialSize;
 
-    const setFont = () => {
+    const setFont = (): void => {
       context.font =
         `bold ${size}px "Trebuchet MS", Arial, sans-serif`;
     };
 
     setFont();
 
+    // Reducir el tamaño si el nombre es largo.
     while (
-      context.measureText(text).width >
-        maxWidth &&
+      context.measureText(text).width > maxWidth &&
       size > 20
     ) {
       size -= 1;
@@ -643,26 +575,22 @@ export class Badges implements OnDestroy {
     }
 
     context.fillStyle = color;
-
-    context.fillText(
-      text,
-      540,
-      y,
-      maxWidth,
-    );
+    context.fillText(text, 540, y, maxWidth);
   }
 
-  // =====================================================
-  // DESTROY
-  // =====================================================
+  // ==========================================
+  // LIMPIEZA
+  // ==========================================
+
+  private clearDownloadTimer(): void {
+    if (this.downloadResetTimer !== undefined) {
+      clearTimeout(this.downloadResetTimer);
+      this.downloadResetTimer = undefined;
+    }
+  }
 
   ngOnDestroy(): void {
     this.destroyed = true;
-
-    if (this.downloadResetTimer) {
-      clearTimeout(
-        this.downloadResetTimer,
-      );
-    }
+    this.clearDownloadTimer();
   }
 }
