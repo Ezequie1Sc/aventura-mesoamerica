@@ -1263,3 +1263,359 @@ a:focus-visible {
     transition: none;
   }
 }
+/* =========================================
+   CARTEL DEL ENCABEZADO
+   ========================================= */
+
+.map-header {
+  padding-top: 20px;
+  align-items: center;
+}
+
+.map-header__title {
+  position: relative;
+  min-width: 0;
+}
+
+.map-title-sign {
+  position: relative;
+  isolation: isolate;
+
+  padding: 15px 8px 10px;
+
+  border: 3px solid #75451f;
+  border-radius: 45% 43% 17% 18% / 16% 18% 13% 14%;
+
+  background:
+    linear-gradient(
+      180deg,
+      transparent 35%,
+      #63371966 36%,
+      #efbd7744 38%,
+      transparent 39%,
+      transparent 71%,
+      #63371966 72%,
+      #efbd7744 74%,
+      transparent 75%
+    ),
+    repeating-linear-gradient(
+      174deg,
+      transparent 0 13px,
+      #60331122 14px,
+      transparent 16px 28px
+    ),
+    linear-gradient(
+      100deg,
+      #915526,
+      #bf803d 25%,
+      #d49a50 50%,
+      #b47333 78%,
+      #8b4e24
+    );
+
+  box-shadow:
+    inset 0 3px 0 #edba72,
+    inset 0 -4px 0 #63351466,
+    0 5px 0 #58331a,
+    0 9px 0 #34200c44,
+    0 12px 17px #052b2055;
+
+  transform: rotate(-2deg);
+}
+
+.map-title-sign::before {
+  content: '';
+  position: absolute;
+  inset: 5px;
+
+  border: 1px solid #f4cb8b66;
+  border-radius: inherit;
+
+  pointer-events: none;
+}
+
+/* Cuerdas */
+
+.map-title-sign__rope {
+  position: absolute;
+  z-index: -1;
+  top: -37px;
+
+  width: 7px;
+  height: 47px;
+
+  border: 1px solid #67451f;
+  border-radius: 5px;
+
+  background: repeating-linear-gradient(
+    35deg,
+    #785526 0 3px,
+    #c9a465 3px 6px,
+    #95703b 6px 8px
+  );
+
+  box-shadow: 2px 1px 2px #16342255;
+}
+
+.map-title-sign__rope--left {
+  left: 17%;
+  transform: rotate(3deg);
+}
+
+.map-title-sign__rope--right {
+  right: 17%;
+  transform: rotate(-3deg);
+}
+
+/* Hojas */
+
+.map-title-sign__leaves {
+  position: absolute;
+  z-index: -1;
+  bottom: -15px;
+
+  width: 61px;
+  height: 80px;
+
+  object-fit: contain;
+  pointer-events: none;
+  user-select: none;
+}
+
+.map-title-sign__leaves--left {
+  left: -29px;
+  transform: rotate(-30deg);
+}
+
+.map-title-sign__leaves--right {
+  right: -29px;
+  transform: scaleX(-1) rotate(-30deg);
+}
+
+/* Letras del cartel */
+
+.map-title-sign .map-header__eyebrow {
+  position: relative;
+  display: block;
+
+  margin: 0 0 5px;
+
+  color: #fff0d0;
+  font-family: var(--font-adventure);
+  font-size: clamp(11px, 2vw, 17px);
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: .1em;
+
+  -webkit-text-stroke: 2px #593116;
+  paint-order: stroke fill;
+
+  text-shadow: 0 2px 0 #45260f;
+}
+
+.map-title-sign h1 {
+  position: relative;
+  margin: 0;
+
+  color: #ffdb62;
+  font-family: var(--font-adventure);
+  font-size: clamp(26px, 5.6vw, 47px);
+  font-weight: 400;
+  line-height: 1.15;
+  letter-spacing: -.04em;
+  white-space: nowrap;
+
+  -webkit-text-stroke: 4px #512b12;
+  paint-order: stroke fill;
+
+  text-shadow:
+    0 2px 0 #512b12,
+    0 4px 0 #512b12,
+    0 6px 2px #321c0d66;
+
+  transform: none;
+}
+
+.map-title-sign__ornament {
+  display: block;
+  margin-top: 9px;
+
+  color: #72401b;
+  font-size: 10px;
+  line-height: 1;
+  text-align: center;
+
+  text-shadow: 0 1px 0 #e4b372;
+}
+
+.map-header__subtitle {
+  position: relative;
+  margin-top: 13px;
+}
+
+/* =========================================
+   ENTRADA A LA PREGUNTA
+   ========================================= */
+
+.station-entry {
+  position: absolute;
+  z-index: 10;
+  inset: -8px -4px -14px;
+
+  display: block;
+  border-radius: 20px;
+
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.station-entry:focus-visible {
+  outline: 4px solid #fff2a3;
+  outline-offset: 4px;
+
+  background: rgb(255 231 130 / 8%);
+  box-shadow: 0 0 0 8px rgb(36 74 44 / 65%);
+}
+
+.map-station--current .station-marker,
+.map-station--current .station-info {
+  transition:
+    translate 160ms ease,
+    filter 160ms ease;
+}
+
+@media (hover: hover) {
+  .map-station--current:hover .station-marker,
+  .map-station--current:hover .station-info {
+    translate: 0 -3px;
+    filter: brightness(1.06);
+  }
+}
+
+.map-station--current:focus-within .station-info {
+  filter: brightness(1.07);
+}
+
+.map-station--current:active .station-marker,
+.map-station--current:active .station-info {
+  translate: 0 2px;
+}
+
+/* =========================================
+   MAÍZ, CACAO Y TEMPLO
+   ========================================= */
+
+.station-resource {
+  position: absolute;
+  z-index: 2;
+  top: 50%;
+  left: -68px;
+
+  width: 62px;
+  height: 88px;
+
+  object-fit: contain;
+  transform: translateY(-40%) rotate(-7deg);
+
+  filter: drop-shadow(0 5px 3px #18351f55);
+
+  pointer-events: none;
+  user-select: none;
+}
+
+.station-resource--cacao {
+  width: 65px;
+  transform: translateY(-35%) rotate(9deg);
+}
+
+.station-resource--temple {
+  left: -87px;
+  width: 82px;
+  height: 96px;
+  transform: translateY(-35%);
+}
+
+/* =========================================
+   MÓVIL
+   ========================================= */
+
+@media (max-width: 540px) {
+  /*
+   * El cartel ocupa la primera fila.
+   * Volver y progreso quedan debajo, sin apretar el título.
+   */
+  .map-header {
+    grid-template-columns: 1fr 1fr;
+    gap: 14px 10px;
+    padding-top: 22px;
+  }
+
+  .map-header__title {
+    grid-column: 1 / -1;
+    grid-row: 1;
+
+    width: min(100% - 24px, 330px);
+    justify-self: center;
+  }
+
+  .map-header .back-button {
+    grid-column: 1;
+    grid-row: 2;
+    justify-self: start;
+  }
+
+  .map-header .progress-badge {
+    grid-column: 2;
+    grid-row: 2;
+
+    min-width: 77px;
+    justify-self: end;
+  }
+
+  .map-title-sign {
+    padding: 13px 9px 9px;
+  }
+
+  .map-title-sign .map-header__eyebrow {
+    font-size: 13px;
+  }
+
+  .map-title-sign h1 {
+    font-size: clamp(32px, 9.5vw, 43px);
+    -webkit-text-stroke: 3px #512b12;
+  }
+
+  .map-header__subtitle {
+    gap: 7px;
+    font-size: 9px;
+    letter-spacing: .06em;
+  }
+
+  .map-intro {
+    margin-top: 12px;
+  }
+
+  .station-resource {
+    left: -43px;
+    width: 40px;
+    height: 65px;
+  }
+
+  .station-resource--cacao {
+    width: 41px;
+  }
+
+  .station-resource--temple {
+    left: -56px;
+    width: 52px;
+    height: 70px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .map-station--current .station-marker,
+  .map-station--current .station-info {
+    transition: none;
+  }
+}

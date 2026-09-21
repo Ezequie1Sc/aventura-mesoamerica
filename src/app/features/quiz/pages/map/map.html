@@ -50,9 +50,39 @@
       </a>
 
       <div class="map-header__title">
-        <span class="map-header__eyebrow">Tu aventura</span>
+        <div class="map-title-sign">
+          <span
+            class="map-title-sign__rope map-title-sign__rope--left"
+            aria-hidden="true"
+          ></span>
 
-        <h1 id="map-title">Mesoamérica</h1>
+          <span
+            class="map-title-sign__rope map-title-sign__rope--right"
+            aria-hidden="true"
+          ></span>
+
+          <img
+            class="map-title-sign__leaves map-title-sign__leaves--left"
+            src="/assets/nature/leaves.webp"
+            alt=""
+            aria-hidden="true"
+          />
+
+          <img
+            class="map-title-sign__leaves map-title-sign__leaves--right"
+            src="/assets/nature/leaves.webp"
+            alt=""
+            aria-hidden="true"
+          />
+
+          <span class="map-header__eyebrow">Tu aventura</span>
+
+          <h1 id="map-title">Mesoamérica</h1>
+
+          <span class="map-title-sign__ornament" aria-hidden="true">
+            ◆ ━ ◆ ━ ◆
+          </span>
+        </div>
 
         <p class="map-header__subtitle">
           Explora <span>•</span> Aprende <span>•</span> Descubre
@@ -192,7 +222,10 @@
               } @else if (!isUnlocked(index)) {
                 <span class="station-status station-status--locked">
                   <svg viewBox="0 0 24 24" fill="none">
-                    <path class="lock-shackle" d="M7 10V7a5 5 0 0 1 10 0v3" />
+                    <path
+                      class="lock-shackle"
+                      d="M7 10V7a5 5 0 0 1 10 0v3"
+                    />
                     <rect x="4" y="9" width="16" height="13" rx="3" />
                     <path class="lock-key" d="M12 14v3" />
                   </svg>
@@ -213,7 +246,7 @@
                   isCompleted(index)
                     ? 'Completada'
                     : isCurrent(index)
-                      ? '¡Estás aquí!'
+                      ? '¡Toca para jugar!'
                       : 'Por descubrir'
                 }}
               </span>
@@ -227,6 +260,48 @@
                 />
               }
             </div>
+
+            <!-- Recursos decorativos -->
+            @if (index === 2) {
+              <img
+                class="station-resource station-resource--corn"
+                src="/assets/objects/corn.webp"
+                alt=""
+                aria-hidden="true"
+                loading="lazy"
+              />
+            }
+
+            @if (index === 4) {
+              <img
+                class="station-resource station-resource--cacao"
+                src="/assets/objects/cacao.webp"
+                alt=""
+                aria-hidden="true"
+                loading="lazy"
+              />
+            }
+
+            @if (index === 5) {
+              <img
+                class="station-resource station-resource--temple"
+                src="/assets/objects/pyramid.webp"
+                alt=""
+                aria-hidden="true"
+                loading="lazy"
+              />
+            }
+
+            <!-- Área clicable de la pregunta actual -->
+            @if (isCurrent(index)) {
+              <a
+                routerLink="/quiz"
+                class="station-entry"
+                [attr.aria-label]="
+                  'Entrar a la pregunta ' + (index + 1) + ': ' + station.title
+                "
+              ></a>
+            }
           </li>
         }
       </ol>
