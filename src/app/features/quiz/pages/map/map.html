@@ -1,374 +1,332 @@
 <main class="map-page" aria-labelledby="map-title">
+  <div class="map-background" aria-hidden="true"></div>
+  <div class="map-overlay" aria-hidden="true"></div>
 
-  <!-- ========================================= -->
-  <!-- BACKGROUND -->
-  <!-- ========================================= -->
-
-  <div
-    class="map-background"
-    aria-hidden="true"
-  ></div>
-
-  <div
-    class="map-overlay"
-    aria-hidden="true"
-  ></div>
-
-
-  <!-- ========================================= -->
-  <!-- DECORACIÓN -->
-  <!-- ========================================= -->
-
+  <!-- Vegetación del marco -->
   <img
-    class="map-decoration map-decoration--left"
+    class="map-decoration map-decoration--top-left"
     src="/assets/nature/leaves.webp"
     alt=""
     aria-hidden="true"
   />
 
   <img
-    class="map-decoration map-decoration--right"
+    class="map-decoration map-decoration--top-right"
     src="/assets/nature/leaves.webp"
     alt=""
     aria-hidden="true"
   />
 
   <img
-    class="map-pyramid"
-    src="/assets/objects/pyramid.webp"
+    class="map-decoration map-decoration--bottom-left"
+    src="/assets/nature/leaves.webp"
     alt=""
     aria-hidden="true"
   />
 
-
-  <!-- ========================================= -->
-  <!-- CONTENIDO -->
-  <!-- ========================================= -->
+  <img
+    class="map-decoration map-decoration--bottom-right"
+    src="/assets/nature/leaves.webp"
+    alt=""
+    aria-hidden="true"
+  />
 
   <div class="map-content">
-
-    <!-- Header -->
-
+    <!-- Encabezado -->
     <header class="map-header">
-
       <a
         routerLink="/instrucciones"
         class="back-button"
         aria-label="Volver a instrucciones"
       >
-        ←
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          aria-hidden="true"
+          focusable="false"
+        >
+          <path d="m14 5-7 7 7 7M7 12h14" />
+        </svg>
       </a>
 
       <div class="map-header__title">
-        <span class="map-header__eyebrow">
-          Tu aventura
-        </span>
+        <span class="map-header__eyebrow">Tu aventura</span>
 
-        <h1 id="map-title">
-          Mesoamérica
-        </h1>
+        <h1 id="map-title">Mesoamérica</h1>
+
+        <p class="map-header__subtitle">
+          Explora <span>•</span> Aprende <span>•</span> Descubre
+        </p>
       </div>
 
-      <div class="progress-badge">
-        <span class="progress-badge__star">★</span>
-
-        <span>
-          {{ currentQuestionIndex() }}/{{ totalQuestions() }}
-        </span>
+      <div
+        class="progress-badge"
+        role="status"
+        [attr.aria-label]="
+          completedCount() + ' de ' + totalQuestions() + ' preguntas completadas'
+        "
+      >
+        <span class="progress-badge__star" aria-hidden="true">★</span>
+        <span>{{ completedCount() }}/{{ totalQuestions() }}</span>
       </div>
-
     </header>
 
-
-    <!-- ========================================= -->
-    <!-- INTRO -->
-    <!-- ========================================= -->
-
-    <section class="map-intro">
-
+    <!-- Bienvenida -->
+    <section class="map-intro" aria-labelledby="intro-title">
       <div class="map-intro__character">
-
         <img
           src="/assets/characters/welcome.webp"
-          alt="Explorador listo para comenzar la aventura"
+          alt="Explorador dando la bienvenida"
+          width="1024"
+          height="1536"
         />
-
       </div>
 
-      <div class="map-intro__text">
+      <div class="intro-scroll">
+        <span class="intro-scroll__pin intro-scroll__pin--left"></span>
+        <span class="intro-scroll__pin intro-scroll__pin--right"></span>
 
-        <span class="map-intro__label">
-          ¡Tu viaje comienza!
-        </span>
+        <h2 id="intro-title">
+          {{ adventureCompleted() ? '¡Qué gran aventura!' : '¡Tu viaje comienza!' }}
+        </h2>
 
         <p>
-          Recorre el camino y descubre los secretos
-          de las antiguas culturas mesoamericanas.
+          {{
+            adventureCompleted()
+              ? 'Has recorrido todas las estaciones y descubierto nuevos conocimientos.'
+              : 'Recorre el camino y descubre los secretos de las antiguas culturas mesoamericanas.'
+          }}
         </p>
-
       </div>
-
     </section>
 
+    <!-- Recorrido -->
+    <section class="adventure-map" aria-label="Estaciones de la aventura">
+      <!-- El camino comparte coordenadas con las estaciones -->
+      <svg
+        class="trail"
+        viewBox="0 0 600 840"
+        preserveAspectRatio="none"
+        aria-hidden="true"
+        focusable="false"
+      >
+        <defs>
+          <path
+            id="adventure-trail-line"
+            d="
+              M 156 70
+              C 90 140, 365 120, 270 200
+              S 65 245, 156 330
+              S 365 375, 270 460
+              S 65 505, 156 590
+              S 365 635, 270 720
+              S 180 790, 240 840
+            "
+          />
+        </defs>
 
-    <!-- ========================================= -->
-    <!-- MAPA -->
-    <!-- ========================================= -->
+        <use href="#adventure-trail-line" class="trail__shadow" />
+        <use href="#adventure-trail-line" class="trail__border" />
+        <use href="#adventure-trail-line" class="trail__sand" />
+        <use href="#adventure-trail-line" class="trail__light" />
+        <use href="#adventure-trail-line" class="trail__details" />
+      </svg>
 
+      <!-- Elementos del paisaje -->
+      <img
+        class="landmark landmark--pyramid"
+        src="/assets/objects/pyramid.webp"
+        alt=""
+        aria-hidden="true"
+      />
+
+      <img
+        class="landmark landmark--leaves-one"
+        src="/assets/nature/leaves.webp"
+        alt=""
+        aria-hidden="true"
+      />
+
+      <img
+        class="landmark landmark--leaves-two"
+        src="/assets/nature/leaves.webp"
+        alt=""
+        aria-hidden="true"
+      />
+
+      <span class="map-rock map-rock--one" aria-hidden="true"></span>
+      <span class="map-rock map-rock--two" aria-hidden="true"></span>
+      <span class="map-rock map-rock--three" aria-hidden="true"></span>
+
+      <ol class="station-list">
+        @for (station of stations; track station.id; let index = $index) {
+          <li
+            class="map-station"
+            [class.map-station--right]="index % 2 !== 0"
+            [class.map-station--current]="isCurrent(index)"
+            [class.map-station--completed]="isCompleted(index)"
+            [class.map-station--locked]="!isUnlocked(index)"
+            [style.top.%]="station.top"
+            [attr.aria-current]="isCurrent(index) ? 'step' : null"
+          >
+            <!-- Plataforma -->
+            <div class="station-marker" aria-hidden="true">
+              @if (isCurrent(index)) {
+                <span class="station-aura"></span>
+
+                <span class="station-flag">
+                  <span class="station-flag__cloth"></span>
+                </span>
+              }
+
+              <span class="station-marker__face">
+                <span class="station-number">{{ index + 1 }}</span>
+              </span>
+
+              @if (isCompleted(index)) {
+                <span class="station-status station-status--done">
+                  <svg viewBox="0 0 24 24" fill="none">
+                    <path d="m5 12 4 4L19 6" />
+                  </svg>
+                </span>
+              } @else if (!isUnlocked(index)) {
+                <span class="station-status station-status--locked">
+                  <svg viewBox="0 0 24 24" fill="none">
+                    <path class="lock-shackle" d="M7 10V7a5 5 0 0 1 10 0v3" />
+                    <rect x="4" y="9" width="16" height="13" rx="3" />
+                    <path class="lock-key" d="M12 14v3" />
+                  </svg>
+                </span>
+              }
+            </div>
+
+            <!-- Letrero -->
+            <div class="station-info">
+              <span class="station-info__eyebrow">
+                Pregunta {{ index + 1 }}
+              </span>
+
+              <h3>{{ station.title }}</h3>
+
+              <span class="station-info__status">
+                {{
+                  isCompleted(index)
+                    ? 'Completada'
+                    : isCurrent(index)
+                      ? '¡Estás aquí!'
+                      : 'Por descubrir'
+                }}
+              </span>
+
+              @if (isCurrent(index)) {
+                <img
+                  class="station-info__leaves"
+                  src="/assets/nature/leaves.webp"
+                  alt=""
+                  aria-hidden="true"
+                />
+              }
+            </div>
+          </li>
+        }
+      </ol>
+    </section>
+
+    <!-- Meta -->
     <section
-      class="adventure-map"
-      aria-label="Mapa de la aventura"
+      class="map-finish"
+      [class.map-finish--completed]="adventureCompleted()"
+      aria-labelledby="finish-title"
     >
-
-      <div class="map-path" aria-hidden="true"></div>
-
-
-      <!-- ESTACIÓN 1 -->
-
-      <article
-        class="map-station map-station--one"
-        [class]="getStationClass(0)"
-      >
-
-        <div class="station-marker">
-
-          <span class="station-number">
-            1
-          </span>
-
-          <span class="station-star">
-            ★
-          </span>
-
-        </div>
-
-        <div class="station-info">
-          <span>Pregunta 1</span>
-          <strong>El comienzo</strong>
-        </div>
-
-      </article>
-
-
-      <!-- ESTACIÓN 2 -->
-
-      <article
-        class="map-station map-station--two"
-        [class]="getStationClass(1)"
-      >
-
-        <div class="station-marker">
-
-          <span class="station-number">
-            2
-          </span>
-
-          <span class="station-star">
-            ★
-          </span>
-
-          @if (!isUnlocked(1)) {
-            <span class="station-lock">🔒</span>
-          }
-
-        </div>
-
-        <div class="station-info">
-          <span>Pregunta 2</span>
-          <strong>Las culturas</strong>
-        </div>
-
-      </article>
-
-
-      <!-- ESTACIÓN 3 -->
-
-      <article
-        class="map-station map-station--three"
-        [class]="getStationClass(2)"
-      >
-
-        <div class="station-marker">
-
-          <span class="station-number">
-            3
-          </span>
-
-          <span class="station-star">
-            ★
-          </span>
-
-          @if (!isUnlocked(2)) {
-            <span class="station-lock">🔒</span>
-          }
-
-        </div>
-
-        <div class="station-info">
-          <span>Pregunta 3</span>
-          <strong>El maíz</strong>
-        </div>
-
-      </article>
-
-
-      <!-- ESTACIÓN 4 -->
-
-      <article
-        class="map-station map-station--four"
-        [class]="getStationClass(3)"
-      >
-
-        <div class="station-marker">
-
-          <span class="station-number">
-            4
-          </span>
-
-          <span class="station-star">
-            ★
-          </span>
-
-          @if (!isUnlocked(3)) {
-            <span class="station-lock">🔒</span>
-          }
-
-        </div>
-
-        <div class="station-info">
-          <span>Pregunta 4</span>
-          <strong>Los pueblos</strong>
-        </div>
-
-      </article>
-
-
-      <!-- ESTACIÓN 5 -->
-
-      <article
-        class="map-station map-station--five"
-        [class]="getStationClass(4)"
-      >
-
-        <div class="station-marker">
-
-          <span class="station-number">
-            5
-          </span>
-
-          <span class="station-star">
-            ★
-          </span>
-
-          @if (!isUnlocked(4)) {
-            <span class="station-lock">🔒</span>
-          }
-
-        </div>
-
-        <div class="station-info">
-          <span>Pregunta 5</span>
-          <strong>El cacao</strong>
-        </div>
-
-      </article>
-
-
-      <!-- ESTACIÓN 6 -->
-
-      <article
-        class="map-station map-station--six"
-        [class]="getStationClass(5)"
-      >
-
-        <div class="station-marker">
-
-          <span class="station-number">
-            6
-          </span>
-
-          <span class="station-star">
-            ★
-          </span>
-
-          @if (!isUnlocked(5)) {
-            <span class="station-lock">🔒</span>
-          }
-
-        </div>
-
-        <div class="station-info">
-          <span>Pregunta 6</span>
-          <strong>Los templos</strong>
-        </div>
-
-      </article>
-
-
-      <!-- META -->
-
-      <div class="map-finish">
-
-        <div class="finish-icon">
-          🏆
-        </div>
-
-        <span>
-          Meta de la aventura
-        </span>
-
+      <div class="finish-trophy" aria-hidden="true">
+        <svg viewBox="0 0 100 110" fill="none">
+          <path
+            d="M27 20H11v15c0 17 13 23 25 23M73 20h16v15c0 17-13 23-25 23"
+            stroke="#98511a"
+            stroke-width="10"
+            stroke-linejoin="round"
+          />
+          <path
+            d="M27 20H11v15c0 17 13 23 25 23M73 20h16v15c0 17-13 23-25 23"
+            stroke="#ffcf4c"
+            stroke-width="5"
+            stroke-linejoin="round"
+          />
+          <path
+            d="M23 10h54l-5 37c-2 17-12 25-22 25S28 64 27 47Z"
+            fill="#ffc53e"
+            stroke="#a85e1b"
+            stroke-width="4"
+          />
+          <path
+            d="M30 15h11l-3 30c0 9 3 17 7 21-11-3-14-13-15-23Z"
+            fill="#ffed95"
+          />
+          <path d="M45 72h10v18H45Z" fill="#e8a022" />
+          <path
+            d="M34 89h32l9 12H25Z"
+            fill="#ffc53e"
+            stroke="#a85e1b"
+            stroke-width="4"
+            stroke-linejoin="round"
+          />
+          <path
+            d="m52 27 4 9 10 1-8 7 2 10-8-5-9 5 2-10-7-7 10-1Z"
+            fill="#fff0a0"
+            stroke="#d98d1f"
+            stroke-width="2"
+          />
+        </svg>
       </div>
 
+      <div class="finish-scroll">
+        <h2 id="finish-title">
+          {{ adventureCompleted() ? '¡Recorrido completado!' : 'Meta de la aventura' }}
+        </h2>
+
+        <p>
+          Completa las {{ totalQuestions() }} preguntas
+          <br />
+          y descubre tu insignia.
+        </p>
+      </div>
     </section>
 
-
-    <!-- ========================================= -->
-    <!-- ACCIÓN -->
-    <!-- ========================================= -->
-
-    <section class="map-action">
-
+    <!-- Acción principal -->
+    <section class="map-action" aria-label="Continuar el juego">
       <p class="map-action__text">
-        Estás en la estación
-        <strong>{{ currentQuestionIndex() + 1 }}</strong>
-        de
-        <strong>{{ totalQuestions() }}</strong>
+        @if (adventureCompleted()) {
+          ¡Llegaste al final del camino!
+        } @else {
+          Estación
+          <strong>{{ completedCount() + 1 }}</strong>
+          de
+          <strong>{{ totalQuestions() }}</strong>
+        }
       </p>
 
-      <a
-        routerLink="/quiz"
-        class="continue-button"
-      >
-
-        <span class="continue-button__icon">
-          ▶
-        </span>
+      <a routerLink="/quiz" class="continue-button">
+        <svg
+          viewBox="0 0 24 24"
+          fill="currentColor"
+          aria-hidden="true"
+          focusable="false"
+        >
+          <path d="M6 4a1 1 0 0 1 1.5-.86l13 8a1 1 0 0 1 0 1.72l-13 8A1 1 0 0 1 6 20Z" />
+        </svg>
 
         <span>
-          Continuar aventura
+          {{ adventureCompleted() ? 'Volver al juego' : 'Continuar aventura' }}
         </span>
-
       </a>
-
     </section>
 
-
-    <!-- Footer -->
-
     <footer class="map-footer">
-
       <span>Explora</span>
-
-      <i></i>
-
+      <span aria-hidden="true">◆</span>
       <span>Aprende</span>
-
-      <i></i>
-
+      <span aria-hidden="true">◆</span>
       <span>Descubre</span>
-
     </footer>
-
   </div>
-
 </main>
