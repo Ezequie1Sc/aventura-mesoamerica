@@ -1,9 +1,11 @@
 import {
   Component,
   ElementRef,
+  OnInit,
   ViewChild,
   inject,
 } from '@angular/core';
+
 import { RouterLink } from '@angular/router';
 
 import { AudioService } from '../../../../core/services/audio.service';
@@ -15,28 +17,57 @@ import { AudioService } from '../../../../core/services/audio.service';
   templateUrl: './home.html',
   styleUrl: './home.scss',
 })
-export class Home {
+export class Home implements OnInit {
   @ViewChild('helpDialog')
   private helpDialog!: ElementRef<HTMLDialogElement>;
 
-  readonly audioService = inject(AudioService);
+  readonly audioService =
+    inject(AudioService);
+
+  // =========================================================
+  // INICIO
+  // =========================================================
+
+  ngOnInit(): void {
+    /*
+     * Inicia la música principal de la aventura
+     * al entrar a la pantalla de inicio.
+     *
+     * AudioService se encarga de evitar que
+     * home.mp3 se reinicie innecesariamente.
+     */
+    this.audioService.playHomeMusic();
+  }
+
+  // =========================================================
+  // AYUDA
+  // =========================================================
 
   openHelp(): void {
-    const dialog = this.helpDialog.nativeElement;
+    const dialog =
+      this.helpDialog.nativeElement;
 
     if (!dialog.open) {
       dialog.showModal();
     }
   }
 
-  closeOnBackdrop(event: MouseEvent): void {
-    const dialog = this.helpDialog.nativeElement;
+  // =========================================================
+  // CERRAR DIALOG AL HACER CLIC FUERA
+  // =========================================================
+
+  closeOnBackdrop(
+    event: MouseEvent
+  ): void {
+    const dialog =
+      this.helpDialog.nativeElement;
 
     if (event.target !== dialog) {
       return;
     }
 
-    const rect = dialog.getBoundingClientRect();
+    const rect =
+      dialog.getBoundingClientRect();
 
     const clickedOutside =
       event.clientX < rect.left ||
