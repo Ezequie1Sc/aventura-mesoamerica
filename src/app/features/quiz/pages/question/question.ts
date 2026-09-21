@@ -61,6 +61,21 @@ export class Question implements OnInit, OnDestroy {
     this.quizService.startQuiz();
   }
 
+  /**
+   * Reproduce el sonido cuando el cursor
+   * entra sobre una respuesta.
+   */
+  playAnswerHover(): void {
+    if (
+      this.isAnswered() ||
+      this.isFinished()
+    ) {
+      return;
+    }
+
+    this.audioService.playSelect();
+  }
+
   answerQuestion(answerId: string): void {
     if (
       this.destroyed ||
@@ -79,29 +94,16 @@ export class Question implements OnInit, OnDestroy {
       return;
     }
 
-    /*
-     * Sonido de selección.
-     */
     this.audioService.playSelect();
 
-    /*
-     * Registramos la respuesta.
-     */
     this.quizService.answerQuestion(answerId);
 
-    /*
-     * Reproducimos el sonido dependiendo
-     * de si la respuesta fue correcta o incorrecta.
-     */
     if (this.isCorrectAnswer(answerId)) {
       this.audioService.playCorrect();
     } else {
       this.audioService.playIncorrect();
     }
 
-    /*
-     * Programamos el avance automático.
-     */
     if (this.isAnswered()) {
       this.scheduleNextQuestion();
     }
@@ -123,8 +125,10 @@ export class Question implements OnInit, OnDestroy {
         this.destroyed ||
         this.isFinished() ||
         !this.isAnswered() ||
-        this.currentQuestionIndex() !== answeredIndex ||
-        this.currentQuestion() !== answeredQuestion
+        this.currentQuestionIndex() !==
+          answeredIndex ||
+        this.currentQuestion() !==
+          answeredQuestion
       ) {
         return;
       }
@@ -149,28 +153,15 @@ export class Question implements OnInit, OnDestroy {
       return;
     }
 
-    /*
-     * Sonido de transición.
-     */
     this.audioService.playNext();
 
-    /*
-     * Avanzamos el estado interno del quiz.
-     */
     this.quizService.nextQuestion();
 
-    /*
-     * Si terminamos el quiz,
-     * vamos directamente al resultado.
-     */
     if (this.isFinished()) {
       void this.router.navigate(['/resultado']);
       return;
     }
 
-    /*
-     * Volvemos al mapa.
-     */
     void this.router.navigate(['/mapa']);
   }
 
@@ -241,7 +232,8 @@ export class Question implements OnInit, OnDestroy {
       return '¡Respuesta correcta! Sigue explorando.';
     }
 
-    const question = this.currentQuestion();
+    const question =
+      this.currentQuestion();
 
     const correctOption =
       question.options.find(

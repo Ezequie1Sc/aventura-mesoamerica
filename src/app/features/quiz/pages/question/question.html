@@ -140,6 +140,7 @@
           "
           [disabled]="isAnswered() || isFinished()"
           [attr.aria-pressed]="selectedAnswer() === option.id"
+          (mouseenter)="playAnswerHover()"
           (click)="answerQuestion(option.id)"
         >
           <span
