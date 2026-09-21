@@ -1,16 +1,55 @@
-<main class="result-page" aria-labelledby="result-title">
-  <div class="result-background" aria-hidden="true"></div>
-  <div class="result-overlay" aria-hidden="true"></div>
+<main
+  class="result-page"
+  aria-labelledby="result-title"
+>
+  <div
+    class="result-background"
+    aria-hidden="true"
+  ></div>
+
+  <div
+    class="result-overlay"
+    aria-hidden="true"
+  ></div>
+
+  <!-- ========================================
+       CONFETI
+       ======================================== -->
+
+  <div
+    class="result-confetti"
+    aria-hidden="true"
+  >
+    @for (
+      piece of confettiPieces;
+      track piece
+    ) {
+      <span
+        class="confetti-piece"
+        [style.--confetti-index]="piece"
+      ></span>
+    }
+  </div>
 
   <div class="result-content">
-    <!-- Navegación -->
+
+    <!-- ========================================
+         NAVEGACIÓN
+         ======================================== -->
+
     <header class="result-header">
       <a
         routerLink="/"
         class="back-button"
         aria-label="Volver al inicio"
+        (mouseenter)="audioService.playSelect()"
+        (click)="audioService.playSelect()"
       >
-        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          aria-hidden="true"
+        >
           <path
             d="M14 6 8 12l6 6M8 12h12"
             stroke="currentColor"
@@ -29,10 +68,19 @@
       <div aria-hidden="true"></div>
     </header>
 
-    <!-- Personaje y mensaje -->
-    <section class="result-hero" aria-labelledby="result-title">
+    <!-- ========================================
+         PERSONAJE Y MENSAJE
+         ======================================== -->
+
+    <section
+      class="result-hero"
+      aria-labelledby="result-title"
+    >
       <div class="result-character">
-        <div class="result-character__glow" aria-hidden="true"></div>
+        <div
+          class="result-character__glow"
+          aria-hidden="true"
+        ></div>
 
         <img
           class="result-character__image"
@@ -53,14 +101,27 @@
           {{ getResultTitle() }}
         </h1>
 
-        <p>{{ getResultMessage() }}</p>
+        <p>
+          {{ getResultMessage() }}
+        </p>
 
-        <span class="result-speech__spark" aria-hidden="true">✦</span>
+        <span
+          class="result-speech__spark"
+          aria-hidden="true"
+        >
+          ✦
+        </span>
       </div>
     </section>
 
-    <!-- Panel de puntuación -->
-    <section class="result-summary" aria-label="Tu puntuación">
+    <!-- ========================================
+         PANEL DE PUNTUACIÓN
+         ======================================== -->
+
+    <section
+      class="result-summary"
+      aria-label="Tu puntuación"
+    >
       <span
         class="result-summary__corner result-summary__corner--left"
         aria-hidden="true"
@@ -71,24 +132,39 @@
         aria-hidden="true"
       ></span>
 
-      <div class="score-stars" aria-hidden="true">
-        @for (star of [1, 2, 3]; track star) {
+      <div
+        class="score-stars"
+        aria-hidden="true"
+      >
+        @for (
+          star of [1, 2, 3];
+          track star
+        ) {
           <img
             src="/assets/rewards/star.webp"
             alt=""
             width="48"
             height="48"
-            [class.score-star--active]="score() >= star * 2"
+            [class.score-star--active]="
+              score() >= star * 2
+            "
           />
         }
       </div>
 
       <div class="score-value">
-        <strong>{{ score() }}</strong>
-        <span>/ {{ totalQuestions() }}</span>
+        <strong>
+          {{ score() }}
+        </strong>
+
+        <span>
+          / {{ totalQuestions() }}
+        </span>
       </div>
 
-      <p class="score-caption">respuestas correctas</p>
+      <p class="score-caption">
+        respuestas correctas
+      </p>
 
       <progress
         class="score-progress"
@@ -98,7 +174,10 @@
       ></progress>
 
       <div class="score-detail">
-        <span class="score-detail__line" aria-hidden="true"></span>
+        <span
+          class="score-detail__line"
+          aria-hidden="true"
+        ></span>
 
         <img
           src="/assets/objects/pyramid.webp"
@@ -109,11 +188,17 @@
         />
 
         <span>
-          <strong>{{ score() }}</strong>
+          <strong>
+            {{ score() }}
+          </strong>
+
           de {{ totalQuestions() }} retos
         </span>
 
-        <span class="score-detail__line" aria-hidden="true"></span>
+        <span
+          class="score-detail__line"
+          aria-hidden="true"
+        ></span>
       </div>
 
       <img
@@ -135,17 +220,34 @@
       />
     </section>
 
-    <!-- Insignia -->
-    <section class="result-badge" aria-labelledby="badge-title">
+    <!-- ========================================
+         INSIGNIA
+         ======================================== -->
+
+    <section
+      class="result-badge"
+      aria-labelledby="badge-title"
+    >
       <div class="result-badge__heading">
-        <span aria-hidden="true">✦</span>
-        <span>INSIGNIA OBTENIDA</span>
-        <span aria-hidden="true">✦</span>
+        <span aria-hidden="true">
+          ✦
+        </span>
+
+        <span>
+          INSIGNIA OBTENIDA
+        </span>
+
+        <span aria-hidden="true">
+          ✦
+        </span>
       </div>
 
       <div class="result-badge__body">
         <div class="result-badge__image-wrapper">
-          <div class="result-badge__glow" aria-hidden="true"></div>
+          <div
+            class="result-badge__glow"
+            aria-hidden="true"
+          ></div>
 
           <img
             class="result-badge__image"
@@ -157,18 +259,35 @@
         </div>
 
         <div class="result-badge__copy">
-          <span class="result-badge__eyebrow">Tu nuevo logro</span>
+          <span class="result-badge__eyebrow">
+            Tu nuevo logro
+          </span>
 
-          <h2 id="badge-title">{{ getBadge().name }}</h2>
+          <h2 id="badge-title">
+            {{ getBadge().name }}
+          </h2>
 
-          <p>{{ getBadge().description }}</p>
+          <p>
+            {{ getBadge().description }}
+          </p>
         </div>
       </div>
     </section>
 
-    <!-- Acciones -->
-    <nav class="result-actions" aria-label="Acciones del resultado">
-      <a routerLink="/insignias" class="claim-button">
+    <!-- ========================================
+         ACCIONES
+         ======================================== -->
+
+    <nav
+      class="result-actions"
+      aria-label="Acciones del resultado"
+    >
+      <a
+        routerLink="/insignias"
+        class="claim-button"
+        (mouseenter)="audioService.playSelect()"
+        (click)="audioService.playSelect()"
+      >
         <img
           src="/assets/rewards/medal.webp"
           alt=""
@@ -177,22 +296,40 @@
           height="30"
         />
 
-        <span>Ver mi insignia</span>
-        <span aria-hidden="true">→</span>
+        <span>
+          Ver mi insignia
+        </span>
+
+        <span aria-hidden="true">
+          →
+        </span>
       </a>
 
       <button
         type="button"
         class="restart-button"
+        (mouseenter)="audioService.playSelect()"
         (click)="restartQuiz()"
       >
-        <span aria-hidden="true">↻</span>
-        <span>Volver a jugar</span>
+        <span aria-hidden="true">
+          ↻
+        </span>
+
+        <span>
+          Volver a jugar
+        </span>
       </button>
     </nav>
 
+    <!-- ========================================
+         FOOTER
+         ======================================== -->
+
     <footer class="result-footer">
-      <p>¡Sigue explorando y aprendiendo!</p>
+      <p>
+        ¡Sigue explorando y aprendiendo!
+      </p>
     </footer>
+
   </div>
 </main>
