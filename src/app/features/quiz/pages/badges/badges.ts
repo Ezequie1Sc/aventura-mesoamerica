@@ -63,6 +63,10 @@ export class Badges implements OnDestroy {
   private downloadResetTimer?: ReturnType<typeof setTimeout>;
   private destroyed = false;
 
+  // =====================================================
+  // RESULTADO
+  // =====================================================
+
   getCurrentScore(): number {
     return this.isFinished()
       ? this.score()
@@ -130,6 +134,29 @@ export class Badges implements OnDestroy {
     }
 
     return 'Toda gran aventura comienza con un primer paso.';
+  }
+
+  // =====================================================
+  // NUEVA AVENTURA
+  // =====================================================
+
+  restartQuiz(): void {
+    /*
+     * Reinicia completamente el intento:
+     * - Pregunta 1
+     * - Puntuación 0
+     * - Estado sin responder
+     * - Quiz no terminado
+     * - Elimina el nombre guardado de la insignia
+     */
+    this.quizService.restartQuiz();
+
+    /*
+     * Después del reinicio regresamos al mapa.
+     * El mapa ahora debe mostrar únicamente
+     * la primera estación como disponible.
+     */
+    void this.router.navigate(['/map']);
   }
 
   // =====================================================
@@ -508,7 +535,10 @@ export class Badges implements OnDestroy {
 
       link.remove();
 
-      // Cerrar diálogo
+      // =================================================
+      // CERRAR DIÁLOGO
+      // =================================================
+
       if (this.nameDialog?.nativeElement) {
         this.nameDialog.nativeElement.close();
       }
@@ -609,7 +639,6 @@ export class Badges implements OnDestroy {
       size > 20
     ) {
       size -= 1;
-
       setFont();
     }
 
