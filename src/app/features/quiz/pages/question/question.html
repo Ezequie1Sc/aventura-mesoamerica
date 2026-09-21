@@ -2,10 +2,7 @@
   class="question-page"
   aria-labelledby="question-title"
 >
-  <!-- ========================================= -->
-  <!-- BACKGROUND -->
-  <!-- ========================================= -->
-
+  <!-- Fondo -->
   <div
     class="question-background"
     aria-hidden="true"
@@ -16,64 +13,61 @@
     aria-hidden="true"
   ></div>
 
-
-  <!-- ========================================= -->
-  <!-- CONTENT -->
-  <!-- ========================================= -->
-
   <div class="question-content">
-
-    <!-- ======================================= -->
-    <!-- HEADER -->
-    <!-- ======================================= -->
-
+    <!-- Encabezado -->
     <header class="question-header">
-
       <button
         type="button"
         class="back-button"
         aria-label="Volver al mapa"
-        (click)="router.navigate(['/mapa'])"
+        (click)="goToMap()"
       >
-        ←
+        <span aria-hidden="true">←</span>
       </button>
 
       <div class="question-progress">
-
         <span class="question-progress__label">
           Pregunta
         </span>
 
         <strong>
           {{ currentQuestionIndex() + 1 }}
-          /
-          {{ totalQuestions() }}
+          / {{ totalQuestions() }}
         </strong>
-
       </div>
 
       <div class="score-badge">
-
-        <span class="score-badge__star">
+        <span
+          class="score-badge__star"
+          aria-hidden="true"
+        >
           ★
         </span>
 
-        <strong>
+        <strong
+          [attr.aria-label]="
+            score() + ' respuestas correctas'
+          "
+        >
           {{ score() }}
         </strong>
-
       </div>
-
     </header>
 
-
-    <!-- ======================================= -->
-    <!-- PROGRESS BAR -->
-    <!-- ======================================= -->
-
+    <!-- Progreso -->
     <div
       class="progress-track"
-      aria-hidden="true"
+      role="progressbar"
+      aria-label="Progreso de la aventura"
+      [attr.aria-valuemin]="0"
+      [attr.aria-valuemax]="totalQuestions()"
+      [attr.aria-valuenow]="currentQuestionIndex() + 1"
+      [attr.aria-valuetext]="
+        'Pregunta ' +
+        (currentQuestionIndex() + 1) +
+        ' de ' +
+        totalQuestions()
+      "
     >
       <div
         class="progress-fill"
@@ -81,16 +75,11 @@
       ></div>
     </div>
 
-
-    <!-- ======================================= -->
-    <!-- CHARACTER -->
-    <!-- ======================================= -->
-
+    <!-- Personaje -->
     <section
       class="question-character"
       aria-label="Explorador"
     >
-
       <div
         class="character-glow"
         aria-hidden="true"
@@ -98,56 +87,66 @@
 
       <img
         [src]="getCharacterImage()"
-        alt="Explorador"
+        alt="Tu compañero de aventura"
         width="1024"
         height="1536"
       />
-
     </section>
 
-
-    <!-- ======================================= -->
-    <!-- QUESTION -->
-    <!-- ======================================= -->
-
-    <section class="question-card">
-
+    <!-- Pregunta actual -->
+    <section
+      class="question-card"
+      aria-labelledby="question-title"
+    >
       <span class="question-card__number">
         DESAFÍO {{ currentQuestionIndex() + 1 }}
       </span>
 
-      <h1 id="question-title">
+      <h1
+        id="question-title"
+        aria-live="polite"
+        aria-atomic="true"
+      >
         {{ currentQuestion().question }}
       </h1>
-
     </section>
 
-
-    <!-- ======================================= -->
-    <!-- ANSWERS -->
-    <!-- ======================================= -->
-
+    <!-- Opciones -->
     <section
       class="answers"
       aria-label="Opciones de respuesta"
     >
-
       @for (
         option of currentQuestion().options;
         track option.id;
         let index = $index
       ) {
-
         <button
           type="button"
           class="answer-card"
-          [class]="getAnswerClass(option.id)"
-          [disabled]="isAnswered()"
+          [class.answer-card--correct]="
+            isAnswered() &&
+            isCorrectAnswer(option.id)
+          "
+          [class.answer-card--incorrect]="
+            isAnswered() &&
+            selectedAnswer() === option.id &&
+            !isCorrectAnswer(option.id)
+          "
+          [class.answer-card--disabled]="
+            isAnswered() &&
+            selectedAnswer() !== option.id &&
+            !isCorrectAnswer(option.id)
+          "
+          [disabled]="isAnswered() || isFinished()"
+          [attr.aria-pressed]="selectedAnswer() === option.id"
           (click)="answerQuestion(option.id)"
         >
-
-          <span class="answer-card__letter">
-            {{ ['A', 'B', 'C'][index] }}
+          <span
+            class="answer-card__letter"
+            aria-hidden="true"
+          >
+            {{ 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'[index] }}
           </span>
 
           <span class="answer-card__text">
@@ -158,7 +157,10 @@
             isAnswered() &&
             isCorrectAnswer(option.id)
           ) {
-            <span class="answer-card__status">
+            <span
+              class="answer-card__status"
+              aria-label="Respuesta correcta"
+            >
               ✓
             </span>
           }
@@ -168,36 +170,36 @@
             selectedAnswer() === option.id &&
             !isCorrectAnswer(option.id)
           ) {
-            <span class="answer-card__status">
+            <span
+              class="answer-card__status"
+              aria-label="Respuesta incorrecta"
+            >
               ×
             </span>
           }
-
         </button>
-
       }
-
     </section>
 
-
-    <!-- ======================================= -->
-    <!-- FEEDBACK -->
-    <!-- ======================================= -->
-
+    <!-- Resultado de la respuesta -->
     @if (isAnswered()) {
-
       <section
         class="feedback"
+        role="status"
+        aria-live="polite"
+        aria-atomic="true"
         [class.feedback--correct]="
-          isCorrectAnswer(selectedAnswer()!)
+          isCorrectAnswer(selectedAnswer() ?? '')
         "
         [class.feedback--incorrect]="
-          !isCorrectAnswer(selectedAnswer()!)
+          !isCorrectAnswer(selectedAnswer() ?? '')
         "
       >
-
-        <div class="feedback__icon">
-          @if (isCorrectAnswer(selectedAnswer()!)) {
+        <div
+          class="feedback__icon"
+          aria-hidden="true"
+        >
+          @if (isCorrectAnswer(selectedAnswer() ?? '')) {
             ✓
           } @else {
             !
@@ -205,67 +207,72 @@
         </div>
 
         <div class="feedback__content">
-
-          <h2>
-            {{ getFeedbackTitle() }}
-          </h2>
-
-          <p>
-            {{ getFeedbackText() }}
-          </p>
-
+          <h2>{{ getFeedbackTitle() }}</h2>
+          <p>{{ getFeedbackText() }}</p>
         </div>
-
       </section>
 
-
-      <!-- Explanation -->
-
-      <section class="explanation">
-
-        <div class="explanation__icon">
+      <!-- Explicación -->
+      <section
+        class="explanation"
+        aria-label="Explicación de la respuesta"
+      >
+        <div
+          class="explanation__icon"
+          aria-hidden="true"
+        >
           💡
         </div>
 
         <div>
-
-          <span>
-            ¿Sabías que...?
-          </span>
+          <span>¿Sabías que...?</span>
 
           <p>
             {{ currentQuestion().explanation }}
           </p>
-
         </div>
-
       </section>
 
+      <!-- Aviso del avance automático -->
+      <p class="auto-advance-note">
+        @if (isFinished()) {
+          Tu aventura terminó. Pulsa el botón para ver
+          tu resultado.
+        } @else if (
+          currentQuestionIndex() === totalQuestions() - 1
+        ) {
+          Tu resultado se abrirá automáticamente
+          {{ autoAdvanceSeconds }} segundos después
+          de responder. También puedes continuar ahora.
+        } @else {
+          La siguiente pregunta aparecerá automáticamente
+          {{ autoAdvanceSeconds }} segundos después
+          de responder. También puedes avanzar ahora.
+        }
+      </p>
 
-      <!-- Next -->
-
+      <!-- Avanzar manualmente -->
       <button
         type="button"
         class="next-button"
         (click)="nextQuestion()"
       >
-
         <span>
           {{
+            isFinished() ||
             currentQuestionIndex() === totalQuestions() - 1
               ? 'Ver resultado'
               : 'Siguiente pregunta'
           }}
         </span>
 
-        <span class="next-button__icon">
+        <span
+          class="next-button__icon"
+          aria-hidden="true"
+        >
           →
         </span>
-
       </button>
-
     }
-
   </div>
-
 </main>

@@ -1,28 +1,28 @@
-import { Component, inject } from '@angular/core';
+import {
+  Component,
+  OnDestroy,
+  OnInit,
+  inject,
+} from '@angular/core';
+
 import { Router } from '@angular/router';
 
 import { QuizService } from '../../../../core/services/quiz.service';
 
 @Component({
   selector: 'app-question',
+  standalone: true,
   imports: [],
   templateUrl: './question.html',
   styleUrl: './question.scss',
 })
-export class Question {
-  // =========================================================
-  // DEPENDENCIAS
-  // =========================================================
+export class Question implements OnInit, OnDestroy {
+  readonly quizService = inject(QuizService);
+  readonly router = inject(Router);
 
-  readonly quizService =
-    inject(QuizService);
-
-  readonly router =
-    inject(Router);
-
-  // =========================================================
-  // ESTADO
-  // =========================================================
+  // ==========================================
+  // ESTADO COMPARTIDO
+  // ==========================================
 
   readonly currentQuestion =
     this.quizService.currentQuestion;
@@ -48,95 +48,161 @@ export class Question {
   readonly isFinished =
     this.quizService.isFinished;
 
-  // =========================================================
-  // RESPONDER
-  // =========================================================
+  // Tiempo para leer el feedback antes de avanzar.
+  readonly autoAdvanceSeconds = 6;
 
-  answerQuestion(
-    answerId: string
-  ): void {
+  private advanceTimer?: ReturnType<typeof setTimeout>;
+  private destroyed = false;
+
+  // ==========================================
+  // INICIO
+  // ==========================================
+
+  ngOnInit(): void {
+    // No reiniciar una aventura ya terminada al entrar aquí.
     if (this.isFinished()) {
+      void this.router.navigate(['/resultado']);
       return;
     }
 
-    this.quizService.answerQuestion(
-      answerId
-    );
+    // El servicio conserva el intento si ya fue iniciado.
+    this.quizService.startQuiz();
+
+    // Si vuelve desde el mapa con una respuesta registrada,
+    // conservarla y reanudar el avance.
+    if (this.isAnswered()) {
+      this.scheduleNextQuestion();
+    }
   }
 
-  // =========================================================
-  // SIGUIENTE
-  // =========================================================
+  // ==========================================
+  // RESPONDER
+  // ==========================================
+
+  answerQuestion(answerId: string): void {
+    if (
+      this.destroyed ||
+      this.isAnswered() ||
+      this.isFinished()
+    ) {
+      return;
+    }
+
+    // Aceptar solo opciones de la pregunta actual.
+    const optionExists = this.currentQuestion()
+      .options.some((option) => option.id === answerId);
+
+    if (!optionExists) {
+      return;
+    }
+
+    this.quizService.answerQuestion(answerId);
+
+    if (this.isAnswered()) {
+      this.scheduleNextQuestion();
+    }
+  }
+
+  // ==========================================
+  // AVANCE AUTOMÁTICO
+  // ==========================================
+
+  private scheduleNextQuestion(): void {
+    this.clearAdvanceTimer();
+
+    const answeredIndex = this.currentQuestionIndex();
+    const answeredQuestion = this.currentQuestion();
+
+    this.advanceTimer = setTimeout(() => {
+      this.advanceTimer = undefined;
+
+      // No aplicar un temporizador a otra pregunta.
+      if (
+        this.destroyed ||
+        this.isFinished() ||
+        !this.isAnswered() ||
+        this.currentQuestionIndex() !== answeredIndex ||
+        this.currentQuestion() !== answeredQuestion
+      ) {
+        return;
+      }
+
+      this.nextQuestion();
+    }, this.autoAdvanceSeconds * 1000);
+  }
+
+  // ==========================================
+  // AVANCE MANUAL O AUTOMÁTICO
+  // ==========================================
 
   nextQuestion(): void {
+    // Si se pulsa el botón, cancelar el avance pendiente.
+    this.clearAdvanceTimer();
+
+    if (this.destroyed) {
+      return;
+    }
+
+    if (this.isFinished()) {
+      void this.router.navigate(['/resultado']);
+      return;
+    }
+
     if (!this.isAnswered()) {
       return;
     }
 
+    // El servicio incrementa el índice y limpia el feedback.
     this.quizService.nextQuestion();
 
-    /*
-     * No calculamos aquí si es la última pregunta.
-     * QuizService es la única fuente de verdad.
-     */
-
     if (this.isFinished()) {
-      this.router.navigate([
-        '/resultado',
-      ]);
+      void this.router.navigate(['/resultado']);
     }
   }
 
-  // =========================================================
-  // RESPUESTA CORRECTA
-  // =========================================================
+  // ==========================================
+  // VOLVER AL MAPA
+  // ==========================================
 
-  isCorrectAnswer(
-    answerId: string
-  ): boolean {
-    return this.quizService.isCorrectAnswer(
-      answerId
-    );
+  goToMap(): void {
+    this.clearAdvanceTimer();
+    void this.router.navigate(['/mapa']);
   }
 
-  // =========================================================
-  // CLASE DE RESPUESTA
-  // =========================================================
+  // ==========================================
+  // ESTADO DE LAS RESPUESTAS
+  // ==========================================
 
-  getAnswerClass(
-    answerId: string
-  ): string {
+  isCorrectAnswer(answerId: string): boolean {
+    return this.quizService.isCorrectAnswer(answerId);
+  }
+
+  getAnswerClass(answerId: string): string {
     if (!this.isAnswered()) {
       return '';
     }
 
-    if (
-      this.isCorrectAnswer(answerId)
-    ) {
+    if (this.isCorrectAnswer(answerId)) {
       return 'answer-card--correct';
     }
 
-    if (
-      this.selectedAnswer() ===
-      answerId
-    ) {
+    if (this.selectedAnswer() === answerId) {
       return 'answer-card--incorrect';
     }
 
     return 'answer-card--disabled';
   }
 
-  // =========================================================
+  // ==========================================
   // PERSONAJE
-  // =========================================================
+  // ==========================================
 
   getCharacterImage(): string {
     if (!this.isAnswered()) {
       return '/assets/characters/thinking.webp';
     }
 
-    const answer =
-      this.selectedAnswer();
+    const answer = this.selectedAnswer();
 
     if (
       answer !== null &&
@@ -148,13 +214,12 @@ export class Question {
     return '/assets/characters/sad.webp';
   }
 
-  // =========================================================
-  // TÍTULO DEL FEEDBACK
-  // =========================================================
+  // ==========================================
+  // FEEDBACK
+  // ==========================================
 
   getFeedbackTitle(): string {
-    const answer =
-      this.selectedAnswer();
+    const answer = this.selectedAnswer();
 
     if (
       answer !== null &&
@@ -166,35 +231,41 @@ export class Question {
     return '¡Casi!';
   }
 
-  // =========================================================
-  // TEXTO DEL FEEDBACK
-  // =========================================================
-
   getFeedbackText(): string {
-    const answer =
-      this.selectedAnswer();
+    const answer = this.selectedAnswer();
 
     if (answer === null) {
       return '';
     }
 
-    if (
-      this.isCorrectAnswer(answer)
-    ) {
+    if (this.isCorrectAnswer(answer)) {
       return '¡Respuesta correcta! Sigue explorando.';
     }
 
-    const correctOption =
-      this.currentQuestion()
-        .options.find(
-          (option) =>
-            option.id ===
-            this.currentQuestion()
-              .correctAnswer
-        );
+    const question = this.currentQuestion();
+
+    const correctOption = question.options.find(
+      (option) => option.id === question.correctAnswer
+    );
 
     return `La respuesta correcta era: ${
       correctOption?.text ?? ''
     }`;
+  }
+
+  // ==========================================
+  // LIMPIEZA
+  // ==========================================
+
+  private clearAdvanceTimer(): void {
+    if (this.advanceTimer !== undefined) {
+      clearTimeout(this.advanceTimer);
+      this.advanceTimer = undefined;
+    }
+  }
+
+  ngOnDestroy(): void {
+    this.destroyed = true;
+    this.clearAdvanceTimer();
   }
 }
