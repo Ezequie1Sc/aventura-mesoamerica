@@ -29,6 +29,7 @@ export class AudioService {
     achievement: `${this.basePath}/rewards/achievement.wav`,
     victory: `${this.basePath}/rewards/victory.wav`,
     win: `${this.basePath}/ui/win.wav`,
+    piplup: `${this.basePath}/music/piplup.mp3`,
   } as const;
 
   /*
@@ -134,8 +135,8 @@ export class AudioService {
      * RESULT
      * ========================================
      *
-     * Piplup será la música de fondo
-     * durante la pantalla de resultados.
+     * En resultado utilizamos Piplup
+     * como música de fondo.
      */
 
     if (url.startsWith('/resultado')) {
@@ -170,6 +171,9 @@ export class AudioService {
       /*
        * El navegador puede bloquear la reproducción
        * si no existe una interacción del usuario.
+       *
+       * No hacemos nada en ese caso para evitar
+       * errores en consola.
        */
     });
 
@@ -184,8 +188,17 @@ export class AudioService {
     );
   }
 
+  /*
+   * ========================================
+   * UI SOUNDS
+   * ========================================
+   */
+
   playSelect(): void {
-    this.play('select', 0.7);
+    this.play(
+      'select',
+      0.7
+    );
   }
 
   playSelectAlternative(): void {
@@ -196,27 +209,75 @@ export class AudioService {
   }
 
   playNext(): void {
-    this.play('next', 0.8);
+    this.play(
+      'next',
+      0.8
+    );
   }
 
+  /*
+   * ========================================
+   * QUIZ SOUNDS
+   * ========================================
+   */
+
   playCorrect(): void {
-    this.play('correct', 0.8);
+    this.play(
+      'correct',
+      0.8
+    );
   }
 
   playIncorrect(): void {
-    this.play('incorrect', 0.65);
+    this.play(
+      'incorrect',
+      0.65
+    );
   }
 
+  /*
+   * ========================================
+   * REWARD SOUNDS
+   * ========================================
+   */
+
   playAchievement(): void {
-    this.play('achievement', 0.9);
+    this.play(
+      'achievement',
+      0.9
+    );
   }
 
   playVictory(): void {
-    this.play('victory', 0.9);
+    this.play(
+      'victory',
+      0.9
+    );
   }
 
   playWin(): void {
-    this.play('win', 0.85);
+    this.play(
+      'win',
+      0.85
+    );
+  }
+
+  /*
+   * ========================================
+   * PIPLUP - ONE SHOT
+   * ========================================
+   *
+   * Se reproduce una sola vez.
+   *
+   * Se utiliza cuando la insignia
+   * termina de generarse y descargarse.
+   */
+
+  playPiplup(): void {
+    this.play(
+      'piplup',
+      0.75
+    );
   }
 
   /*
@@ -264,16 +325,22 @@ export class AudioService {
     );
 
     this.backgroundAudio = audio;
-    this.currentBackgroundMusic = music;
+
+    this.currentBackgroundMusic =
+      music;
 
     /*
      * Intentar reproducir.
+     *
+     * Algunos navegadores, especialmente
+     * en dispositivos móviles, pueden bloquear
+     * autoplay hasta que exista interacción.
      */
 
     void audio.play().catch(() => {
       /*
-       * Algunos navegadores pueden bloquear
-       * autoplay hasta que exista interacción.
+       * No mostramos el error para evitar
+       * errores innecesarios en consola.
        */
     });
   }
