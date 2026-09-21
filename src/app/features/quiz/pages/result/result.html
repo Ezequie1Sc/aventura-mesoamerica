@@ -1,244 +1,184 @@
-<main class="result-page">
-  <!-- Fondo -->
-  <div
-    class="result-background"
-    aria-hidden="true"
-  ></div>
+<main class="result-page" aria-labelledby="result-title">
+  <div class="result-background" aria-hidden="true"></div>
+  <div class="result-overlay" aria-hidden="true"></div>
 
-  <div
-    class="result-overlay"
-    aria-hidden="true"
-  ></div>
-
-  <!-- Decoración -->
-  <img
-    class="result-leaf result-leaf--left"
-    src="/assets/nature/leaves.webp"
-    alt=""
-    aria-hidden="true"
-  />
-
-  <img
-    class="result-leaf result-leaf--right"
-    src="/assets/nature/leaves.webp"
-    alt=""
-    aria-hidden="true"
-  />
-
-  <section class="result-content">
-
-    <!-- =========================================
-         HEADER
-         ========================================= -->
+  <div class="result-content">
+    <!-- Navegación -->
     <header class="result-header">
       <a
         routerLink="/"
         class="back-button"
         aria-label="Volver al inicio"
       >
-        ←
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <path
+            d="M14 6 8 12l6 6M8 12h12"
+            stroke="currentColor"
+            stroke-width="2.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
       </a>
 
-      <div class="result-header__title">
-        <img
-          src="/assets/rewards/star.webp"
-          alt=""
-          aria-hidden="true"
-        />
+      <div class="adventure-sign">
+        <span>AVENTURA</span>
+        <strong>MESOAMÉRICA</strong>
+      </div>
 
-        <p>AVENTURA MESOAMÉRICA</p>
+      <div aria-hidden="true"></div>
+    </header>
+
+    <!-- Personaje y mensaje -->
+    <section class="result-hero" aria-labelledby="result-title">
+      <div class="result-character">
+        <div class="result-character__glow" aria-hidden="true"></div>
 
         <img
-          src="/assets/rewards/star.webp"
-          alt=""
-          aria-hidden="true"
+          class="result-character__image"
+          [src]="getCharacterImage()"
+          alt="Tu compañero de aventura"
+          width="260"
+          height="340"
+          fetchpriority="high"
         />
       </div>
 
-      <div
-        class="result-header__spacer"
-        aria-hidden="true"
-      ></div>
-    </header>
-
-    <!-- =========================================
-         PERSONAJE
-         ========================================= -->
-    <section
-      class="result-character"
-      aria-label="Personaje celebrando"
-    >
-      <div
-        class="result-character__glow"
-        aria-hidden="true"
-      ></div>
-
-      <img
-        class="result-character__image"
-        [src]="getCharacterImage()"
-        alt="Explorador celebrando"
-      />
-    </section>
-
-    <!-- =========================================
-         CARD PRINCIPAL DEL RESULTADO
-         ========================================= -->
-    <section
-      class="result-summary"
-      aria-labelledby="result-title"
-    >
-
-      <!-- Título -->
-      <div class="result-heading">
-
-        <div
-          class="result-heading__decoration"
-          aria-hidden="true"
-        >
-          <img
-            src="/assets/rewards/star.webp"
-            alt=""
-          />
-
-          <span></span>
-
-          <img
-            src="/assets/rewards/star.webp"
-            alt=""
-          />
-        </div>
+      <div class="result-speech">
+        <span class="result-speech__label">
+          ¡LO ESTÁS LOGRANDO!
+        </span>
 
         <h1 id="result-title">
           {{ getResultTitle() }}
         </h1>
 
-        <p>
-          {{ getResultMessage() }}
-        </p>
+        <p>{{ getResultMessage() }}</p>
+
+        <span class="result-speech__spark" aria-hidden="true">✦</span>
+      </div>
+    </section>
+
+    <!-- Panel de puntuación -->
+    <section class="result-summary" aria-label="Tu puntuación">
+      <span
+        class="result-summary__corner result-summary__corner--left"
+        aria-hidden="true"
+      ></span>
+
+      <span
+        class="result-summary__corner result-summary__corner--right"
+        aria-hidden="true"
+      ></span>
+
+      <div class="score-stars" aria-hidden="true">
+        @for (star of [1, 2, 3]; track star) {
+          <img
+            src="/assets/rewards/star.webp"
+            alt=""
+            width="48"
+            height="48"
+            [class.score-star--active]="score() >= star * 2"
+          />
+        }
       </div>
 
-      <!-- Puntuación -->
-      <div class="score-card">
+      <div class="score-value">
+        <strong>{{ score() }}</strong>
+        <span>/ {{ totalQuestions() }}</span>
+      </div>
 
-        <div
-          class="score-card__stars"
+      <p class="score-caption">respuestas correctas</p>
+
+      <progress
+        class="score-progress"
+        [value]="score()"
+        [max]="totalQuestions() || 1"
+        aria-label="Respuestas correctas"
+      ></progress>
+
+      <div class="score-detail">
+        <span class="score-detail__line" aria-hidden="true"></span>
+
+        <img
+          src="/assets/objects/pyramid.webp"
+          alt=""
           aria-hidden="true"
-        >
-          @for (star of [1, 2, 3]; track star) {
-            <img
-              src="/assets/rewards/star.webp"
-              alt=""
-              [class.score-star--active]="
-                score() >= star * 2
-              "
-            />
-          }
-        </div>
-
-        <div class="score-card__score">
-          <strong>
-            {{ score() }}
-          </strong>
-
-          <span>
-            / {{ totalQuestions() }}
-          </span>
-        </div>
-
-        <p>
-          respuestas correctas
-        </p>
-      </div>
-
-      <!-- Frase de progreso -->
-      <div class="result-summary__progress">
-        <span>
-          {{ score() }}
-        </span>
-
-        <span class="result-summary__progress-dot">
-          ◆
-        </span>
+          width="34"
+          height="34"
+        />
 
         <span>
+          <strong>{{ score() }}</strong>
           de {{ totalQuestions() }} retos
         </span>
+
+        <span class="score-detail__line" aria-hidden="true"></span>
       </div>
 
+      <img
+        class="panel-leaf panel-leaf--left"
+        src="/assets/nature/leaves.webp"
+        alt=""
+        aria-hidden="true"
+        width="90"
+        height="100"
+      />
+
+      <img
+        class="panel-leaf panel-leaf--right"
+        src="/assets/nature/leaves.webp"
+        alt=""
+        aria-hidden="true"
+        width="90"
+        height="100"
+      />
     </section>
 
-    <!-- =========================================
-         INSIGNIA OBTENIDA
-         ========================================= -->
-    <section
-      class="result-badge"
-      aria-labelledby="badge-title"
-    >
-
+    <!-- Insignia -->
+    <section class="result-badge" aria-labelledby="badge-title">
       <div class="result-badge__heading">
-
-        <img
-          src="/assets/rewards/star.webp"
-          alt=""
-          aria-hidden="true"
-        />
-
-        <span>
-          INSIGNIA OBTENIDA
-        </span>
-
-        <img
-          src="/assets/rewards/star.webp"
-          alt=""
-          aria-hidden="true"
-        />
-
+        <span aria-hidden="true">✦</span>
+        <span>INSIGNIA OBTENIDA</span>
+        <span aria-hidden="true">✦</span>
       </div>
 
-      <div class="result-badge__image-wrapper">
+      <div class="result-badge__body">
+        <div class="result-badge__image-wrapper">
+          <div class="result-badge__glow" aria-hidden="true"></div>
 
-        <div
-          class="result-badge__glow"
-          aria-hidden="true"
-        ></div>
+          <img
+            class="result-badge__image"
+            [src]="getBadgeImage()"
+            [alt]="getBadge().name"
+            width="180"
+            height="180"
+          />
+        </div>
 
-        <img
-          class="result-badge__image"
-          [src]="getBadgeImage()"
-          [alt]="getBadge().name"
-        />
+        <div class="result-badge__copy">
+          <span class="result-badge__eyebrow">Tu nuevo logro</span>
 
+          <h2 id="badge-title">{{ getBadge().name }}</h2>
+
+          <p>{{ getBadge().description }}</p>
+        </div>
       </div>
-
-      <h2 id="badge-title">
-        {{ getBadge().name }}
-      </h2>
-
-      <p>
-        {{ getBadge().description }}
-      </p>
-
     </section>
 
-    <!-- =========================================
-         ACCIONES
-         ========================================= -->
-    <section
-      class="result-actions"
-      aria-label="Acciones del resultado"
-    >
+    <!-- Acciones -->
+    <nav class="result-actions" aria-label="Acciones del resultado">
+      <a routerLink="/insignias" class="claim-button">
+        <img
+          src="/assets/rewards/medal.webp"
+          alt=""
+          aria-hidden="true"
+          width="30"
+          height="30"
+        />
 
-      <a
-        routerLink="/insignias"
-        class="claim-button"
-      >
-        <span>✦</span>
-
-        <span>
-          Ver mi insignia
-        </span>
-
-        <span>→</span>
+        <span>Ver mi insignia</span>
+        <span aria-hidden="true">→</span>
       </a>
 
       <button
@@ -246,37 +186,13 @@
         class="restart-button"
         (click)="restartQuiz()"
       >
-        <span>↻</span>
-
-        <span>
-          Volver a jugar
-        </span>
+        <span aria-hidden="true">↻</span>
+        <span>Volver a jugar</span>
       </button>
+    </nav>
 
-    </section>
-
-    <!-- =========================================
-         FOOTER
-         ========================================= -->
     <footer class="result-footer">
-
-      <img
-        src="/assets/rewards/star.webp"
-        alt=""
-        aria-hidden="true"
-      />
-
-      <p>
-        ¡Sigue explorando y aprendiendo!
-      </p>
-
-      <img
-        src="/assets/rewards/star.webp"
-        alt=""
-        aria-hidden="true"
-      />
-
+      <p>¡Sigue explorando y aprendiendo!</p>
     </footer>
-
-  </section>
+  </div>
 </main>
