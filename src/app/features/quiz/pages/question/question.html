@@ -2,7 +2,10 @@
   class="question-page"
   aria-labelledby="question-title"
 >
-  <!-- Fondo -->
+  <!-- ========================================
+       BACKGROUND
+       ======================================== -->
+
   <div
     class="question-background"
     aria-hidden="true"
@@ -13,30 +16,89 @@
     aria-hidden="true"
   ></div>
 
+  <!-- ========================================
+       CONFETI
+       ======================================== -->
+
+  @if (showConfetti()) {
+    <div
+      class="question-confetti"
+      aria-hidden="true"
+    >
+      @for (
+        piece of confettiPieces;
+        track piece
+      ) {
+        <span
+          class="question-confetti__piece"
+          [class.question-confetti__piece--small]="
+            piece % 4 === 0
+          "
+          [class.question-confetti__piece--circle]="
+            piece % 5 === 0
+          "
+          [class.question-confetti__piece--wide]="
+            piece % 7 === 0
+          "
+          [style.left.%]="
+            getConfettiLeft(piece)
+          "
+          [style.animation-delay.ms]="
+            getConfettiDelay(piece)
+          "
+        ></span>
+      }
+    </div>
+  }
+
+  <!-- ========================================
+       MAIN CONTENT
+       ======================================== -->
+
   <div class="question-content">
-    <!-- Encabezado -->
+
+    <!-- ======================================
+         HEADER
+         ====================================== -->
+
     <header class="question-header">
+
+      <!-- Back -->
       <button
         type="button"
         class="back-button"
         aria-label="Volver al mapa"
+        (mouseenter)="playButtonHover()"
         (click)="goToMap()"
       >
-        <span aria-hidden="true">←</span>
+        <span aria-hidden="true">
+          ←
+        </span>
       </button>
 
+      <!-- Question counter -->
       <div class="question-progress">
+
         <span class="question-progress__label">
-          Pregunta
+          PREGUNTA
         </span>
 
         <strong>
           {{ currentQuestionIndex() + 1 }}
-          / {{ totalQuestions() }}
+          /
+          {{ totalQuestions() }}
         </strong>
+
       </div>
 
-      <div class="score-badge">
+      <!-- Score -->
+      <div
+        class="score-badge"
+        [attr.aria-label]="
+          score() + ' respuestas correctas'
+        "
+      >
+
         <span
           class="score-badge__star"
           aria-hidden="true"
@@ -44,24 +106,33 @@
           ★
         </span>
 
-        <strong
-          [attr.aria-label]="
-            score() + ' respuestas correctas'
-          "
-        >
+        <strong>
           {{ score() }}
         </strong>
+
       </div>
+
     </header>
 
-    <!-- Progreso -->
+    <!-- ======================================
+         PROGRESS BAR
+         ====================================== -->
+
     <div
       class="progress-track"
       role="progressbar"
       aria-label="Progreso de la aventura"
-      [attr.aria-valuemin]="0"
-      [attr.aria-valuemax]="totalQuestions()"
-      [attr.aria-valuenow]="currentQuestionIndex() + 1"
+
+      [attr.aria-valuemin]="1"
+
+      [attr.aria-valuemax]="
+        totalQuestions()
+      "
+
+      [attr.aria-valuenow]="
+        currentQuestionIndex() + 1
+      "
+
       [attr.aria-valuetext]="
         'Pregunta ' +
         (currentQuestionIndex() + 1) +
@@ -69,17 +140,23 @@
         totalQuestions()
       "
     >
+
       <div
         class="progress-fill"
         [style.width.%]="progress()"
       ></div>
+
     </div>
 
-    <!-- Personaje -->
+    <!-- ======================================
+         CHARACTER
+         ====================================== -->
+
     <section
       class="question-character"
-      aria-label="Explorador"
+      aria-label="Compañero de aventura"
     >
+
       <div
         class="character-glow"
         aria-hidden="true"
@@ -88,16 +165,21 @@
       <img
         [src]="getCharacterImage()"
         alt="Tu compañero de aventura"
-        width="1024"
-        height="1536"
+        width="420"
+        height="520"
       />
+
     </section>
 
-    <!-- Pregunta actual -->
+    <!-- ======================================
+         QUESTION
+         ====================================== -->
+
     <section
       class="question-card"
       aria-labelledby="question-title"
     >
+
       <span class="question-card__number">
         DESAFÍO {{ currentQuestionIndex() + 1 }}
       </span>
@@ -109,159 +191,242 @@
       >
         {{ currentQuestion().question }}
       </h1>
+
     </section>
 
-    <!-- Opciones -->
+    <!-- ======================================
+         ANSWERS
+         ====================================== -->
+
     <section
       class="answers"
       aria-label="Opciones de respuesta"
     >
+
       @for (
         option of currentQuestion().options;
         track option.id;
         let index = $index
       ) {
+
         <button
           type="button"
           class="answer-card"
+
           [class.answer-card--correct]="
             isAnswered() &&
             isCorrectAnswer(option.id)
           "
+
           [class.answer-card--incorrect]="
             isAnswered() &&
             selectedAnswer() === option.id &&
             !isCorrectAnswer(option.id)
           "
+
           [class.answer-card--disabled]="
             isAnswered() &&
             selectedAnswer() !== option.id &&
             !isCorrectAnswer(option.id)
           "
-          [disabled]="isAnswered() || isFinished()"
-          [attr.aria-pressed]="selectedAnswer() === option.id"
-          (mouseenter)="playAnswerHover()"
-          (click)="answerQuestion(option.id)"
+
+          [disabled]="
+            isAnswered() ||
+            isFinished()
+          "
+
+          [attr.aria-pressed]="
+            selectedAnswer() === option.id
+          "
+
+          (mouseenter)="playButtonHover()"
+
+          (click)="
+            answerQuestion(option.id)
+          "
         >
+
+          <!-- Letter -->
+
           <span
             class="answer-card__letter"
             aria-hidden="true"
           >
-            {{ 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'[index] }}
+            {{
+              'ABCDEFGHIJKLMNOPQRSTUVWXYZ'[index]
+            }}
           </span>
+
+          <!-- Answer text -->
 
           <span class="answer-card__text">
             {{ option.text }}
           </span>
 
+          <!-- Correct -->
+
           @if (
             isAnswered() &&
             isCorrectAnswer(option.id)
           ) {
+
             <span
               class="answer-card__status"
               aria-label="Respuesta correcta"
             >
               ✓
             </span>
+
           }
+
+          <!-- Incorrect -->
 
           @if (
             isAnswered() &&
             selectedAnswer() === option.id &&
             !isCorrectAnswer(option.id)
           ) {
+
             <span
               class="answer-card__status"
               aria-label="Respuesta incorrecta"
             >
               ×
             </span>
+
           }
+
         </button>
+
       }
+
     </section>
 
-    <!-- Resultado de la respuesta -->
+    <!-- ======================================
+         FEEDBACK
+         ====================================== -->
+
     @if (isAnswered()) {
+
       <section
         class="feedback"
+
         role="status"
+
         aria-live="polite"
+
         aria-atomic="true"
+
         [class.feedback--correct]="
-          isCorrectAnswer(selectedAnswer() ?? '')
+          isCorrectAnswer(
+            selectedAnswer() ?? ''
+          )
         "
+
         [class.feedback--incorrect]="
-          !isCorrectAnswer(selectedAnswer() ?? '')
+          !isCorrectAnswer(
+            selectedAnswer() ?? ''
+          )
         "
       >
+
+        <!-- Feedback icon -->
+
         <div
           class="feedback__icon"
           aria-hidden="true"
         >
-          @if (isCorrectAnswer(selectedAnswer() ?? '')) {
+
+          @if (
+            isCorrectAnswer(
+              selectedAnswer() ?? ''
+            )
+          ) {
+
             ✓
+
           } @else {
+
             !
+
           }
+
         </div>
+
+        <!-- Feedback content -->
 
         <div class="feedback__content">
-          <h2>{{ getFeedbackTitle() }}</h2>
-          <p>{{ getFeedbackText() }}</p>
+
+          <h2>
+            {{ getFeedbackTitle() }}
+          </h2>
+
+          <p>
+            {{ getFeedbackText() }}
+          </p>
+
         </div>
+
       </section>
 
-      <!-- Explicación -->
+      <!-- ====================================
+           EXPLANATION
+           ==================================== -->
+
       <section
         class="explanation"
         aria-label="Explicación de la respuesta"
       >
+
+        <!-- Jaguar -->
+
         <div
           class="explanation__icon"
           aria-hidden="true"
         >
-          💡
+
+          <img
+            src="/assets/objects/jaguar.webp"
+            alt=""
+            width="72"
+            height="72"
+          />
+
         </div>
 
-        <div>
-          <span>¿Sabías que...?</span>
+        <!-- Explanation -->
+
+        <div class="explanation__content">
+
+          <span>
+            ¿Sabías que?
+          </span>
 
           <p>
             {{ currentQuestion().explanation }}
           </p>
+
         </div>
+
       </section>
 
-      <!-- Aviso del avance automático -->
-      <p class="auto-advance-note">
-        @if (isFinished()) {
-          Tu aventura terminó. Pulsa el botón para ver
-          tu resultado.
-        } @else if (
-          currentQuestionIndex() === totalQuestions() - 1
-        ) {
-          Tu resultado se abrirá automáticamente
-          {{ autoAdvanceSeconds }} segundos después
-          de responder. También puedes continuar ahora.
-        } @else {
-          La siguiente pregunta aparecerá automáticamente
-          {{ autoAdvanceSeconds }} segundos después
-          de responder. También puedes avanzar ahora.
-        }
-      </p>
+      <!-- ====================================
+           NEXT QUESTION
+           ==================================== -->
 
-      <!-- Avanzar manualmente -->
       <button
         type="button"
         class="next-button"
+
+        (mouseenter)="playButtonHover()"
+
         (click)="nextQuestion()"
       >
+
         <span>
           {{
-            isFinished() ||
-            currentQuestionIndex() === totalQuestions() - 1
+            currentQuestionIndex() ===
+            totalQuestions() - 1
               ? 'Ver resultado'
               : 'Siguiente pregunta'
           }}
@@ -273,7 +438,11 @@
         >
           →
         </span>
+
       </button>
+
     }
+
   </div>
+
 </main>
