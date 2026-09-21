@@ -1,5 +1,12 @@
-import { Component, ElementRef, ViewChild } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  ViewChild,
+  inject,
+} from '@angular/core';
 import { RouterLink } from '@angular/router';
+
+import { AudioService } from '../../../../core/services/audio.service';
 
 @Component({
   selector: 'app-home',
@@ -11,6 +18,8 @@ import { RouterLink } from '@angular/router';
 export class Home {
   @ViewChild('helpDialog')
   private helpDialog!: ElementRef<HTMLDialogElement>;
+
+  readonly audioService = inject(AudioService);
 
   openHelp(): void {
     const dialog = this.helpDialog.nativeElement;
