@@ -1,4 +1,12 @@
-import { Component, inject, signal } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  OnDestroy,
+  ViewChild,
+  computed,
+  inject,
+  signal,
+} from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 
 import { QuizService } from '../../../../core/services/quiz.service';
@@ -6,14 +14,18 @@ import { StorageService } from '../../../../core/services/storage.service';
 
 @Component({
   selector: 'app-badges',
+  standalone: true,
   imports: [RouterLink],
   templateUrl: './badges.html',
   styleUrl: './badges.scss',
 })
-export class Badges {
+export class Badges implements OnDestroy {
   private readonly quizService = inject(QuizService);
   private readonly storageService = inject(StorageService);
   private readonly router = inject(Router);
+
+  @ViewChild('nameDialog')
+  private nameDialog!: ElementRef<HTMLDialogElement>;
 
   readonly isFinished = this.quizService.isFinished;
   readonly score = this.quizService.score;
@@ -22,23 +34,48 @@ export class Badges {
   readonly isDownloading = signal(false);
   readonly downloadCompleted = signal(false);
 
+  /**
+   * El nombre queda guardado durante el intento actual.
+   * Se elimina cuando comienza un nuevo quiz.
+   */
+  readonly explorerName = signal(
+    localStorage.getItem('aventura-explorer-name') ?? '',
+  );
+
+  readonly downloadError = signal('');
+
+  readonly cleanName = computed(() =>
+    this.explorerName()
+      .replace(/\s+/g, ' ')
+      .trim(),
+  );
+
+  readonly validName = computed(() => {
+    const name = this.cleanName();
+
+    return (
+      name.length > 0 &&
+      name.length <= 60 &&
+      /\p{L}/u.test(name)
+    );
+  });
+
   private downloadResetTimer?: ReturnType<typeof setTimeout>;
+  private destroyed = false;
 
   getCurrentScore(): number {
-    if (this.isFinished()) {
-      return this.score();
-    }
-
-    return this.storageService.getBestScore();
+    return this.isFinished()
+      ? this.score()
+      : this.storageService.getBestScore();
   }
 
   getBadge() {
-    return this.quizService.getBadge(this.getCurrentScore());
+    return this.quizService.getBadge(
+      this.getCurrentScore(),
+    );
   }
 
   getBadgeImage(): string {
-    const badgeId = this.getBadge().id;
-
     const images: Record<string, string> = {
       semilla:
         '/assets/badges/semilla-conocimiento.webp',
@@ -54,7 +91,7 @@ export class Badges {
     };
 
     return (
-      images[badgeId] ??
+      images[this.getBadge().id] ??
       '/assets/badges/semilla-conocimiento.webp'
     );
   }
@@ -95,166 +132,366 @@ export class Badges {
     return 'Toda gran aventura comienza con un primer paso.';
   }
 
-  async downloadCard(): Promise<void> {
+  // =====================================================
+  // DIÁLOGO DEL NOMBRE
+  // =====================================================
+
+  openNameDialog(): void {
     if (this.isDownloading()) {
       return;
     }
 
-    this.isDownloading.set(true);
+    /*
+     * Si ya existe un nombre, significa que esta insignia
+     * ya fue personalizada durante este intento.
+     *
+     * No volvemos a mostrar el diálogo.
+     */
+    if (this.validName()) {
+      void this.downloadCard();
+      return;
+    }
+
+    this.downloadError.set('');
     this.downloadCompleted.set(false);
 
     if (this.downloadResetTimer) {
       clearTimeout(this.downloadResetTimer);
+      this.downloadResetTimer = undefined;
     }
 
-    const badge = this.getBadge();
-    const score = this.getCurrentScore();
-    const imageUrl = this.getBadgeImage();
+    const dialog = this.nameDialog.nativeElement;
 
-    const canvas = document.createElement('canvas');
-    const context = canvas.getContext('2d');
+    if (!dialog.open) {
+      dialog.showModal();
+    }
+  }
 
-    if (!context) {
-      this.isDownloading.set(false);
+  closeNameDialog(): void {
+    if (this.isDownloading()) {
       return;
     }
 
-    canvas.width = 1080;
-    canvas.height = 1350;
+    this.nameDialog.nativeElement.close();
+  }
 
-    const gradient = context.createLinearGradient(
-      0,
-      0,
-      0,
-      canvas.height
+  onDialogCancel(event: Event): void {
+    if (this.isDownloading()) {
+      event.preventDefault();
+    }
+  }
+
+  updateName(value: string): void {
+    /*
+     * Si ya existe un nombre guardado no permitimos
+     * modificarlo desde el formulario.
+     */
+    if (this.validName()) {
+      return;
+    }
+
+    this.explorerName.set(value);
+    this.downloadError.set('');
+  }
+
+  confirmDownload(event: Event): void {
+    event.preventDefault();
+
+    void this.downloadCard();
+  }
+
+  // =====================================================
+  // DESCARGA
+  // =====================================================
+
+  async downloadCard(): Promise<void> {
+    if (
+      this.isDownloading() ||
+      this.destroyed
+    ) {
+      return;
+    }
+
+    /*
+     * Si no hay nombre todavía, primero mostramos
+     * el diálogo.
+     */
+    if (!this.validName()) {
+      this.openNameDialog();
+
+      this.downloadError.set(
+        'Escribe tu nombre para descargar la insignia.',
+      );
+
+      return;
+    }
+
+    const name = this.cleanName();
+    const badge = this.getBadge();
+    const score = this.getCurrentScore();
+    const total = this.totalQuestions();
+    const imageUrl = this.getBadgeImage();
+
+    /*
+     * Guardamos el nombre ANTES de generar la tarjeta.
+     * Así queda asociado al intento actual.
+     */
+    localStorage.setItem(
+      'aventura-explorer-name',
+      name,
     );
 
-    gradient.addColorStop(0, '#173f2d');
-    gradient.addColorStop(0.55, '#276047');
-    gradient.addColorStop(1, '#10291f');
+    this.explorerName.set(name);
 
-    context.fillStyle = gradient;
+    this.isDownloading.set(true);
+    this.downloadCompleted.set(false);
+    this.downloadError.set('');
 
-    context.fillRect(
-      0,
-      0,
-      canvas.width,
-      canvas.height
-    );
+    if (this.downloadResetTimer) {
+      clearTimeout(this.downloadResetTimer);
+      this.downloadResetTimer = undefined;
+    }
 
-    context.fillStyle =
-      'rgba(244, 198, 72, 0.12)';
+    try {
+      const badgeImage =
+        await this.loadImage(imageUrl);
 
-    context.beginPath();
+      if (this.destroyed) {
+        return;
+      }
 
-    context.arc(
-      540,
-      420,
-      430,
-      0,
-      Math.PI * 2
-    );
+      // =================================================
+      // CANVAS
+      // =================================================
 
-    context.fill();
+      const canvas =
+        document.createElement('canvas');
 
-    context.strokeStyle = '#e6b84b';
-    context.lineWidth = 8;
+      canvas.width = 1080;
+      canvas.height = 1350;
 
-    context.strokeRect(
-      42,
-      42,
-      996,
-      1266
-    );
+      const context =
+        canvas.getContext('2d');
 
-    context.textAlign = 'center';
+      if (!context) {
+        throw new Error(
+          'No se pudo crear la imagen.',
+        );
+      }
 
-    context.fillStyle = '#f8d875';
-    context.font = 'bold 64px Arial';
+      context.textAlign = 'center';
+      context.textBaseline = 'middle';
 
-    context.fillText(
-      'AVENTURA',
-      540,
-      125
-    );
+      // =================================================
+      // FONDO
+      // =================================================
 
-    context.fillStyle = '#fff4ce';
-    context.font = 'bold 72px Arial';
+      const gradient =
+        context.createLinearGradient(
+          0,
+          0,
+          0,
+          canvas.height,
+        );
 
-    context.fillText(
-      'MESOAMÉRICA',
-      540,
-      205
-    );
+      gradient.addColorStop(
+        0,
+        '#173f2d',
+      );
 
-    const badgeImage = new Image();
+      gradient.addColorStop(
+        0.55,
+        '#276047',
+      );
 
-    badgeImage.onload = () => {
-      const maxSize = 580;
+      gradient.addColorStop(
+        1,
+        '#10291f',
+      );
+
+      context.fillStyle = gradient;
+
+      context.fillRect(
+        0,
+        0,
+        canvas.width,
+        canvas.height,
+      );
+
+      // =================================================
+      // RESPLANDOR
+      // =================================================
+
+      context.fillStyle =
+        'rgba(244, 198, 72, 0.12)';
+
+      context.beginPath();
+
+      context.arc(
+        540,
+        430,
+        390,
+        0,
+        Math.PI * 2,
+      );
+
+      context.fill();
+
+      // =================================================
+      // MARCO
+      // =================================================
+
+      context.strokeStyle =
+        '#e6b84b';
+
+      context.lineWidth = 8;
+
+      context.strokeRect(
+        42,
+        42,
+        996,
+        1266,
+      );
+
+      // =================================================
+      // TÍTULO
+      // =================================================
+
+      this.drawFittedText(
+        context,
+        'AVENTURA',
+        115,
+        62,
+        '#f8d875',
+      );
+
+      this.drawFittedText(
+        context,
+        'MESOAMÉRICA',
+        190,
+        72,
+        '#fff4ce',
+      );
+
+      // =================================================
+      // INSIGNIA
+      // =================================================
+
+      const maxWidth = 580;
+      const maxHeight = 500;
 
       const ratio = Math.min(
-        maxSize / badgeImage.width,
-        maxSize / badgeImage.height
+        maxWidth /
+          badgeImage.naturalWidth,
+        maxHeight /
+          badgeImage.naturalHeight,
       );
 
       const width =
-        badgeImage.width * ratio;
+        badgeImage.naturalWidth * ratio;
 
       const height =
-        badgeImage.height * ratio;
+        badgeImage.naturalHeight * ratio;
 
       context.drawImage(
         badgeImage,
         (canvas.width - width) / 2,
-        250,
+        245 +
+          (maxHeight - height) / 2,
         width,
-        height
+        height,
       );
 
-      context.fillStyle = '#f8d875';
-      context.font = 'bold 34px Arial';
+      // =================================================
+      // ETIQUETA
+      // =================================================
 
-      context.fillText(
+      this.drawFittedText(
+        context,
         'INSIGNIA OBTENIDA',
-        540,
-        890
+        790,
+        30,
+        '#f8d875',
       );
 
-      context.fillStyle = '#ffffff';
-      context.font = 'bold 48px Arial';
+      // =================================================
+      // NOMBRE DE INSIGNIA
+      // =================================================
 
-      context.fillText(
+      this.drawFittedText(
+        context,
         badge.name,
-        540,
-        960
+        850,
+        48,
+        '#ffffff',
       );
 
-      context.fillStyle = '#f8d875';
-      context.font = 'bold 62px Arial';
+      // =================================================
+      // NOMBRE DEL EXPLORADOR
+      // =================================================
 
-      context.fillText(
-        `${score} / 6`,
-        540,
-        1060
+      context.fillStyle =
+        '#fff4d8';
+
+      context.fillRect(
+        100,
+        905,
+        880,
+        150,
       );
 
-      context.fillStyle = '#fff4ce';
-      context.font = '28px Arial';
+      this.drawFittedText(
+        context,
+        'OTORGADA A',
+        942,
+        25,
+        '#426044',
+      );
 
-      context.fillText(
+      this.drawFittedText(
+        context,
+        name,
+        1000,
+        54,
+        '#173f2d',
+        800,
+      );
+
+      // =================================================
+      // PUNTUACIÓN
+      // =================================================
+
+      this.drawFittedText(
+        context,
+        `${score} / ${total}`,
+        1120,
+        62,
+        '#f8d875',
+      );
+
+      // =================================================
+      // MENSAJE
+      // =================================================
+
+      this.drawFittedText(
+        context,
         '¡Tu aventura continúa!',
-        540,
-        1160
+        1200,
+        30,
+        '#fff4ce',
       );
 
-      context.fillStyle = '#c9e2d0';
-      context.font = '24px Arial';
-
-      context.fillText(
+      this.drawFittedText(
+        context,
         'Aventura Mesoamérica',
-        540,
-        1220
+        1250,
+        24,
+        '#c9e2d0',
       );
+
+      // =================================================
+      // DESCARGAR
+      // =================================================
 
       const link =
         document.createElement('a');
@@ -271,24 +508,132 @@ export class Badges {
 
       link.remove();
 
-      this.isDownloading.set(false);
+      // Cerrar diálogo
+      if (this.nameDialog?.nativeElement) {
+        this.nameDialog.nativeElement.close();
+      }
+
       this.downloadCompleted.set(true);
 
       this.downloadResetTimer =
         setTimeout(() => {
           this.downloadCompleted.set(false);
         }, 3500);
-    };
 
-    badgeImage.onerror = () => {
+    } catch {
+      if (!this.destroyed) {
+        this.downloadError.set(
+          'No pudimos preparar tu insignia. Inténtalo de nuevo.',
+        );
+      }
+    } finally {
       this.isDownloading.set(false);
-      this.downloadCompleted.set(false);
-    };
-
-    badgeImage.src = imageUrl;
+    }
   }
 
-  goToHome(): void {
-    this.router.navigate(['/']);
+  // =====================================================
+  // CARGAR IMAGEN
+  // =====================================================
+
+  private loadImage(
+    src: string,
+  ): Promise<HTMLImageElement> {
+    return new Promise(
+      (resolve, reject) => {
+        const image =
+          new Image();
+
+        const timeout =
+          setTimeout(() => {
+            image.onload = null;
+            image.onerror = null;
+
+            reject(
+              new Error(
+                'La imagen tardó demasiado en cargar.',
+              ),
+            );
+          }, 15000);
+
+        image.onload = () => {
+          clearTimeout(timeout);
+
+          image.onload = null;
+          image.onerror = null;
+
+          resolve(image);
+        };
+
+        image.onerror = () => {
+          clearTimeout(timeout);
+
+          image.onload = null;
+          image.onerror = null;
+
+          reject(
+            new Error(
+              'No se pudo cargar la insignia.',
+            ),
+          );
+        };
+
+        image.src = src;
+      },
+    );
+  }
+
+  // =====================================================
+  // TEXTO DEL CANVAS
+  // =====================================================
+
+  private drawFittedText(
+    context: CanvasRenderingContext2D,
+    text: string,
+    y: number,
+    initialSize: number,
+    color: string,
+    maxWidth = 880,
+  ): void {
+    let size = initialSize;
+
+    const setFont = () => {
+      context.font =
+        `bold ${size}px "Trebuchet MS", Arial, sans-serif`;
+    };
+
+    setFont();
+
+    while (
+      context.measureText(text).width >
+        maxWidth &&
+      size > 20
+    ) {
+      size -= 1;
+
+      setFont();
+    }
+
+    context.fillStyle = color;
+
+    context.fillText(
+      text,
+      540,
+      y,
+      maxWidth,
+    );
+  }
+
+  // =====================================================
+  // DESTROY
+  // =====================================================
+
+  ngOnDestroy(): void {
+    this.destroyed = true;
+
+    if (this.downloadResetTimer) {
+      clearTimeout(
+        this.downloadResetTimer,
+      );
+    }
   }
 }
