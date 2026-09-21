@@ -1201,3 +1201,58 @@
     opacity: 0;
   }
 }
+.result-badge__image-button {
+  position: relative;
+
+  display: grid;
+
+  place-items: center;
+
+  width: 100%;
+
+  padding: 0;
+
+  margin: 0;
+
+  border: 0;
+
+  background: transparent;
+
+  appearance: none;
+
+  cursor: pointer;
+
+  border-radius: 50%;
+
+  transition:
+    transform 180ms ease,
+    filter 180ms ease;
+}
+
+.result-badge__image-button:hover {
+  transform: scale(1.04);
+
+  filter:
+    drop-shadow(
+      0 8px 14px
+      rgba(0, 0, 0, 0.18)
+    );
+}
+
+.result-badge__image-button:active {
+  transform: scale(0.96);
+}
+
+.result-badge__image-button:focus-visible {
+  outline: 4px solid
+    rgba(255, 214, 76, 0.95);
+
+  outline-offset: 6px;
+}
+
+.result-badge__image-button
+.result-badge__image {
+  display: block;
+
+  pointer-events: none;
+}
