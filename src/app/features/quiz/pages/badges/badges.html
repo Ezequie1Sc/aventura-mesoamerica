@@ -1,4 +1,5 @@
 <main class="badges-page">
+
   <!-- ========================================
        BACKGROUND
        ======================================== -->
@@ -13,7 +14,28 @@
     aria-hidden="true"
   ></div>
 
+  <!-- ========================================
+       CONFETTI
+       ======================================== -->
+
+  @if (showConfetti()) {
+    <div
+      class="badges-confetti"
+      aria-hidden="true"
+    >
+      @for (
+        piece of confettiPieces;
+        track piece
+      ) {
+        <span
+          class="badge-confetti-piece"
+        ></span>
+      }
+    </div>
+  }
+
   <!-- Decorative leaves -->
+
   <img
     class="badges-leaf badges-leaf--left"
     src="/assets/nature/leaves.webp"
@@ -39,10 +61,13 @@
          ====================================== -->
 
     <header class="badges-header">
+
       <a
         routerLink="/"
         class="back-button"
         aria-label="Volver al inicio"
+        (mouseenter)="playButtonHover()"
+        (click)="audioService.playSelect()"
       >
         ←
       </a>
@@ -50,12 +75,15 @@
       <div class="badges-header__title">
         <span>✦</span>
 
-        <p>AVENTURA MESOAMÉRICA</p>
+        <p>
+          AVENTURA MESOAMÉRICA
+        </p>
 
         <span>✦</span>
       </div>
 
       <div aria-hidden="true"></div>
+
     </header>
 
     <!-- ======================================
@@ -63,7 +91,10 @@
          ====================================== -->
 
     <section class="achievement-heading">
-      <span class="achievement-heading__star">
+
+      <span
+        class="achievement-heading__star"
+      >
         ✦
       </span>
 
@@ -71,9 +102,12 @@
         ¡Insignia obtenida!
       </h1>
 
-      <span class="achievement-heading__star">
+      <span
+        class="achievement-heading__star"
+      >
         ✦
       </span>
+
     </section>
 
     <!-- ======================================
@@ -84,6 +118,7 @@
       class="badge-showcase"
       aria-label="Insignia obtenida"
     >
+
       <div
         class="badge-showcase__glow"
         aria-hidden="true"
@@ -101,6 +136,7 @@
         alt=""
         aria-hidden="true"
       />
+
     </section>
 
     <!-- ======================================
@@ -108,6 +144,7 @@
          ====================================== -->
 
     <section class="badge-info">
+
       <span class="badge-info__label">
         ✦ INSIGNIA OBTENIDA ✦
       </span>
@@ -121,7 +158,9 @@
       </p>
 
       <!-- Score -->
+
       <div class="score-display">
+
         <span class="score-display__star">
           ★
         </span>
@@ -133,32 +172,39 @@
         <span>
           / {{ totalQuestions() }}
         </span>
+
       </div>
 
       <p class="score-message">
         {{ getScoreMessage() }}
       </p>
+
     </section>
 
     <!-- ======================================
-         DOWNLOAD INFORMATION
+         SHARE INFORMATION
          ====================================== -->
 
     <section class="download-card">
+
       <div class="download-card__icon">
-        ↓
+        ★
       </div>
 
       <div class="download-card__content">
+
         <h3>
-          Guarda tu logro
+          ¡Comparte tu logro!
         </h3>
 
         <p>
-          Descarga una tarjeta de tu aventura
-          para conservarla.
+          Genera una imagen personalizada
+          de tu insignia para conservarla
+          y compartirla.
         </p>
+
       </div>
+
     </section>
 
     <!-- ======================================
@@ -167,47 +213,74 @@
 
     <div class="badge-actions">
 
-      <!-- Download -->
+      <!-- Share badge -->
+
       <button
         type="button"
         class="download-button"
-        [class.download-button--success]="downloadCompleted()"
+        [class.download-button--success]="
+          downloadCompleted()
+        "
         [disabled]="isDownloading()"
-        (click)="openNameDialog()"
+        (mouseenter)="playButtonHover()"
+        (click)="
+          audioService.playSelect();
+          openNameDialog()
+        "
       >
+
         @if (isDownloading()) {
-          <span class="download-button__icon">
+
+          <span
+            class="download-button__icon"
+          >
             ◌
           </span>
 
           <span>
-            Preparando tarjeta...
+            Preparando insignia...
           </span>
+
         } @else if (downloadCompleted()) {
-          <span class="download-button__icon">
+
+          <span
+            class="download-button__icon"
+          >
             ✓
           </span>
 
           <span>
-            ¡Tarjeta descargada!
+            ¡Insignia compartida!
           </span>
+
         } @else {
-          <span class="download-button__icon">
-            ↓
+
+          <span
+            class="download-button__icon"
+          >
+            ↗
           </span>
 
           <span>
-            Descargar tarjeta
+            Compartir insignia
           </span>
+
         }
+
       </button>
 
       <!-- Restart -->
+
       <button
         type="button"
         class="home-button"
-        (click)="restartQuiz()"
+        (mouseenter)="playButtonHover()"
+        (click)="
+          audioService.playSelect();
+          restartQuiz()
+        "
       >
+
         <span>
           ↻
         </span>
@@ -215,13 +288,18 @@
         <span>
           Volver a jugar
         </span>
+
       </button>
 
       <!-- Home -->
+
       <a
         routerLink="/"
         class="home-button"
+        (mouseenter)="playButtonHover()"
+        (click)="audioService.playSelect()"
       >
+
         <span>
           ⌂
         </span>
@@ -229,33 +307,45 @@
         <span>
           Volver al inicio
         </span>
+
       </a>
+
     </div>
 
     <!-- ======================================
-         DOWNLOAD SUCCESS TOAST
+         DOWNLOAD SUCCESS
          ====================================== -->
 
     @if (downloadCompleted()) {
+
       <div
-        class="download-toast"
+        class="download-toast download-toast--success"
         role="status"
         aria-live="polite"
       >
-        <div class="download-toast__icon">
+
+        <div
+          class="download-toast__icon"
+        >
           ✓
         </div>
 
-        <div class="download-toast__content">
+        <div
+          class="download-toast__content"
+        >
+
           <strong>
-            ¡Tarjeta lista!
+            ¡Insignia lista! 🎉
           </strong>
 
           <span>
-            Tu logro se descargó correctamente.
+            Tu insignia se guardó correctamente.
           </span>
+
         </div>
+
       </div>
+
     }
 
     <!-- ======================================
@@ -263,6 +353,7 @@
          ====================================== -->
 
     <footer class="badges-footer">
+
       <span>
         🌿
       </span>
@@ -274,6 +365,7 @@
       <span>
         🌿
       </span>
+
     </footer>
 
   </section>
@@ -289,11 +381,13 @@
     aria-describedby="name-dialog-description"
     (cancel)="onDialogCancel($event)"
   >
+
     <form
       class="badge-name-form"
       (submit)="confirmDownload($event)"
       [attr.aria-busy]="isDownloading()"
     >
+
       <span
         class="badge-name-icon"
         aria-hidden="true"
@@ -306,7 +400,8 @@
       </h2>
 
       <p id="name-dialog-description">
-        Escribe cómo quieres aparecer en tu insignia.
+        Escribe cómo quieres aparecer
+        en tu insignia.
       </p>
 
       <label for="explorer-name">
@@ -330,16 +425,19 @@
       />
 
       <small id="explorer-name-help">
-        Puedes escribir solo tu nombre. Máximo 60 caracteres.
+        Puedes escribir solo tu nombre.
+        Máximo 60 caracteres.
       </small>
 
       @if (downloadError()) {
+
         <p
           class="badge-name-error"
           role="alert"
         >
           {{ downloadError() }}
         </p>
+
       }
 
       <div class="badge-name-actions">
@@ -348,7 +446,11 @@
           type="button"
           class="badge-name-cancel"
           [disabled]="isDownloading()"
-          (click)="closeNameDialog()"
+          (mouseenter)="playButtonHover()"
+          (click)="
+            audioService.playSelect();
+            closeNameDialog()
+          "
         >
           Cancelar
         </button>
@@ -356,17 +458,25 @@
         <button
           type="submit"
           class="badge-name-confirm"
-          [disabled]="!validName() || isDownloading()"
+          [disabled]="
+            !validName() ||
+            isDownloading()
+          "
+          (mouseenter)="playButtonHover()"
         >
+
           @if (isDownloading()) {
             Preparando…
           } @else {
-            Descargar mi insignia
+            Crear mi insignia
           }
+
         </button>
 
       </div>
+
     </form>
+
   </dialog>
 
 </main>
