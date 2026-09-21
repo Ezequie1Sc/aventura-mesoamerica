@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 
 import { QuizService } from '../../../../core/services/quiz.service';
@@ -18,6 +18,11 @@ export class Badges {
   readonly isFinished = this.quizService.isFinished;
   readonly score = this.quizService.score;
   readonly totalQuestions = this.quizService.totalQuestions;
+
+  readonly isDownloading = signal(false);
+  readonly downloadCompleted = signal(false);
+
+  private downloadResetTimer?: ReturnType<typeof setTimeout>;
 
   getCurrentScore(): number {
     if (this.isFinished()) {
@@ -84,13 +89,24 @@ export class Badges {
     }
 
     if (score >= 2) {
-      return '¡Ya conoces algunos secretos de Mesoamérica!';
+      return '¡Ya conoces muchos secretos de Mesoamérica!';
     }
 
     return 'Toda gran aventura comienza con un primer paso.';
   }
 
   async downloadCard(): Promise<void> {
+    if (this.isDownloading()) {
+      return;
+    }
+
+    this.isDownloading.set(true);
+    this.downloadCompleted.set(false);
+
+    if (this.downloadResetTimer) {
+      clearTimeout(this.downloadResetTimer);
+    }
+
     const badge = this.getBadge();
     const score = this.getCurrentScore();
     const imageUrl = this.getBadgeImage();
@@ -99,6 +115,7 @@ export class Badges {
     const context = canvas.getContext('2d');
 
     if (!context) {
+      this.isDownloading.set(false);
       return;
     }
 
@@ -117,6 +134,7 @@ export class Badges {
     gradient.addColorStop(1, '#10291f');
 
     context.fillStyle = gradient;
+
     context.fillRect(
       0,
       0,
@@ -124,8 +142,11 @@ export class Badges {
       canvas.height
     );
 
-    context.fillStyle = 'rgba(244, 198, 72, 0.12)';
+    context.fillStyle =
+      'rgba(244, 198, 72, 0.12)';
+
     context.beginPath();
+
     context.arc(
       540,
       420,
@@ -133,10 +154,12 @@ export class Badges {
       0,
       Math.PI * 2
     );
+
     context.fill();
 
     context.strokeStyle = '#e6b84b';
     context.lineWidth = 8;
+
     context.strokeRect(
       42,
       42,
@@ -148,6 +171,7 @@ export class Badges {
 
     context.fillStyle = '#f8d875';
     context.font = 'bold 64px Arial';
+
     context.fillText(
       'AVENTURA',
       540,
@@ -156,6 +180,7 @@ export class Badges {
 
     context.fillStyle = '#fff4ce';
     context.font = 'bold 72px Arial';
+
     context.fillText(
       'MESOAMÉRICA',
       540,
@@ -188,6 +213,7 @@ export class Badges {
 
       context.fillStyle = '#f8d875';
       context.font = 'bold 34px Arial';
+
       context.fillText(
         'INSIGNIA OBTENIDA',
         540,
@@ -196,6 +222,7 @@ export class Badges {
 
       context.fillStyle = '#ffffff';
       context.font = 'bold 48px Arial';
+
       context.fillText(
         badge.name,
         540,
@@ -204,6 +231,7 @@ export class Badges {
 
       context.fillStyle = '#f8d875';
       context.font = 'bold 62px Arial';
+
       context.fillText(
         `${score} / 6`,
         540,
@@ -212,6 +240,7 @@ export class Badges {
 
       context.fillStyle = '#fff4ce';
       context.font = '28px Arial';
+
       context.fillText(
         '¡Tu aventura continúa!',
         540,
@@ -220,6 +249,7 @@ export class Badges {
 
       context.fillStyle = '#c9e2d0';
       context.font = '24px Arial';
+
       context.fillText(
         'Aventura Mesoamérica',
         540,
@@ -235,7 +265,24 @@ export class Badges {
       link.href =
         canvas.toDataURL('image/png');
 
+      document.body.appendChild(link);
+
       link.click();
+
+      link.remove();
+
+      this.isDownloading.set(false);
+      this.downloadCompleted.set(true);
+
+      this.downloadResetTimer =
+        setTimeout(() => {
+          this.downloadCompleted.set(false);
+        }, 3500);
+    };
+
+    badgeImage.onerror = () => {
+      this.isDownloading.set(false);
+      this.downloadCompleted.set(false);
     };
 
     badgeImage.src = imageUrl;
