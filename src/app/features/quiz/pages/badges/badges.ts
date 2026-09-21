@@ -12,6 +12,7 @@ import { Router, RouterLink } from '@angular/router';
 
 import { QuizService } from '../../../../core/services/quiz.service';
 import { StorageService } from '../../../../core/services/storage.service';
+import { AudioService } from '../../../../core/services/audio.service';
 
 @Component({
   selector: 'app-badges',
@@ -21,27 +22,66 @@ import { StorageService } from '../../../../core/services/storage.service';
   styleUrl: './badges.scss',
 })
 export class Badges implements OnDestroy {
-  private readonly quizService = inject(QuizService);
-  private readonly storageService = inject(StorageService);
-  private readonly router = inject(Router);
+  private readonly quizService =
+    inject(QuizService);
 
-  private readonly nameStorageKey = 'aventura-explorer-name';
+  private readonly storageService =
+    inject(StorageService);
+
+  private readonly router =
+    inject(Router);
+
+  readonly audioService =
+    inject(AudioService);
+
+  private readonly nameStorageKey =
+    'aventura-explorer-name';
 
   @ViewChild('nameDialog')
   private nameDialog!: ElementRef<HTMLDialogElement>;
 
-  readonly isFinished = this.quizService.isFinished;
-  readonly score = this.quizService.score;
-  readonly totalQuestions = this.quizService.totalQuestions;
+  readonly isFinished =
+    this.quizService.isFinished;
 
-  readonly isDownloading = signal(false);
-  readonly downloadCompleted = signal(false);
-  readonly downloadError = signal('');
+  readonly score =
+    this.quizService.score;
 
-  readonly explorerName = signal(this.readSavedName());
+  readonly totalQuestions =
+    this.quizService.totalQuestions;
 
-  // Se limpia para validar y descargar, sin modificar
-  // el texto del campo mientras el usuario está escribiendo.
+  readonly isDownloading =
+    signal(false);
+
+  readonly downloadCompleted =
+    signal(false);
+
+  readonly downloadError =
+    signal('');
+
+  readonly explorerName =
+    signal(this.readSavedName());
+
+  /*
+   * ==========================================
+   * CONFETI
+   * ==========================================
+   */
+
+  readonly showConfetti =
+    signal(false);
+
+  readonly confettiPieces =
+    Array.from(
+      { length: 42 },
+      (_, index) => index
+    );
+
+  /*
+   * ==========================================
+   * NOMBRE
+   * ==========================================
+   */
+
   readonly cleanName = computed(() =>
     this.explorerName()
       .replace(/\s+/g, ' ')
@@ -49,7 +89,8 @@ export class Badges implements OnDestroy {
   );
 
   readonly validName = computed(() => {
-    const name = this.cleanName();
+    const name =
+      this.cleanName();
 
     return (
       name.length > 0 &&
@@ -58,7 +99,14 @@ export class Badges implements OnDestroy {
     );
   });
 
-  private downloadResetTimer?: ReturnType<typeof setTimeout>;
+  private downloadResetTimer?: ReturnType<
+    typeof setTimeout
+  >;
+
+  private confettiResetTimer?: ReturnType<
+    typeof setTimeout
+  >;
+
   private destroyed = false;
 
   // ==========================================
@@ -67,31 +115,51 @@ export class Badges implements OnDestroy {
 
   private readSavedName(): string {
     try {
-      if (typeof localStorage === 'undefined') {
+      if (
+        typeof localStorage ===
+        'undefined'
+      ) {
         return '';
       }
 
-      return localStorage.getItem(this.nameStorageKey) ?? '';
+      return (
+        localStorage.getItem(
+          this.nameStorageKey
+        ) ?? ''
+      );
     } catch {
       return '';
     }
   }
 
-  private saveName(name: string): void {
+  private saveName(
+    name: string
+  ): void {
     try {
-      if (typeof localStorage !== 'undefined') {
-        localStorage.setItem(this.nameStorageKey, name);
+      if (
+        typeof localStorage !==
+        'undefined'
+      ) {
+        localStorage.setItem(
+          this.nameStorageKey,
+          name
+        );
       }
     } catch {
-      // La descarga funciona aunque el almacenamiento
-      // del navegador no esté disponible.
+      // La descarga funciona aunque
+      // el almacenamiento no esté disponible.
     }
   }
 
   private removeSavedName(): void {
     try {
-      if (typeof localStorage !== 'undefined') {
-        localStorage.removeItem(this.nameStorageKey);
+      if (
+        typeof localStorage !==
+        'undefined'
+      ) {
+        localStorage.removeItem(
+          this.nameStorageKey
+        );
       }
     } catch {
       // El estado del componente se reinicia igualmente.
@@ -109,11 +177,16 @@ export class Badges implements OnDestroy {
   }
 
   getBadge() {
-    return this.quizService.getBadge(this.getCurrentScore());
+    return this.quizService.getBadge(
+      this.getCurrentScore()
+    );
   }
 
   getBadgeImage(): string {
-    const images: Record<string, string> = {
+    const images: Record<
+      string,
+      string
+    > = {
       semilla:
         '/assets/badges/semilla-conocimiento.webp',
 
@@ -134,7 +207,8 @@ export class Badges implements OnDestroy {
   }
 
   getCharacterImage(): string {
-    const score = this.getCurrentScore();
+    const score =
+      this.getCurrentScore();
 
     if (score === 6) {
       return '/assets/characters/victory.webp';
@@ -152,7 +226,8 @@ export class Badges implements OnDestroy {
   }
 
   getScoreMessage(): string {
-    const score = this.getCurrentScore();
+    const score =
+      this.getCurrentScore();
 
     if (score === 6) {
       return '¡Demostraste que eres un gran conocedor de Mesoamérica!';
@@ -170,6 +245,21 @@ export class Badges implements OnDestroy {
   }
 
   // ==========================================
+  // SONIDOS DE INTERACCIÓN
+  // ==========================================
+
+  playButtonHover(): void {
+    if (
+      this.isDownloading() ||
+      this.destroyed
+    ) {
+      return;
+    }
+
+    this.audioService.playSelect();
+  }
+
+  // ==========================================
   // NUEVA AVENTURA
   // ==========================================
 
@@ -179,15 +269,18 @@ export class Badges implements OnDestroy {
     }
 
     this.clearDownloadTimer();
+    this.clearConfettiTimer();
+
     this.removeSavedName();
 
     this.explorerName.set('');
     this.downloadError.set('');
     this.downloadCompleted.set(false);
+    this.showConfetti.set(false);
 
     this.quizService.restartQuiz();
 
-    void this.router.navigate(['/map']);
+    void this.router.navigate(['/mapa']);
   }
 
   goToHome(): void {
@@ -199,22 +292,32 @@ export class Badges implements OnDestroy {
   // ==========================================
 
   openNameDialog(): void {
-    if (this.isDownloading() || this.destroyed) {
+    if (
+      this.isDownloading() ||
+      this.destroyed
+    ) {
       return;
     }
 
     this.downloadError.set('');
     this.downloadCompleted.set(false);
+    this.showConfetti.set(false);
+
     this.clearDownloadTimer();
+    this.clearConfettiTimer();
 
-    const dialog = this.nameDialog.nativeElement;
+    const dialog =
+      this.nameDialog.nativeElement;
 
-    // Siempre permitir revisar el nombre antes de descargar.
     if (!dialog.open) {
       dialog.showModal();
     }
 
-    dialog.querySelector<HTMLInputElement>('input')?.focus();
+    dialog
+      .querySelector<HTMLInputElement>(
+        'input'
+      )
+      ?.focus();
   }
 
   closeNameDialog(): void {
@@ -225,15 +328,17 @@ export class Badges implements OnDestroy {
     this.nameDialog.nativeElement.close();
   }
 
-  onDialogCancel(event: Event): void {
+  onDialogCancel(
+    event: Event
+  ): void {
     if (this.isDownloading()) {
       event.preventDefault();
     }
   }
 
-  updateName(value: string): void {
-    // No bloquear al escribir la primera letra.
-    // Solo bloquear durante la generación de la imagen.
+  updateName(
+    value: string
+  ): void {
     if (this.isDownloading()) {
       return;
     }
@@ -242,7 +347,9 @@ export class Badges implements OnDestroy {
     this.downloadError.set('');
   }
 
-  confirmDownload(event: Event): void {
+  confirmDownload(
+    event: Event
+  ): void {
     event.preventDefault();
 
     if (this.isDownloading()) {
@@ -253,6 +360,7 @@ export class Badges implements OnDestroy {
       this.downloadError.set(
         'Escribe tu nombre, con un máximo de 60 caracteres.'
       );
+
       return;
     }
 
@@ -260,73 +368,106 @@ export class Badges implements OnDestroy {
   }
 
   // ==========================================
-  // GENERAR Y DESCARGAR TARJETA
+  // GENERAR Y DESCARGAR INSIGNIA
   // ==========================================
 
   async downloadCard(): Promise<void> {
-    if (this.isDownloading() || this.destroyed) {
+    if (
+      this.isDownloading() ||
+      this.destroyed
+    ) {
       return;
     }
 
-    // Protección adicional, aunque se llame al método
-    // directamente.
     if (!this.validName()) {
       this.openNameDialog();
 
       this.downloadError.set(
-        'Escribe tu nombre para descargar la insignia.'
+        'Escribe tu nombre para compartir la insignia.'
       );
 
       return;
     }
 
-    // Capturar el nombre completo confirmado.
-    const name = this.cleanName();
-    const badge = this.getBadge();
-    const score = this.getCurrentScore();
-    const total = this.totalQuestions();
-    const imageUrl = this.getBadgeImage();
+    const name =
+      this.cleanName();
+
+    const badge =
+      this.getBadge();
+
+    const score =
+      this.getCurrentScore();
+
+    const total =
+      this.totalQuestions();
+
+    const imageUrl =
+      this.getBadgeImage();
 
     this.isDownloading.set(true);
     this.downloadCompleted.set(false);
     this.downloadError.set('');
+    this.showConfetti.set(false);
 
     this.clearDownloadTimer();
+    this.clearConfettiTimer();
 
     try {
-      const badgeImage = await this.loadImage(imageUrl);
+      const badgeImage =
+        await this.loadImage(
+          imageUrl
+        );
 
       if (this.destroyed) {
         return;
       }
 
-      const canvas = document.createElement('canvas');
+      const canvas =
+        document.createElement(
+          'canvas'
+        );
 
       canvas.width = 1080;
       canvas.height = 1350;
 
-      const context = canvas.getContext('2d');
+      const context =
+        canvas.getContext('2d');
 
       if (!context) {
-        throw new Error('No se pudo crear la imagen.');
+        throw new Error(
+          'No se pudo crear la imagen.'
+        );
       }
 
       context.textAlign = 'center';
       context.textBaseline = 'middle';
 
-      // Fondo.
-      const gradient = context.createLinearGradient(
+      // Fondo
+      const gradient =
+        context.createLinearGradient(
+          0,
+          0,
+          0,
+          canvas.height
+        );
+
+      gradient.addColorStop(
         0,
-        0,
-        0,
-        canvas.height
+        '#173f2d'
       );
 
-      gradient.addColorStop(0, '#173f2d');
-      gradient.addColorStop(0.55, '#276047');
-      gradient.addColorStop(1, '#10291f');
+      gradient.addColorStop(
+        0.55,
+        '#276047'
+      );
 
-      context.fillStyle = gradient;
+      gradient.addColorStop(
+        1,
+        '#10291f'
+      );
+
+      context.fillStyle =
+        gradient;
 
       context.fillRect(
         0,
@@ -335,19 +476,36 @@ export class Badges implements OnDestroy {
         canvas.height
       );
 
-      // Resplandor.
-      context.fillStyle = 'rgba(244, 198, 72, 0.12)';
+      // Resplandor
+      context.fillStyle =
+        'rgba(244, 198, 72, 0.12)';
 
       context.beginPath();
-      context.arc(540, 430, 390, 0, Math.PI * 2);
+
+      context.arc(
+        540,
+        430,
+        390,
+        0,
+        Math.PI * 2
+      );
+
       context.fill();
 
-      // Marco.
-      context.strokeStyle = '#e6b84b';
-      context.lineWidth = 8;
-      context.strokeRect(42, 42, 996, 1266);
+      // Marco
+      context.strokeStyle =
+        '#e6b84b';
 
-      // Encabezado.
+      context.lineWidth = 8;
+
+      context.strokeRect(
+        42,
+        42,
+        996,
+        1266
+      );
+
+      // Encabezado
       this.drawFittedText(
         context,
         'AVENTURA',
@@ -364,22 +522,31 @@ export class Badges implements OnDestroy {
         '#fff4ce'
       );
 
-      // Insignia, conservando sus proporciones.
+      // Insignia
       const maxWidth = 580;
       const maxHeight = 500;
 
-      const ratio = Math.min(
-        maxWidth / badgeImage.naturalWidth,
-        maxHeight / badgeImage.naturalHeight
-      );
+      const ratio =
+        Math.min(
+          maxWidth /
+            badgeImage.naturalWidth,
+          maxHeight /
+            badgeImage.naturalHeight
+        );
 
-      const width = badgeImage.naturalWidth * ratio;
-      const height = badgeImage.naturalHeight * ratio;
+      const width =
+        badgeImage.naturalWidth *
+        ratio;
+
+      const height =
+        badgeImage.naturalHeight *
+        ratio;
 
       context.drawImage(
         badgeImage,
         (canvas.width - width) / 2,
-        245 + (maxHeight - height) / 2,
+        245 +
+          (maxHeight - height) / 2,
         width,
         height
       );
@@ -400,9 +567,16 @@ export class Badges implements OnDestroy {
         '#ffffff'
       );
 
-      // Recuadro del nombre.
-      context.fillStyle = '#fff4d8';
-      context.fillRect(100, 905, 880, 150);
+      // Nombre
+      context.fillStyle =
+        '#fff4d8';
+
+      context.fillRect(
+        100,
+        905,
+        880,
+        150
+      );
 
       this.drawFittedText(
         context,
@@ -412,7 +586,6 @@ export class Badges implements OnDestroy {
         '#426044'
       );
 
-      // Dibujar el nombre completo en la imagen.
       this.drawFittedText(
         context,
         name,
@@ -422,7 +595,7 @@ export class Badges implements OnDestroy {
         800
       );
 
-      // Puntuación.
+      // Puntuación
       this.drawFittedText(
         context,
         `${score} / ${total}`,
@@ -447,16 +620,28 @@ export class Badges implements OnDestroy {
         '#c9e2d0'
       );
 
-      // Preparar descarga.
-      const imageData = canvas.toDataURL('image/png');
-      const link = document.createElement('a');
+      // ======================================
+      // DESCARGA
+      // ======================================
+
+      const imageData =
+        canvas.toDataURL(
+          'image/png'
+        );
+
+      const link =
+        document.createElement(
+          'a'
+        );
 
       link.download =
         `${badge.id}-aventura-mesoamerica.png`;
 
       link.href = imageData;
 
-      document.body.appendChild(link);
+      document.body.appendChild(
+        link
+      );
 
       try {
         link.click();
@@ -464,21 +649,61 @@ export class Badges implements OnDestroy {
         link.remove();
       }
 
-      // Guardar únicamente después de generar la tarjeta.
+      // ======================================
+      // ÉXITO
+      // ======================================
+
       this.saveName(name);
       this.explorerName.set(name);
 
       this.nameDialog.nativeElement.close();
-      this.downloadCompleted.set(true);
 
-      this.downloadResetTimer = setTimeout(() => {
-        this.downloadCompleted.set(false);
-        this.downloadResetTimer = undefined;
-      }, 3500);
+      this.downloadCompleted.set(
+        true
+      );
+
+      /*
+       * Reproducir Piplup una sola vez
+       * al completar la descarga.
+       */
+      this.audioService.playPiplup();
+
+      /*
+       * Mostrar confeti.
+       */
+      this.showConfetti.set(true);
+
+      this.clearConfettiTimer();
+
+      this.confettiResetTimer =
+        setTimeout(() => {
+          if (!this.destroyed) {
+            this.showConfetti.set(false);
+          }
+
+          this.confettiResetTimer =
+            undefined;
+        }, 4500);
+
+      /*
+       * Mantener el estado de éxito
+       * durante unos segundos.
+       */
+      this.downloadResetTimer =
+        setTimeout(() => {
+          if (!this.destroyed) {
+            this.downloadCompleted.set(
+              false
+            );
+          }
+
+          this.downloadResetTimer =
+            undefined;
+        }, 5000);
     } catch {
       if (!this.destroyed) {
-        // Mantener visible el formulario y su error.
-        const dialog = this.nameDialog.nativeElement;
+        const dialog =
+          this.nameDialog.nativeElement;
 
         if (!dialog.open) {
           dialog.showModal();
@@ -500,52 +725,65 @@ export class Badges implements OnDestroy {
   private loadImage(
     src: string
   ): Promise<HTMLImageElement> {
-    return new Promise((resolve, reject) => {
-      const image = new Image();
+    return new Promise(
+      (resolve, reject) => {
+        const image =
+          new Image();
 
-      const timeout = setTimeout(() => {
-        image.onload = null;
-        image.onerror = null;
+        const timeout =
+          setTimeout(() => {
+            image.onload = null;
+            image.onerror = null;
 
-        reject(
-          new Error('La imagen tardó demasiado en cargar.')
-        );
-      }, 15000);
+            reject(
+              new Error(
+                'La imagen tardó demasiado en cargar.'
+              )
+            );
+          }, 15000);
 
-      image.onload = () => {
-        clearTimeout(timeout);
+        image.onload = () => {
+          clearTimeout(timeout);
 
-        image.onload = null;
-        image.onerror = null;
+          image.onload = null;
+          image.onerror = null;
 
-        if (
-          image.naturalWidth === 0 ||
-          image.naturalHeight === 0
-        ) {
-          reject(new Error('La imagen no tiene un tamaño válido.'));
-          return;
-        }
+          if (
+            image.naturalWidth === 0 ||
+            image.naturalHeight === 0
+          ) {
+            reject(
+              new Error(
+                'La imagen no tiene un tamaño válido.'
+              )
+            );
 
-        resolve(image);
-      };
+            return;
+          }
 
-      image.onerror = () => {
-        clearTimeout(timeout);
+          resolve(image);
+        };
 
-        image.onload = null;
-        image.onerror = null;
+        image.onerror = () => {
+          clearTimeout(timeout);
 
-        reject(
-          new Error('No se pudo cargar la insignia.')
-        );
-      };
+          image.onload = null;
+          image.onerror = null;
 
-      image.src = src;
-    });
+          reject(
+            new Error(
+              'No se pudo cargar la insignia.'
+            )
+          );
+        };
+
+        image.src = src;
+      }
+    );
   }
 
   // ==========================================
-  // AJUSTAR TEXTO AL ANCHO DISPONIBLE
+  // AJUSTAR TEXTO
   // ==========================================
 
   private drawFittedText(
@@ -556,26 +794,35 @@ export class Badges implements OnDestroy {
     color: string,
     maxWidth = 880
   ): void {
-    let size = initialSize;
+    let size =
+      initialSize;
 
-    const setFont = (): void => {
-      context.font =
-        `bold ${size}px "Trebuchet MS", Arial, sans-serif`;
-    };
+    const setFont =
+      (): void => {
+        context.font =
+          `bold ${size}px "Trebuchet MS", Arial, sans-serif`;
+      };
 
     setFont();
 
-    // Reducir el tamaño si el nombre es largo.
     while (
-      context.measureText(text).width > maxWidth &&
+      context.measureText(text)
+        .width > maxWidth &&
       size > 20
     ) {
       size -= 1;
       setFont();
     }
 
-    context.fillStyle = color;
-    context.fillText(text, 540, y, maxWidth);
+    context.fillStyle =
+      color;
+
+    context.fillText(
+      text,
+      540,
+      y,
+      maxWidth
+    );
   }
 
   // ==========================================
@@ -583,14 +830,37 @@ export class Badges implements OnDestroy {
   // ==========================================
 
   private clearDownloadTimer(): void {
-    if (this.downloadResetTimer !== undefined) {
-      clearTimeout(this.downloadResetTimer);
-      this.downloadResetTimer = undefined;
+    if (
+      this.downloadResetTimer !==
+      undefined
+    ) {
+      clearTimeout(
+        this.downloadResetTimer
+      );
+
+      this.downloadResetTimer =
+        undefined;
+    }
+  }
+
+  private clearConfettiTimer(): void {
+    if (
+      this.confettiResetTimer !==
+      undefined
+    ) {
+      clearTimeout(
+        this.confettiResetTimer
+      );
+
+      this.confettiResetTimer =
+        undefined;
     }
   }
 
   ngOnDestroy(): void {
     this.destroyed = true;
+
     this.clearDownloadTimer();
+    this.clearConfettiTimer();
   }
 }
