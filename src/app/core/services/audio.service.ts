@@ -5,8 +5,7 @@ import { filter } from 'rxjs';
 type BackgroundMusic =
   | 'home'
   | 'map'
-  | 'quiz'
-  | 'piplup';
+  | 'quiz';
 
 @Injectable({
   providedIn: 'root',
@@ -65,9 +64,6 @@ export class AudioService {
 
     quiz:
       `${this.basePath}/music/quiz.mp3`,
-
-    piplup:
-      `${this.basePath}/music/piplup.mp3`,
   } as const;
 
   /*
@@ -161,18 +157,21 @@ export class AudioService {
      * RESULT
      * ======================================
      *
-     * Piplup se reproduce únicamente durante
-     * los primeros 3 segundos.
+     * La pantalla de resultado utiliza
+     * nuevamente la música principal
+     * de la aventura.
+     *
+     * Piplup NO se reproduce automáticamente.
      */
 
     if (url.startsWith('/resultado')) {
-      this.playPiplupMusic();
+      this.playHomeMusic();
     }
   }
 
   /*
    * ========================================
-   * SOUND EFFECTS
+   * GENERIC SOUND
    * ========================================
    */
 
@@ -196,8 +195,8 @@ export class AudioService {
 
     void audio.play().catch(() => {
       /*
-       * El navegador puede bloquear la reproducción
-       * si no existe una interacción del usuario.
+       * El navegador puede bloquear
+       * la reproducción automática.
        */
     });
 
@@ -295,22 +294,21 @@ export class AudioService {
 
   /*
    * ========================================
-   * PIPLUP - ONE SHOT
+   * PIPLUP
    * ========================================
    *
-   * Reproduce Piplup una sola vez.
+   * Piplup NO es música de fondo.
    *
-   * IMPORTANTE:
-   * Solo se reproducen los primeros 3 segundos.
+   * Se reproduce únicamente cuando una
+   * acción explícita de la aplicación
+   * lo solicita.
    */
 
   playPiplup(): void {
-
     this.play(
       'piplup',
       0.75
     );
-
   }
 
   /*
@@ -325,8 +323,8 @@ export class AudioService {
   ): void {
 
     /*
-     * Si ya está reproduciéndose la misma música,
-     * no la reiniciamos.
+     * Si ya está reproduciéndose la misma
+     * música, no la reiniciamos.
      */
 
     if (
@@ -338,7 +336,7 @@ export class AudioService {
     }
 
     /*
-     * Detener la música anterior.
+     * Detener música anterior.
      */
 
     this.stopBackground();
@@ -348,11 +346,10 @@ export class AudioService {
     );
 
     /*
-     * Piplup NO debe repetirse.
+     * Música de fondo en loop.
      */
 
-    audio.loop =
-      music !== 'piplup';
+    audio.loop = true;
 
     audio.volume = Math.min(
       Math.max(volume, 0),
@@ -365,85 +362,11 @@ export class AudioService {
     this.currentBackgroundMusic =
       music;
 
-    /*
-     * ======================================
-     * PIPLUP: SOLO 3 SEGUNDOS
-     * ======================================
-     */
-
-    if (music === 'piplup') {
-
-      const stopPiplup =
-        (): void => {
-
-          if (
-            this.backgroundAudio ===
-            audio
-          ) {
-
-            audio.pause();
-
-            audio.currentTime = 0;
-
-            this.backgroundAudio =
-              undefined;
-
-            this.currentBackgroundMusic =
-              undefined;
-          }
-        };
-
-      /*
-       * Cortar exactamente en el segundo 3.
-       */
-
-      const piplupTimer =
-        window.setTimeout(() => {
-
-          stopPiplup();
-
-        }, 3000);
-
-      /*
-       * Si el audio termina antes,
-       * limpiamos el timer.
-       */
-
-      audio.addEventListener(
-        'ended',
-        () => {
-
-          window.clearTimeout(
-            piplupTimer
-          );
-
-          if (
-            this.backgroundAudio ===
-            audio
-          ) {
-
-            this.backgroundAudio =
-              undefined;
-
-            this.currentBackgroundMusic =
-              undefined;
-          }
-
-        },
-        {
-          once: true,
-        }
-      );
-    }
-
-    /*
-     * Intentar reproducir.
-     */
-
     void audio.play().catch(() => {
       /*
-       * Algunos navegadores pueden bloquear
-       * autoplay hasta que exista interacción.
+       * El navegador puede bloquear
+       * autoplay hasta que exista
+       * interacción del usuario.
        */
     });
   }
@@ -455,39 +378,24 @@ export class AudioService {
    */
 
   playHomeMusic(): void {
-
     this.playBackground(
       'home',
       0.25
     );
-
   }
 
   playMapMusic(): void {
-
     this.playBackground(
       'map',
       0.25
     );
-
   }
 
   playQuizMusic(): void {
-
     this.playBackground(
       'quiz',
       0.22
     );
-
-  }
-
-  playPiplupMusic(): void {
-
-    this.playBackground(
-      'piplup',
-      0.25
-    );
-
   }
 
   /*
