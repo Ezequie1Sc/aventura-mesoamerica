@@ -12,7 +12,8 @@ type BackgroundMusic =
   providedIn: 'root',
 })
 export class AudioService {
-  private readonly basePath = '/assets/audio';
+  private readonly basePath =
+    '/assets/audio';
 
   /*
    * ========================================
@@ -21,15 +22,32 @@ export class AudioService {
    */
 
   private readonly sounds = {
-    select: `${this.basePath}/ui/select.wav`,
-    selectAlternative: `${this.basePath}/ui/select1.wav`,
-    next: `${this.basePath}/ui/next.wav`,
-    correct: `${this.basePath}/quiz/correct.wav`,
-    incorrect: `${this.basePath}/quiz/incorrect.wav`,
-    achievement: `${this.basePath}/rewards/achievement.wav`,
-    victory: `${this.basePath}/rewards/victory.wav`,
-    win: `${this.basePath}/ui/win.wav`,
-    piplup: `${this.basePath}/music/piplup.mp3`,
+    select:
+      `${this.basePath}/ui/select.wav`,
+
+    selectAlternative:
+      `${this.basePath}/ui/select1.wav`,
+
+    next:
+      `${this.basePath}/ui/next.wav`,
+
+    correct:
+      `${this.basePath}/quiz/correct.wav`,
+
+    incorrect:
+      `${this.basePath}/quiz/incorrect.wav`,
+
+    achievement:
+      `${this.basePath}/rewards/achievement.wav`,
+
+    victory:
+      `${this.basePath}/rewards/victory.wav`,
+
+    win:
+      `${this.basePath}/ui/win.wav`,
+
+    piplup:
+      `${this.basePath}/music/piplup.mp3`,
   } as const;
 
   /*
@@ -39,10 +57,17 @@ export class AudioService {
    */
 
   private readonly music = {
-    home: `${this.basePath}/music/home.mp3`,
-    map: `${this.basePath}/music/map.mp3`,
-    quiz: `${this.basePath}/music/quiz.mp3`,
-    piplup: `${this.basePath}/music/piplup.mp3`,
+    home:
+      `${this.basePath}/music/home.mp3`,
+
+    map:
+      `${this.basePath}/music/map.mp3`,
+
+    quiz:
+      `${this.basePath}/music/quiz.mp3`,
+
+    piplup:
+      `${this.basePath}/music/piplup.mp3`,
   } as const;
 
   /*
@@ -93,10 +118,11 @@ export class AudioService {
   private handleRouteMusic(
     url: string
   ): void {
+
     /*
-     * ========================================
+     * ======================================
      * HOME + INSTRUCTIONS + BADGES
-     * ========================================
+     * ======================================
      */
 
     if (
@@ -109,9 +135,9 @@ export class AudioService {
     }
 
     /*
-     * ========================================
+     * ======================================
      * MAP
-     * ========================================
+     * ======================================
      */
 
     if (url.startsWith('/mapa')) {
@@ -120,9 +146,9 @@ export class AudioService {
     }
 
     /*
-     * ========================================
+     * ======================================
      * QUIZ
-     * ========================================
+     * ======================================
      */
 
     if (url.startsWith('/quiz')) {
@@ -131,12 +157,12 @@ export class AudioService {
     }
 
     /*
-     * ========================================
+     * ======================================
      * RESULT
-     * ========================================
+     * ======================================
      *
-     * En resultado utilizamos Piplup
-     * como música de fondo.
+     * Piplup se reproduce únicamente durante
+     * los primeros 3 segundos.
      */
 
     if (url.startsWith('/resultado')) {
@@ -154,6 +180,7 @@ export class AudioService {
     sound: keyof typeof this.sounds,
     volume = 1
   ): void {
+
     this.stop();
 
     const audio = new Audio(
@@ -171,20 +198,24 @@ export class AudioService {
       /*
        * El navegador puede bloquear la reproducción
        * si no existe una interacción del usuario.
-       *
-       * No hacemos nada en ese caso para evitar
-       * errores en consola.
        */
     });
 
     audio.addEventListener(
       'ended',
       () => {
-        if (this.currentAudio === audio) {
-          this.currentAudio = undefined;
+
+        if (
+          this.currentAudio === audio
+        ) {
+          this.currentAudio =
+            undefined;
         }
+
       },
-      { once: true }
+      {
+        once: true,
+      }
     );
   }
 
@@ -267,17 +298,19 @@ export class AudioService {
    * PIPLUP - ONE SHOT
    * ========================================
    *
-   * Se reproduce una sola vez.
+   * Reproduce Piplup una sola vez.
    *
-   * Se utiliza cuando la insignia
-   * termina de generarse y descargarse.
+   * IMPORTANTE:
+   * Solo se reproducen los primeros 3 segundos.
    */
 
   playPiplup(): void {
+
     this.play(
       'piplup',
       0.75
     );
+
   }
 
   /*
@@ -290,6 +323,7 @@ export class AudioService {
     music: BackgroundMusic,
     volume = 0.25
   ): void {
+
     /*
      * Si ya está reproduciéndose la misma música,
      * no la reiniciamos.
@@ -314,33 +348,102 @@ export class AudioService {
     );
 
     /*
-     * La música se repite indefinidamente.
+     * Piplup NO debe repetirse.
      */
 
-    audio.loop = true;
+    audio.loop =
+      music !== 'piplup';
 
     audio.volume = Math.min(
       Math.max(volume, 0),
       1
     );
 
-    this.backgroundAudio = audio;
+    this.backgroundAudio =
+      audio;
 
     this.currentBackgroundMusic =
       music;
 
     /*
+     * ======================================
+     * PIPLUP: SOLO 3 SEGUNDOS
+     * ======================================
+     */
+
+    if (music === 'piplup') {
+
+      const stopPiplup =
+        (): void => {
+
+          if (
+            this.backgroundAudio ===
+            audio
+          ) {
+
+            audio.pause();
+
+            audio.currentTime = 0;
+
+            this.backgroundAudio =
+              undefined;
+
+            this.currentBackgroundMusic =
+              undefined;
+          }
+        };
+
+      /*
+       * Cortar exactamente en el segundo 3.
+       */
+
+      const piplupTimer =
+        window.setTimeout(() => {
+
+          stopPiplup();
+
+        }, 3000);
+
+      /*
+       * Si el audio termina antes,
+       * limpiamos el timer.
+       */
+
+      audio.addEventListener(
+        'ended',
+        () => {
+
+          window.clearTimeout(
+            piplupTimer
+          );
+
+          if (
+            this.backgroundAudio ===
+            audio
+          ) {
+
+            this.backgroundAudio =
+              undefined;
+
+            this.currentBackgroundMusic =
+              undefined;
+          }
+
+        },
+        {
+          once: true,
+        }
+      );
+    }
+
+    /*
      * Intentar reproducir.
-     *
-     * Algunos navegadores, especialmente
-     * en dispositivos móviles, pueden bloquear
-     * autoplay hasta que exista interacción.
      */
 
     void audio.play().catch(() => {
       /*
-       * No mostramos el error para evitar
-       * errores innecesarios en consola.
+       * Algunos navegadores pueden bloquear
+       * autoplay hasta que exista interacción.
        */
     });
   }
@@ -352,31 +455,39 @@ export class AudioService {
    */
 
   playHomeMusic(): void {
+
     this.playBackground(
       'home',
       0.25
     );
+
   }
 
   playMapMusic(): void {
+
     this.playBackground(
       'map',
       0.25
     );
+
   }
 
   playQuizMusic(): void {
+
     this.playBackground(
       'quiz',
       0.22
     );
+
   }
 
   playPiplupMusic(): void {
+
     this.playBackground(
       'piplup',
       0.25
     );
+
   }
 
   /*
@@ -386,7 +497,9 @@ export class AudioService {
    */
 
   stopBackground(): void {
+
     if (!this.backgroundAudio) {
+
       this.currentBackgroundMusic =
         undefined;
 
@@ -395,9 +508,11 @@ export class AudioService {
 
     this.backgroundAudio.pause();
 
-    this.backgroundAudio.currentTime = 0;
+    this.backgroundAudio.currentTime =
+      0;
 
-    this.backgroundAudio = undefined;
+    this.backgroundAudio =
+      undefined;
 
     this.currentBackgroundMusic =
       undefined;
@@ -410,14 +525,17 @@ export class AudioService {
    */
 
   stop(): void {
+
     if (!this.currentAudio) {
       return;
     }
 
     this.currentAudio.pause();
 
-    this.currentAudio.currentTime = 0;
+    this.currentAudio.currentTime =
+      0;
 
-    this.currentAudio = undefined;
+    this.currentAudio =
+      undefined;
   }
 }
