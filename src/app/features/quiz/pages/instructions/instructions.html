@@ -1,6 +1,15 @@
-<main class="guide-page" aria-labelledby="guide-title">
-  <!-- Decoración de fondo -->
-  <div class="guide-background" aria-hidden="true"></div>
+<main
+  class="guide-page"
+  aria-labelledby="guide-title"
+>
+  <!-- ========================================
+       DECORACIÓN DE FONDO
+       ======================================== -->
+
+  <div
+    class="guide-background"
+    aria-hidden="true"
+  ></div>
 
   <img
     class="guide-decoration guide-decoration--left"
@@ -17,12 +26,21 @@
   />
 
   <div class="guide-container">
-    <!-- Navegación -->
-    <nav class="guide-navigation" aria-label="Navegación">
+
+    <!-- ========================================
+         NAVEGACIÓN
+         ======================================== -->
+
+    <nav
+      class="guide-navigation"
+      aria-label="Navegación"
+    >
       <a
         class="guide-back"
         routerLink="/"
         aria-label="Volver al inicio"
+        (mouseenter)="audioService.playSelect()"
+        (click)="audioService.playSelect()"
       >
         <svg
           viewBox="0 0 24 24"
@@ -52,11 +70,15 @@
           alt=""
           aria-hidden="true"
         />
+
         6 retos
       </span>
     </nav>
 
-    <!-- Cartel -->
+    <!-- ========================================
+         CARTEL
+         ======================================== -->
+
     <header class="guide-sign">
       <span
         class="guide-sign__rope guide-sign__rope--left"
@@ -79,17 +101,31 @@
         Aventura Mesoamérica
       </span>
 
-      <h1 id="guide-title">Guía del explorador</h1>
+      <h1 id="guide-title">
+        Guía del explorador
+      </h1>
 
-      <span class="guide-sign__ornament" aria-hidden="true">
+      <span
+        class="guide-sign__ornament"
+        aria-hidden="true"
+      >
         ◆ ━ ◆ ━ ◆
       </span>
     </header>
 
-    <!-- Personaje y bienvenida -->
-    <section class="guide-welcome" aria-labelledby="welcome-title">
+    <!-- ========================================
+         PERSONAJE Y BIENVENIDA
+         ======================================== -->
+
+    <section
+      class="guide-welcome"
+      aria-labelledby="welcome-title"
+    >
       <div class="guide-portrait">
-        <div class="guide-portrait__glow" aria-hidden="true"></div>
+        <div
+          class="guide-portrait__glow"
+          aria-hidden="true"
+        ></div>
 
         <img
           class="guide-portrait__character"
@@ -127,11 +163,21 @@
       </div>
     </section>
 
-    <!-- Pergamino -->
-    <section class="guide-panel" aria-labelledby="rules-title">
+    <!-- ========================================
+         PERGAMINO
+         ======================================== -->
+
+    <section
+      class="guide-panel"
+      aria-labelledby="rules-title"
+    >
       <div class="guide-panel__heading">
         <span aria-hidden="true">✦</span>
-        <h2 id="rules-title">¡Así se juega!</h2>
+
+        <h2 id="rules-title">
+          ¡Así se juega!
+        </h2>
+
         <span aria-hidden="true">✦</span>
       </div>
 
@@ -140,6 +186,9 @@
       </p>
 
       <ol class="guide-rules">
+
+        <!-- Regla 1 -->
+
         <li class="guide-rule">
           <div class="guide-rule__illustration">
             <img
@@ -149,21 +198,30 @@
               alt=""
               aria-hidden="true"
             />
-            <span class="guide-rule__number" aria-hidden="true">
+
+            <span
+              class="guide-rule__number"
+              aria-hidden="true"
+            >
               1
             </span>
           </div>
 
           <div class="guide-rule__copy">
             <h3>Lee y elige</h3>
+
             <p>
-              Lee cada pregunta y toca la respuesta que
-              creas correcta.
+              Lee cada pregunta y toca la respuesta
+              que creas correcta.
             </p>
           </div>
         </li>
 
-        <li class="guide-rule guide-rule--points">
+        <!-- Regla 2 -->
+
+        <li
+          class="guide-rule guide-rule--points"
+        >
           <div class="guide-rule__illustration">
             <img
               src="/assets/rewards/star.webp"
@@ -172,21 +230,31 @@
               alt=""
               aria-hidden="true"
             />
-            <span class="guide-rule__number" aria-hidden="true">
+
+            <span
+              class="guide-rule__number"
+              aria-hidden="true"
+            >
               2
             </span>
           </div>
 
           <div class="guide-rule__copy">
             <h3>¡Suma puntos!</h3>
+
             <p>
-              Gana <strong>10 puntos</strong> por cada
-              respuesta correcta.
+              Gana
+              <strong>10 puntos</strong>
+              por cada respuesta correcta.
             </p>
           </div>
         </li>
 
-        <li class="guide-rule guide-rule--reward">
+        <!-- Regla 3 -->
+
+        <li
+          class="guide-rule guide-rule--reward"
+        >
           <div class="guide-rule__illustration">
             <img
               src="/assets/rewards/medal.webp"
@@ -195,20 +263,29 @@
               alt=""
               aria-hidden="true"
             />
-            <span class="guide-rule__number" aria-hidden="true">
+
+            <span
+              class="guide-rule__number"
+              aria-hidden="true"
+            >
               3
             </span>
           </div>
 
           <div class="guide-rule__copy">
             <h3>Consigue tu insignia</h3>
+
             <p>
-              Completa las <strong>6 preguntas</strong>
+              Completa las
+              <strong>6 preguntas</strong>
               y descubre tu recompensa.
             </p>
           </div>
         </li>
+
       </ol>
+
+      <!-- Mensaje de ánimo -->
 
       <div class="guide-encouragement">
         <img
@@ -218,19 +295,39 @@
           alt=""
           aria-hidden="true"
         />
-        <p>Si te equivocas, ¡sigue aprendiendo!</p>
+
+        <p>
+          Si te equivocas, ¡sigue aprendiendo!
+        </p>
       </div>
     </section>
 
-    <!-- Acción -->
-    <section class="guide-action" aria-label="Comenzar la aventura">
+    <!-- ========================================
+         ACCIÓN
+         ======================================== -->
+
+    <section
+      class="guide-action"
+      aria-label="Comenzar la aventura"
+    >
       <p class="guide-action__summary">
         <span>6 preguntas</span>
-        <span aria-hidden="true">◆</span>
+
+        <span aria-hidden="true">
+          ◆
+        </span>
+
         <span>60 puntos posibles</span>
       </p>
 
-      <a class="guide-start" routerLink="/mapa">
+      <!-- COMENZAR AVENTURA -->
+
+      <a
+        class="guide-start"
+        routerLink="/mapa"
+        (mouseenter)="audioService.playSelect()"
+        (click)="audioService.playSelect()"
+      >
         <svg
           viewBox="0 0 24 24"
           fill="currentColor"
@@ -242,7 +339,9 @@
           />
         </svg>
 
-        <span>¡Vamos a explorar!</span>
+        <span>
+          ¡Vamos a explorar!
+        </span>
       </a>
 
       <p class="guide-action__note">
@@ -250,12 +349,25 @@
       </p>
     </section>
 
+    <!-- ========================================
+         FOOTER
+         ======================================== -->
+
     <footer class="guide-footer">
       <span>Aprende</span>
-      <span aria-hidden="true">◆</span>
+
+      <span aria-hidden="true">
+        ◆
+      </span>
+
       <span>Explora</span>
-      <span aria-hidden="true">◆</span>
+
+      <span aria-hidden="true">
+        ◆
+      </span>
+
       <span>Descubre</span>
     </footer>
+
   </div>
 </main>
