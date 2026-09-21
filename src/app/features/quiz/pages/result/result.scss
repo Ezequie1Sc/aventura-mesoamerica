@@ -891,6 +891,7 @@
   position: fixed;
   inset: 0;
   z-index: 1;
+
   pointer-events: none;
   overflow: hidden;
 }
@@ -903,33 +904,207 @@
 .confetti-piece {
   position: absolute;
   top: -30px;
-  left: calc(
-    var(--confetti-index) * 2.8%
-  );
 
   width: 9px;
   height: 16px;
 
   border-radius: 2px;
 
-  background: #f4c542;
-
   opacity: 0;
-
-  transform:
-    rotate(calc(
-      var(--confetti-index) * 37deg
-    ));
 
   animation:
     confetti-fall
-    calc(3.2s + (var(--confetti-index) * 0.05s))
-    ease-in
-    calc(var(--confetti-index) * 0.08s)
-    infinite;
+    3.8s ease-in
+    forwards;
 }
 
-/* Variación de tamaños y formas */
+/* ========================================
+   POSICIONES
+   ======================================== */
+
+.confetti-piece:nth-child(1) {
+  left: 3%;
+  animation-delay: 0s;
+}
+
+.confetti-piece:nth-child(2) {
+  left: 7%;
+  animation-delay: 0.12s;
+}
+
+.confetti-piece:nth-child(3) {
+  left: 11%;
+  animation-delay: 0.24s;
+}
+
+.confetti-piece:nth-child(4) {
+  left: 15%;
+  animation-delay: 0.36s;
+}
+
+.confetti-piece:nth-child(5) {
+  left: 19%;
+  animation-delay: 0.48s;
+}
+
+.confetti-piece:nth-child(6) {
+  left: 23%;
+  animation-delay: 0.6s;
+}
+
+.confetti-piece:nth-child(7) {
+  left: 27%;
+  animation-delay: 0.72s;
+}
+
+.confetti-piece:nth-child(8) {
+  left: 31%;
+  animation-delay: 0.84s;
+}
+
+.confetti-piece:nth-child(9) {
+  left: 35%;
+  animation-delay: 0.96s;
+}
+
+.confetti-piece:nth-child(10) {
+  left: 39%;
+  animation-delay: 1.08s;
+}
+
+.confetti-piece:nth-child(11) {
+  left: 43%;
+  animation-delay: 1.2s;
+}
+
+.confetti-piece:nth-child(12) {
+  left: 47%;
+  animation-delay: 1.32s;
+}
+
+.confetti-piece:nth-child(13) {
+  left: 51%;
+  animation-delay: 1.44s;
+}
+
+.confetti-piece:nth-child(14) {
+  left: 55%;
+  animation-delay: 1.56s;
+}
+
+.confetti-piece:nth-child(15) {
+  left: 59%;
+  animation-delay: 1.68s;
+}
+
+.confetti-piece:nth-child(16) {
+  left: 63%;
+  animation-delay: 1.8s;
+}
+
+.confetti-piece:nth-child(17) {
+  left: 67%;
+  animation-delay: 1.92s;
+}
+
+.confetti-piece:nth-child(18) {
+  left: 71%;
+  animation-delay: 2.04s;
+}
+
+.confetti-piece:nth-child(19) {
+  left: 75%;
+  animation-delay: 2.16s;
+}
+
+.confetti-piece:nth-child(20) {
+  left: 79%;
+  animation-delay: 2.28s;
+}
+
+.confetti-piece:nth-child(21) {
+  left: 83%;
+  animation-delay: 2.4s;
+}
+
+.confetti-piece:nth-child(22) {
+  left: 87%;
+  animation-delay: 2.52s;
+}
+
+.confetti-piece:nth-child(23) {
+  left: 91%;
+  animation-delay: 2.64s;
+}
+
+.confetti-piece:nth-child(24) {
+  left: 95%;
+  animation-delay: 2.76s;
+}
+
+.confetti-piece:nth-child(25) {
+  left: 5%;
+  animation-delay: 0.4s;
+}
+
+.confetti-piece:nth-child(26) {
+  left: 17%;
+  animation-delay: 0.8s;
+}
+
+.confetti-piece:nth-child(27) {
+  left: 29%;
+  animation-delay: 1.2s;
+}
+
+.confetti-piece:nth-child(28) {
+  left: 41%;
+  animation-delay: 1.6s;
+}
+
+.confetti-piece:nth-child(29) {
+  left: 53%;
+  animation-delay: 2s;
+}
+
+.confetti-piece:nth-child(30) {
+  left: 65%;
+  animation-delay: 2.4s;
+}
+
+.confetti-piece:nth-child(31) {
+  left: 77%;
+  animation-delay: 2.8s;
+}
+
+.confetti-piece:nth-child(32) {
+  left: 89%;
+  animation-delay: 3.2s;
+}
+
+.confetti-piece:nth-child(33) {
+  left: 13%;
+  animation-delay: 0.7s;
+}
+
+.confetti-piece:nth-child(34) {
+  left: 37%;
+  animation-delay: 1.4s;
+}
+
+.confetti-piece:nth-child(35) {
+  left: 61%;
+  animation-delay: 2.1s;
+}
+
+.confetti-piece:nth-child(36) {
+  left: 85%;
+  animation-delay: 2.8s;
+}
+
+/* ========================================
+   FORMAS
+   ======================================== */
 
 .confetti-piece:nth-child(3n) {
   width: 7px;
@@ -954,7 +1129,13 @@
   height: 18px;
 }
 
-/* Variación de tonos */
+/* ========================================
+   COLORES
+   ======================================== */
+
+.confetti-piece:nth-child(1n) {
+  background: #f4c542;
+}
 
 .confetti-piece:nth-child(2n) {
   background: #e85d75;
@@ -976,11 +1157,14 @@
   background: #e98a3a;
 }
 
-/* Animación */
+/* ========================================
+   ANIMACIÓN
+   ======================================== */
 
 @keyframes confetti-fall {
   0% {
     opacity: 0;
+
     transform:
       translate3d(0, -30px, 0)
       rotate(0deg);
@@ -991,27 +1175,18 @@
   }
 
   50% {
+    opacity: 1;
+
     transform:
-      translate3d(
-        calc(
-          (var(--confetti-index) % 2) * 80px - 40px
-        ),
-        50vh,
-        0
-      )
+      translate3d(35px, 50vh, 0)
       rotate(360deg);
   }
 
   100% {
     opacity: 0;
+
     transform:
-      translate3d(
-        calc(
-          (var(--confetti-index) % 2) * 120px - 60px
-        ),
-        110vh,
-        0
-      )
+      translate3d(-35px, 110vh, 0)
       rotate(720deg);
   }
 }
