@@ -25,27 +25,28 @@ export class Map {
   readonly totalQuestions =
     this.quizService.totalQuestions;
 
-  /*
-   * Mantiene la lógica de tu componente:
-   * los índices anteriores al actual están completados.
-   */
-  readonly completedCount = computed(() =>
-    Math.min(
+  readonly isFinished =
+    this.quizService.isFinished;
+
+  // Al terminar, todas las estaciones quedan completadas.
+  // Durante el juego, las anteriores al índice actual.
+  readonly completedCount = computed(() => {
+    const total = this.totalQuestions();
+
+    if (this.isFinished()) {
+      return total;
+    }
+
+    return Math.min(
       Math.max(this.currentQuestionIndex(), 0),
-      this.totalQuestions(),
-    ),
+      total
+    );
+  });
+
+  readonly adventureCompleted = computed(
+    () => this.totalQuestions() > 0 && this.isFinished()
   );
 
-  readonly adventureCompleted = computed(() =>
-    this.totalQuestions() > 0 &&
-    this.completedCount() >= this.totalQuestions(),
-  );
-
-  /*
-   * Las posiciones coinciden con el camino SVG:
-   * y = 70, 200, 330, 460, 590 y 720
-   * dentro de una altura de 840 unidades.
-   */
   readonly stations: readonly MapStation[] = [
     {
       id: 1,
@@ -80,17 +81,29 @@ export class Map {
   ];
 
   isUnlocked(index: number): boolean {
-    return index <= this.completedCount();
+    if (index < 0 || index >= this.totalQuestions()) {
+      return false;
+    }
+
+    return (
+      this.adventureCompleted() ||
+      index <= this.currentQuestionIndex()
+    );
   }
 
   isCurrent(index: number): boolean {
     return (
       !this.adventureCompleted() &&
-      index === this.completedCount()
+      index >= 0 &&
+      index < this.totalQuestions() &&
+      index === this.currentQuestionIndex()
     );
   }
 
   isCompleted(index: number): boolean {
-    return index < this.completedCount();
+    return (
+      index >= 0 &&
+      index < this.completedCount()
+    );
   }
 }

@@ -32,7 +32,6 @@
   />
 
   <div class="map-content">
-
     <!-- Encabezado -->
     <header class="map-header">
       <a
@@ -76,17 +75,26 @@
             aria-hidden="true"
           />
 
-          <span class="map-header__eyebrow">Tu aventura</span>
+          <span class="map-header__eyebrow">
+            Tu aventura
+          </span>
 
           <h1 id="map-title">Mesoamérica</h1>
 
-          <span class="map-title-sign__ornament" aria-hidden="true">
+          <span
+            class="map-title-sign__ornament"
+            aria-hidden="true"
+          >
             ◆ ━ ◆ ━ ◆
           </span>
         </div>
 
         <p class="map-header__subtitle">
-          Explora <span>•</span> Aprende <span>•</span> Descubre
+          Explora
+          <span aria-hidden="true">•</span>
+          Aprende
+          <span aria-hidden="true">•</span>
+          Descubre
         </p>
       </div>
 
@@ -94,16 +102,30 @@
         class="progress-badge"
         role="status"
         [attr.aria-label]="
-          completedCount() + ' de ' + totalQuestions() + ' preguntas completadas'
+          completedCount() +
+          ' de ' +
+          totalQuestions() +
+          ' preguntas completadas'
         "
       >
-        <span class="progress-badge__star" aria-hidden="true">★</span>
-        <span>{{ completedCount() }}/{{ totalQuestions() }}</span>
+        <span
+          class="progress-badge__star"
+          aria-hidden="true"
+        >
+          ★
+        </span>
+
+        <span>
+          {{ completedCount() }}/{{ totalQuestions() }}
+        </span>
       </div>
     </header>
 
     <!-- Bienvenida -->
-    <section class="map-intro" aria-labelledby="intro-title">
+    <section
+      class="map-intro"
+      aria-labelledby="intro-title"
+    >
       <div class="map-intro__character">
         <img
           src="/assets/characters/welcome.webp"
@@ -114,11 +136,24 @@
       </div>
 
       <div class="intro-scroll">
-        <span class="intro-scroll__pin intro-scroll__pin--left"></span>
-        <span class="intro-scroll__pin intro-scroll__pin--right"></span>
+        <span
+          class="intro-scroll__pin intro-scroll__pin--left"
+          aria-hidden="true"
+        ></span>
+
+        <span
+          class="intro-scroll__pin intro-scroll__pin--right"
+          aria-hidden="true"
+        ></span>
 
         <h2 id="intro-title">
-          {{ adventureCompleted() ? '¡Qué gran aventura!' : '¡Tu viaje comienza!' }}
+          {{
+            adventureCompleted()
+              ? '¡Qué gran aventura!'
+              : completedCount() > 0
+                ? '¡Tu viaje continúa!'
+                : '¡Tu viaje comienza!'
+          }}
         </h2>
 
         <p>
@@ -132,8 +167,10 @@
     </section>
 
     <!-- Recorrido -->
-    <section class="adventure-map" aria-label="Estaciones de la aventura">
-      <!-- El camino comparte coordenadas con las estaciones -->
+    <section
+      class="adventure-map"
+      aria-label="Estaciones de la aventura"
+    >
       <svg
         class="trail"
         viewBox="0 0 600 840"
@@ -156,14 +193,33 @@
           />
         </defs>
 
-        <use href="#adventure-trail-line" class="trail__shadow" />
-        <use href="#adventure-trail-line" class="trail__border" />
-        <use href="#adventure-trail-line" class="trail__sand" />
-        <use href="#adventure-trail-line" class="trail__light" />
-        <use href="#adventure-trail-line" class="trail__details" />
+        <use
+          href="#adventure-trail-line"
+          class="trail__shadow"
+        />
+
+        <use
+          href="#adventure-trail-line"
+          class="trail__border"
+        />
+
+        <use
+          href="#adventure-trail-line"
+          class="trail__sand"
+        />
+
+        <use
+          href="#adventure-trail-line"
+          class="trail__light"
+        />
+
+        <use
+          href="#adventure-trail-line"
+          class="trail__details"
+        />
       </svg>
 
-      <!-- Elementos del paisaje -->
+      <!-- Paisaje -->
       <img
         class="landmark landmark--pyramid"
         src="/assets/objects/pyramid.webp"
@@ -185,12 +241,28 @@
         aria-hidden="true"
       />
 
-      <span class="map-rock map-rock--one" aria-hidden="true"></span>
-      <span class="map-rock map-rock--two" aria-hidden="true"></span>
-      <span class="map-rock map-rock--three" aria-hidden="true"></span>
+      <span
+        class="map-rock map-rock--one"
+        aria-hidden="true"
+      ></span>
 
+      <span
+        class="map-rock map-rock--two"
+        aria-hidden="true"
+      ></span>
+
+      <span
+        class="map-rock map-rock--three"
+        aria-hidden="true"
+      ></span>
+
+      <!-- Estaciones -->
       <ol class="station-list">
-        @for (station of stations; track station.id; let index = $index) {
+        @for (
+          station of stations;
+          track station.id;
+          let index = $index
+        ) {
           <li
             class="map-station"
             [class.map-station--right]="index % 2 !== 0"
@@ -201,7 +273,10 @@
             [attr.aria-current]="isCurrent(index) ? 'step' : null"
           >
             <!-- Plataforma -->
-            <div class="station-marker" aria-hidden="true">
+            <div
+              class="station-marker"
+              aria-hidden="true"
+            >
               @if (isCurrent(index)) {
                 <span class="station-aura"></span>
 
@@ -211,24 +286,45 @@
               }
 
               <span class="station-marker__face">
-                <span class="station-number">{{ index + 1 }}</span>
+                <span class="station-number">
+                  {{ index + 1 }}
+                </span>
               </span>
 
               @if (isCompleted(index)) {
                 <span class="station-status station-status--done">
-                  <svg viewBox="0 0 24 24" fill="none">
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    focusable="false"
+                  >
                     <path d="m5 12 4 4L19 6" />
                   </svg>
                 </span>
               } @else if (!isUnlocked(index)) {
                 <span class="station-status station-status--locked">
-                  <svg viewBox="0 0 24 24" fill="none">
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    focusable="false"
+                  >
                     <path
                       class="lock-shackle"
                       d="M7 10V7a5 5 0 0 1 10 0v3"
                     />
-                    <rect x="4" y="9" width="16" height="13" rx="3" />
-                    <path class="lock-key" d="M12 14v3" />
+
+                    <rect
+                      x="4"
+                      y="9"
+                      width="16"
+                      height="13"
+                      rx="3"
+                    />
+
+                    <path
+                      class="lock-key"
+                      d="M12 14v3"
+                    />
                   </svg>
                 </span>
               }
@@ -293,13 +389,16 @@
               />
             }
 
-            <!-- Área clicable de la pregunta actual -->
+            <!-- Solo la estación actual permite entrar -->
             @if (isCurrent(index)) {
               <a
                 routerLink="/quiz"
                 class="station-entry"
                 [attr.aria-label]="
-                  'Entrar a la pregunta ' + (index + 1) + ': ' + station.title
+                  'Entrar a la pregunta ' +
+                  (index + 1) +
+                  ': ' +
+                  station.title
                 "
               ></a>
             }
@@ -315,7 +414,11 @@
       aria-labelledby="finish-title"
     >
       <div class="finish-trophy" aria-hidden="true">
-        <svg viewBox="0 0 100 110" fill="none">
+        <svg
+          viewBox="0 0 100 110"
+          fill="none"
+          focusable="false"
+        >
           <path
             d="M27 20H11v15c0 17 13 23 25 23M73 20h16v15c0 17-13 23-25 23"
             stroke="#98511a"
@@ -366,32 +469,45 @@
 
       <div class="finish-scroll">
         <h2 id="finish-title">
-          {{ adventureCompleted() ? '¡Recorrido completado!' : 'Meta de la aventura' }}
+          {{
+            adventureCompleted()
+              ? '¡Recorrido completado!'
+              : 'Meta de la aventura'
+          }}
         </h2>
 
         <p>
-          Completa las {{ totalQuestions() }} preguntas
-          <br />
-          y descubre tu insignia.
+          @if (adventureCompleted()) {
+            Completaste las {{ totalQuestions() }} preguntas.
+            <br />
+            ¡Descubre tu resultado y tu insignia!
+          } @else {
+            Completa las {{ totalQuestions() }} preguntas
+            <br />
+            y descubre tu insignia.
+          }
         </p>
       </div>
     </section>
 
     <!-- Acción principal -->
-    <section class="map-action" aria-label="Continuar el juego">
+    <section
+      class="map-action"
+      aria-label="Continuar el juego"
+    >
       <p class="map-action__text">
         @if (adventureCompleted()) {
           ¡Llegaste al final del camino!
         } @else {
           Estación
-          <strong>{{ completedCount() + 1 }}</strong>
+          <strong>{{ currentQuestionIndex() + 1 }}</strong>
           de
           <strong>{{ totalQuestions() }}</strong>
         }
       </p>
 
       <a
-        routerLink="/quiz"
+        [routerLink]="adventureCompleted() ? '/resultado' : '/quiz'"
         class="continue-button"
       >
         <svg
@@ -406,7 +522,11 @@
         </svg>
 
         <span>
-          {{ adventureCompleted() ? 'Volver al juego' : 'Continuar aventura' }}
+          {{
+            adventureCompleted()
+              ? 'Ver mi resultado'
+              : 'Continuar aventura'
+          }}
         </span>
       </a>
     </section>
@@ -418,6 +538,5 @@
       <span aria-hidden="true">◆</span>
       <span>Descubre</span>
     </footer>
-
   </div>
 </main>
