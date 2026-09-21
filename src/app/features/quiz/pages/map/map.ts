@@ -2,6 +2,7 @@ import { Component, computed, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 
 import { QuizService } from '../../../../core/services/quiz.service';
+import { AudioService } from '../../../../core/services/audio.service';
 
 interface MapStation {
   id: number;
@@ -18,6 +19,7 @@ interface MapStation {
 })
 export class Map {
   private readonly quizService = inject(QuizService);
+  private readonly audioService = inject(AudioService);
 
   readonly currentQuestionIndex =
     this.quizService.currentQuestionIndex;
@@ -28,8 +30,6 @@ export class Map {
   readonly isFinished =
     this.quizService.isFinished;
 
-  // Al terminar, todas las estaciones quedan completadas.
-  // Durante el juego, las anteriores al índice actual.
   readonly completedCount = computed(() => {
     const total = this.totalQuestions();
 
@@ -44,7 +44,9 @@ export class Map {
   });
 
   readonly adventureCompleted = computed(
-    () => this.totalQuestions() > 0 && this.isFinished()
+    () =>
+      this.totalQuestions() > 0 &&
+      this.isFinished()
   );
 
   readonly stations: readonly MapStation[] = [
@@ -81,7 +83,10 @@ export class Map {
   ];
 
   isUnlocked(index: number): boolean {
-    if (index < 0 || index >= this.totalQuestions()) {
+    if (
+      index < 0 ||
+      index >= this.totalQuestions()
+    ) {
       return false;
     }
 
@@ -105,5 +110,17 @@ export class Map {
       index >= 0 &&
       index < this.completedCount()
     );
+  }
+
+  /**
+   * Sonido al pasar el mouse
+   * sobre la estación actual.
+   */
+  playStationHover(): void {
+    if (this.adventureCompleted()) {
+      return;
+    }
+
+    this.audioService.playSelect();
   }
 }
