@@ -1,10 +1,21 @@
 import { Injectable } from '@angular/core';
 
+type BackgroundMusic =
+  | 'home'
+  | 'map'
+  | 'quiz';
+
 @Injectable({
   providedIn: 'root',
 })
 export class AudioService {
   private readonly basePath = '/assets/audio';
+
+  /*
+   * ========================================
+   * SOUND EFFECTS
+   * ========================================
+   */
 
   private readonly sounds = {
     select: `${this.basePath}/ui/select.wav`,
@@ -17,7 +28,35 @@ export class AudioService {
     win: `${this.basePath}/ui/win.wav`,
   } as const;
 
+  /*
+   * ========================================
+   * BACKGROUND MUSIC
+   * ========================================
+   */
+
+  private readonly music = {
+    home: `${this.basePath}/music/home.mp3`,
+    map: `${this.basePath}/music/map.mp3`,
+    quiz: `${this.basePath}/music/quiz.mp3`,
+  } as const;
+
+  /*
+   * ========================================
+   * AUDIO INSTANCES
+   * ========================================
+   */
+
   private currentAudio?: HTMLAudioElement;
+
+  private backgroundAudio?: HTMLAudioElement;
+
+  private currentBackgroundMusic?: BackgroundMusic;
+
+  /*
+   * ========================================
+   * SOUND EFFECTS
+   * ========================================
+   */
 
   play(
     sound: keyof typeof this.sounds,
@@ -91,6 +130,89 @@ export class AudioService {
   playWin(): void {
     this.play('win', 0.85);
   }
+
+  /*
+   * ========================================
+   * BACKGROUND MUSIC
+   * ========================================
+   */
+
+  playBackground(
+    music: BackgroundMusic,
+    volume = 0.25
+  ): void {
+    /*
+     * Si ya está reproduciéndose la misma música,
+     * no hacemos nada.
+     */
+    if (
+      this.currentBackgroundMusic === music &&
+      this.backgroundAudio &&
+      !this.backgroundAudio.paused
+    ) {
+      return;
+    }
+
+    /*
+     * Detener la música anterior.
+     */
+    this.stopBackground();
+
+    const audio = new Audio(
+      this.music[music]
+    );
+
+    audio.loop = true;
+
+    audio.volume = Math.min(
+      Math.max(volume, 0),
+      1
+    );
+
+    this.backgroundAudio = audio;
+    this.currentBackgroundMusic = music;
+
+    void audio.play().catch(() => {
+      /*
+       * El navegador puede bloquear el autoplay
+       * hasta que exista una interacción del usuario.
+       *
+       * La música podrá iniciarse posteriormente
+       * desde una acción del usuario.
+       */
+    });
+  }
+
+  playHomeMusic(): void {
+    this.playBackground('home', 0.25);
+  }
+
+  playMapMusic(): void {
+    this.playBackground('map', 0.25);
+  }
+
+  playQuizMusic(): void {
+    this.playBackground('quiz', 0.22);
+  }
+
+  stopBackground(): void {
+    if (!this.backgroundAudio) {
+      this.currentBackgroundMusic = undefined;
+      return;
+    }
+
+    this.backgroundAudio.pause();
+    this.backgroundAudio.currentTime = 0;
+
+    this.backgroundAudio = undefined;
+    this.currentBackgroundMusic = undefined;
+  }
+
+  /*
+   * ========================================
+   * STOP SOUND EFFECT
+   * ========================================
+   */
 
   stop(): void {
     if (!this.currentAudio) {
