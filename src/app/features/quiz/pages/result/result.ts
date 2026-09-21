@@ -1,15 +1,21 @@
-import { Component, inject } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  inject,
+} from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 
 import { QuizService } from '../../../../core/services/quiz.service';
+import { AudioService } from '../../../../core/services/audio.service';
 
 @Component({
   selector: 'app-result',
+  standalone: true,
   imports: [RouterLink],
   templateUrl: './result.html',
   styleUrl: './result.scss',
 })
-export class Result {
+export class Result implements OnInit {
   // =========================================================
   // DEPENDENCIAS
   // =========================================================
@@ -19,6 +25,18 @@ export class Result {
 
   private readonly router =
     inject(Router);
+
+  readonly audioService =
+    inject(AudioService);
+
+  // =========================================================
+  // CONFETI
+  // =========================================================
+
+  readonly confettiPieces = Array.from(
+    { length: 36 },
+    (_, index) => index
+  );
 
   // =========================================================
   // ESTADO DEL QUIZ
@@ -32,6 +50,18 @@ export class Result {
 
   readonly result =
     this.quizService.result;
+
+  // =========================================================
+  // INICIO
+  // =========================================================
+
+  ngOnInit(): void {
+    /*
+     * Sonido especial al mostrar
+     * la pantalla de resultados.
+     */
+    this.audioService.playWin();
+  }
 
   // =========================================================
   // INSIGNIA
@@ -144,27 +174,8 @@ export class Result {
   // =========================================================
 
   restartQuiz(): void {
-    /*
-     * Limpia completamente el progreso de
-     * Aventura Mesoamérica y reinicia el estado
-     * del quiz.
-     */
-
     this.quizService.restartQuiz();
 
-    /*
-     * Regresamos al inicio para que el usuario
-     * vuelva a recorrer:
-     *
-     * Inicio
-     *   ↓
-     * Instrucciones
-     *   ↓
-     * Mapa
-     *   ↓
-     * Preguntas
-     */
-
-    this.router.navigate(['/']);
+    void this.router.navigate(['/']);
   }
 }
