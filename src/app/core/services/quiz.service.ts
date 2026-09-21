@@ -49,6 +49,9 @@ export class QuizService {
   constructor(private readonly storageService: StorageService) {}
 
   startQuiz(): void {
+    // Nuevo intento = permitir un nuevo nombre para la insignia
+    localStorage.removeItem('aventura-explorer-name');
+
     this.currentQuestionIndex.set(0);
     this.score.set(0);
     this.selectedAnswer.set(null);
