@@ -80,6 +80,14 @@ export class AudioService {
 
   /*
    * ========================================
+   * PIPLUP TIMER
+   * ========================================
+   */
+
+  private piplupTimer?: ReturnType<typeof setTimeout>;
+
+  /*
+   * ========================================
    * CONSTRUCTOR
    * ========================================
    */
@@ -157,9 +165,7 @@ export class AudioService {
      * RESULT
      * ======================================
      *
-     * La pantalla de resultado utiliza
-     * nuevamente la música principal
-     * de la aventura.
+     * Resultado utiliza home.mp3.
      *
      * Piplup NO se reproduce automáticamente.
      */
@@ -297,18 +303,70 @@ export class AudioService {
    * PIPLUP
    * ========================================
    *
-   * Piplup NO es música de fondo.
+   * Piplup se reproduce únicamente cuando
+   * el usuario presiona la insignia.
    *
-   * Se reproduce únicamente cuando una
-   * acción explícita de la aplicación
-   * lo solicita.
+   * SOLO se reproducen los primeros 3 segundos.
    */
 
   playPiplup(): void {
+
+    /*
+     * Cancelamos cualquier temporizador
+     * anterior de Piplup.
+     */
+
+    this.clearPiplupTimer();
+
+    /*
+     * play() detiene el efecto actual.
+     */
+
     this.play(
       'piplup',
       0.75
     );
+
+    /*
+     * Guardamos una referencia al audio actual.
+     */
+
+    const audio =
+      this.currentAudio;
+
+    if (!audio) {
+      return;
+    }
+
+    /*
+     * Detener Piplup exactamente después
+     * de 3 segundos.
+     */
+
+    this.piplupTimer =
+      setTimeout(() => {
+
+        /*
+         * Solo detenemos el audio si
+         * sigue siendo el mismo Piplup
+         * que iniciamos.
+         */
+
+        if (
+          this.currentAudio === audio
+        ) {
+          audio.pause();
+
+          audio.currentTime = 0;
+
+          this.currentAudio =
+            undefined;
+        }
+
+        this.piplupTimer =
+          undefined;
+
+      }, 3000);
   }
 
   /*
@@ -428,11 +486,39 @@ export class AudioService {
 
   /*
    * ========================================
+   * STOP PIPLUP TIMER
+   * ========================================
+   */
+
+  private clearPiplupTimer(): void {
+
+    if (
+      this.piplupTimer !== undefined
+    ) {
+      clearTimeout(
+        this.piplupTimer
+      );
+
+      this.piplupTimer =
+        undefined;
+    }
+  }
+
+  /*
+   * ========================================
    * STOP SOUND EFFECT
    * ========================================
    */
 
   stop(): void {
+
+    /*
+     * Si estamos deteniendo el efecto
+     * actual, también cancelamos el
+     * temporizador de Piplup.
+     */
+
+    this.clearPiplupTimer();
 
     if (!this.currentAudio) {
       return;
