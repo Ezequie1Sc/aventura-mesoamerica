@@ -5,7 +5,8 @@ import { filter } from 'rxjs';
 type BackgroundMusic =
   | 'home'
   | 'map'
-  | 'quiz';
+  | 'quiz'
+  | 'piplup';
 
 @Injectable({
   providedIn: 'root',
@@ -40,6 +41,7 @@ export class AudioService {
     home: `${this.basePath}/music/home.mp3`,
     map: `${this.basePath}/music/map.mp3`,
     quiz: `${this.basePath}/music/quiz.mp3`,
+    piplup: `${this.basePath}/music/piplup.mp3`,
   } as const;
 
   /*
@@ -94,9 +96,6 @@ export class AudioService {
      * ========================================
      * HOME + INSTRUCTIONS + BADGES
      * ========================================
-     *
-     * Estas páginas utilizan la música
-     * principal de la aventura.
      */
 
     if (
@@ -135,13 +134,12 @@ export class AudioService {
      * RESULT
      * ========================================
      *
-     * En resultado no utilizamos música
-     * de fondo porque aquí se reproducen
-     * los efectos de victoria/recompensa.
+     * Piplup será la música de fondo
+     * durante la pantalla de resultados.
      */
 
     if (url.startsWith('/resultado')) {
-      this.stopBackground();
+      this.playPiplupMusic();
     }
   }
 
@@ -172,9 +170,6 @@ export class AudioService {
       /*
        * El navegador puede bloquear la reproducción
        * si no existe una interacción del usuario.
-       *
-       * No hacemos nada en ese caso para evitar
-       * errores en consola.
        */
     });
 
@@ -238,6 +233,7 @@ export class AudioService {
      * Si ya está reproduciéndose la misma música,
      * no la reiniciamos.
      */
+
     if (
       this.currentBackgroundMusic === music &&
       this.backgroundAudio &&
@@ -249,6 +245,7 @@ export class AudioService {
     /*
      * Detener la música anterior.
      */
+
     this.stopBackground();
 
     const audio = new Audio(
@@ -258,6 +255,7 @@ export class AudioService {
     /*
      * La música se repite indefinidamente.
      */
+
     audio.loop = true;
 
     audio.volume = Math.min(
@@ -270,15 +268,12 @@ export class AudioService {
 
     /*
      * Intentar reproducir.
-     *
-     * Algunos navegadores, especialmente
-     * en dispositivos móviles, pueden bloquear
-     * autoplay hasta que exista interacción.
      */
+
     void audio.play().catch(() => {
       /*
-       * No mostramos el error para evitar
-       * errores innecesarios en consola.
+       * Algunos navegadores pueden bloquear
+       * autoplay hasta que exista interacción.
        */
     });
   }
@@ -307,6 +302,13 @@ export class AudioService {
     this.playBackground(
       'quiz',
       0.22
+    );
+  }
+
+  playPiplupMusic(): void {
+    this.playBackground(
+      'piplup',
+      0.25
     );
   }
 
