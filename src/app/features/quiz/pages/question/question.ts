@@ -20,10 +20,6 @@ export class Question implements OnInit, OnDestroy {
   readonly quizService = inject(QuizService);
   readonly router = inject(Router);
 
-  // ==========================================
-  // ESTADO COMPARTIDO
-  // ==========================================
-
   readonly currentQuestion =
     this.quizService.currentQuestion;
 
@@ -48,36 +44,27 @@ export class Question implements OnInit, OnDestroy {
   readonly isFinished =
     this.quizService.isFinished;
 
-  // Tiempo para leer el feedback antes de avanzar.
   readonly autoAdvanceSeconds = 6;
 
   private advanceTimer?: ReturnType<typeof setTimeout>;
+
   private destroyed = false;
 
-  // ==========================================
-  // INICIO
-  // ==========================================
-
   ngOnInit(): void {
-    // No reiniciar una aventura ya terminada al entrar aquí.
     if (this.isFinished()) {
       void this.router.navigate(['/resultado']);
       return;
     }
 
-    // El servicio conserva el intento si ya fue iniciado.
     this.quizService.startQuiz();
 
-    // Si vuelve desde el mapa con una respuesta registrada,
-    // conservarla y reanudar el avance.
-    if (this.isAnswered()) {
-      this.scheduleNextQuestion();
-    }
+    /*
+     * Si el usuario regresa al mapa después de contestar
+     * una pregunta, NO programamos otro temporizador aquí.
+     *
+     * La siguiente pregunta se abrirá desde el mapa.
+     */
   }
-
-  // ==========================================
-  // RESPONDER
-  // ==========================================
 
   answerQuestion(answerId: string): void {
     if (
@@ -88,9 +75,10 @@ export class Question implements OnInit, OnDestroy {
       return;
     }
 
-    // Aceptar solo opciones de la pregunta actual.
-    const optionExists = this.currentQuestion()
-      .options.some((option) => option.id === answerId);
+    const optionExists =
+      this.currentQuestion().options.some(
+        (option) => option.id === answerId
+      );
 
     if (!optionExists) {
       return;
@@ -103,20 +91,18 @@ export class Question implements OnInit, OnDestroy {
     }
   }
 
-  // ==========================================
-  // AVANCE AUTOMÁTICO
-  // ==========================================
-
   private scheduleNextQuestion(): void {
     this.clearAdvanceTimer();
 
-    const answeredIndex = this.currentQuestionIndex();
-    const answeredQuestion = this.currentQuestion();
+    const answeredIndex =
+      this.currentQuestionIndex();
+
+    const answeredQuestion =
+      this.currentQuestion();
 
     this.advanceTimer = setTimeout(() => {
       this.advanceTimer = undefined;
 
-      // No aplicar un temporizador a otra pregunta.
       if (
         this.destroyed ||
         this.isFinished() ||
@@ -131,12 +117,7 @@ export class Question implements OnInit, OnDestroy {
     }, this.autoAdvanceSeconds * 1000);
   }
 
-  // ==========================================
-  // AVANCE MANUAL O AUTOMÁTICO
-  // ==========================================
-
   nextQuestion(): void {
-    // Si se pulsa el botón, cancelar el avance pendiente.
     this.clearAdvanceTimer();
 
     if (this.destroyed) {
@@ -152,26 +133,40 @@ export class Question implements OnInit, OnDestroy {
       return;
     }
 
-    // El servicio incrementa el índice y limpia el feedback.
+    /*
+     * Primero avanzamos el estado interno del quiz.
+     *
+     * Ejemplo:
+     * pregunta 1 -> pregunta 2
+     * currentQuestionIndex: 0 -> 1
+     */
     this.quizService.nextQuestion();
 
+    /*
+     * Si terminamos el quiz, mostramos el resultado.
+     */
     if (this.isFinished()) {
       void this.router.navigate(['/resultado']);
+      return;
     }
-  }
 
-  // ==========================================
-  // VOLVER AL MAPA
-  // ==========================================
-
-  goToMap(): void {
-    this.clearAdvanceTimer();
+    /*
+     * IMPORTANTE:
+     *
+     * Ya no intentamos mostrar la siguiente pregunta
+     * directamente dentro de este componente.
+     *
+     * Regresamos al mapa para que el usuario vea que
+     * la siguiente estación está desbloqueada.
+     */
     void this.router.navigate(['/mapa']);
   }
 
-  // ==========================================
-  // ESTADO DE LAS RESPUESTAS
-  // ==========================================
+  goToMap(): void {
+    this.clearAdvanceTimer();
+
+    void this.router.navigate(['/mapa']);
+  }
 
   isCorrectAnswer(answerId: string): boolean {
     return this.quizService.isCorrectAnswer(answerId);
@@ -193,10 +188,6 @@ export class Question implements OnInit, OnDestroy {
     return 'answer-card--disabled';
   }
 
-  // ==========================================
-  // PERSONAJE
-  // ==========================================
-
   getCharacterImage(): string {
     if (!this.isAnswered()) {
       return '/assets/characters/thinking.webp';
@@ -213,10 +204,6 @@ export class Question implements OnInit, OnDestroy {
 
     return '/assets/characters/sad.webp';
   }
-
-  // ==========================================
-  // FEEDBACK
-  // ==========================================
 
   getFeedbackTitle(): string {
     const answer = this.selectedAnswer();
@@ -244,28 +231,28 @@ export class Question implements OnInit, OnDestroy {
 
     const question = this.currentQuestion();
 
-    const correctOption = question.options.find(
-      (option) => option.id === question.correctAnswer
-    );
+    const correctOption =
+      question.options.find(
+        (option) =>
+          option.id === question.correctAnswer
+      );
 
     return `La respuesta correcta era: ${
       correctOption?.text ?? ''
     }`;
   }
 
-  // ==========================================
-  // LIMPIEZA
-  // ==========================================
-
   private clearAdvanceTimer(): void {
     if (this.advanceTimer !== undefined) {
       clearTimeout(this.advanceTimer);
+
       this.advanceTimer = undefined;
     }
   }
 
   ngOnDestroy(): void {
     this.destroyed = true;
+
     this.clearAdvanceTimer();
   }
 }
