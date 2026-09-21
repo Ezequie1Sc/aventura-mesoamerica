@@ -11,6 +11,8 @@ interface QuizStorage {
 })
 export class StorageService {
   private readonly storageKey = 'aventura-mesoamerica';
+  private readonly explorerNameKey =
+    'aventura-explorer-name';
 
   private readonly defaultStorage: QuizStorage = {
     bestScore: 0,
@@ -18,31 +20,56 @@ export class StorageService {
     bestBadgeId: null,
   };
 
+  // =========================================================
+  // OBTENER PROGRESO
+  // =========================================================
+
   getProgress(): QuizStorage {
-    const storedData = localStorage.getItem(this.storageKey);
+    const storedData = localStorage.getItem(
+      this.storageKey
+    );
 
     if (!storedData) {
       return { ...this.defaultStorage };
     }
 
     try {
+      const parsedData = JSON.parse(
+        storedData
+      );
+
       return {
         ...this.defaultStorage,
-        ...JSON.parse(storedData),
+        ...parsedData,
       };
     } catch {
       return { ...this.defaultStorage };
     }
   }
 
-  saveResult(score: number, badgeId: string): void {
+  // =========================================================
+  // GUARDAR RESULTADO
+  // =========================================================
+
+  saveResult(
+    score: number,
+    badgeId: string
+  ): void {
     const progress = this.getProgress();
 
     const updatedProgress: QuizStorage = {
-      bestScore: Math.max(progress.bestScore, score),
-      gamesPlayed: progress.gamesPlayed + 1,
+      bestScore: Math.max(
+        progress.bestScore,
+        score
+      ),
+
+      gamesPlayed:
+        progress.gamesPlayed + 1,
+
       bestBadgeId:
-        score >= progress.bestScore ? badgeId : progress.bestBadgeId,
+        score >= progress.bestScore
+          ? badgeId
+          : progress.bestBadgeId,
     };
 
     localStorage.setItem(
@@ -51,19 +78,51 @@ export class StorageService {
     );
   }
 
+  // =========================================================
+  // MEJOR PUNTUACIÓN
+  // =========================================================
+
   getBestScore(): number {
     return this.getProgress().bestScore;
   }
+
+  // =========================================================
+  // PARTIDAS JUGADAS
+  // =========================================================
 
   getGamesPlayed(): number {
     return this.getProgress().gamesPlayed;
   }
 
+  // =========================================================
+  // MEJOR INSIGNIA
+  // =========================================================
+
   getBestBadgeId(): string | null {
     return this.getProgress().bestBadgeId;
   }
 
+  // =========================================================
+  // LIMPIAR PROGRESO
+  // =========================================================
+
   clearProgress(): void {
-    localStorage.removeItem(this.storageKey);
+    localStorage.removeItem(
+      this.storageKey
+    );
+
+    localStorage.removeItem(
+      this.explorerNameKey
+    );
+
+    sessionStorage.clear();
+  }
+
+  // =========================================================
+  // REINICIAR AVENTURA COMPLETAMENTE
+  // =========================================================
+
+  resetAdventure(): void {
+    this.clearProgress();
   }
 }

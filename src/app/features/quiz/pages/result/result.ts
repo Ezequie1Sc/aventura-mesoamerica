@@ -10,21 +10,47 @@ import { QuizService } from '../../../../core/services/quiz.service';
   styleUrl: './result.scss',
 })
 export class Result {
-  private readonly quizService = inject(QuizService);
-  private readonly router = inject(Router);
+  // =========================================================
+  // DEPENDENCIAS
+  // =========================================================
 
-  readonly score = this.quizService.score;
-  readonly totalQuestions = this.quizService.totalQuestions;
-  readonly result = this.quizService.result;
+  private readonly quizService =
+    inject(QuizService);
+
+  private readonly router =
+    inject(Router);
+
+  // =========================================================
+  // ESTADO DEL QUIZ
+  // =========================================================
+
+  readonly score =
+    this.quizService.score;
+
+  readonly totalQuestions =
+    this.quizService.totalQuestions;
+
+  readonly result =
+    this.quizService.result;
+
+  // =========================================================
+  // INSIGNIA
+  // =========================================================
 
   getBadge() {
-    return this.quizService.getBadge(this.score());
+    return this.quizService.getBadge(
+      this.score()
+    );
   }
 
   getBadgeImage(): string {
-    const badgeId = this.getBadge().id;
+    const badgeId =
+      this.getBadge().id;
 
-    const images: Record<string, string> = {
+    const images: Record<
+      string,
+      string
+    > = {
       semilla:
         '/assets/badges/semilla-conocimiento.webp',
 
@@ -44,8 +70,13 @@ export class Result {
     );
   }
 
+  // =========================================================
+  // PERSONAJE
+  // =========================================================
+
   getCharacterImage(): string {
-    const score = this.score();
+    const score =
+      this.score();
 
     if (score === 6) {
       return '/assets/characters/victory.webp';
@@ -62,8 +93,13 @@ export class Result {
     return '/assets/characters/welcome.webp';
   }
 
+  // =========================================================
+  // TÍTULO DEL RESULTADO
+  // =========================================================
+
   getResultTitle(): string {
-    const score = this.score();
+    const score =
+      this.score();
 
     if (score === 6) {
       return '¡Aventura completada!';
@@ -80,8 +116,13 @@ export class Result {
     return '¡Sigue explorando!';
   }
 
+  // =========================================================
+  // MENSAJE DEL RESULTADO
+  // =========================================================
+
   getResultMessage(): string {
-    const score = this.score();
+    const score =
+      this.score();
 
     if (score === 6) {
       return '¡Demostraste que eres un gran conocedor de Mesoamérica!';
@@ -98,8 +139,32 @@ export class Result {
     return 'Toda gran aventura comienza con un primer paso. ¡Sigue aprendiendo!';
   }
 
+  // =========================================================
+  // NUEVA AVENTURA
+  // =========================================================
+
   restartQuiz(): void {
+    /*
+     * Limpia completamente el progreso de
+     * Aventura Mesoamérica y reinicia el estado
+     * del quiz.
+     */
+
     this.quizService.restartQuiz();
-    this.router.navigate(['/quiz']);
+
+    /*
+     * Regresamos al inicio para que el usuario
+     * vuelva a recorrer:
+     *
+     * Inicio
+     *   ↓
+     * Instrucciones
+     *   ↓
+     * Mapa
+     *   ↓
+     * Preguntas
+     */
+
+    this.router.navigate(['/']);
   }
 }
