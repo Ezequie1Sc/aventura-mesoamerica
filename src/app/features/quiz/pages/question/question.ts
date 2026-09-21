@@ -29,10 +29,6 @@ export class Question {
   readonly isFinished =
     this.quizService.isFinished;
 
-  constructor() {
-    this.quizService.startQuiz();
-  }
-
   answerQuestion(answerId: string): void {
     this.quizService.answerQuestion(answerId);
   }
