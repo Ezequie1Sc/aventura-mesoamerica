@@ -1,5 +1,5 @@
 <main class="result-page">
-  <!-- Decorative background -->
+  <!-- Fondo -->
   <div
     class="result-background"
     aria-hidden="true"
@@ -10,7 +10,7 @@
     aria-hidden="true"
   ></div>
 
-  <!-- Decorative leaves -->
+  <!-- Decoración -->
   <img
     class="result-leaf result-leaf--left"
     src="/assets/nature/leaves.webp"
@@ -26,7 +26,10 @@
   />
 
   <section class="result-content">
-    <!-- Header -->
+
+    <!-- =========================================
+         HEADER
+         ========================================= -->
     <header class="result-header">
       <a
         routerLink="/"
@@ -37,17 +40,38 @@
       </a>
 
       <div class="result-header__title">
-        <span>✦</span>
+        <img
+          src="/assets/rewards/star.webp"
+          alt=""
+          aria-hidden="true"
+        />
 
         <p>AVENTURA MESOAMÉRICA</p>
 
-        <span>✦</span>
+        <img
+          src="/assets/rewards/star.webp"
+          alt=""
+          aria-hidden="true"
+        />
       </div>
+
+      <div
+        class="result-header__spacer"
+        aria-hidden="true"
+      ></div>
     </header>
 
-    <!-- Character -->
-    <section class="result-character">
-      <div class="result-character__glow"></div>
+    <!-- =========================================
+         PERSONAJE
+         ========================================= -->
+    <section
+      class="result-character"
+      aria-label="Personaje celebrando"
+    >
+      <div
+        class="result-character__glow"
+        aria-hidden="true"
+      ></div>
 
       <img
         class="result-character__image"
@@ -56,55 +80,123 @@
       />
     </section>
 
-    <!-- Result title -->
-    <section class="result-heading">
-      <span class="result-heading__star">
-        ✦
-      </span>
+    <!-- =========================================
+         CARD PRINCIPAL DEL RESULTADO
+         ========================================= -->
+    <section
+      class="result-summary"
+      aria-labelledby="result-title"
+    >
 
-      <h1>
-        {{ getResultTitle() }}
-      </h1>
+      <!-- Título -->
+      <div class="result-heading">
 
-      <span class="result-heading__star">
-        ✦
-      </span>
+        <div
+          class="result-heading__decoration"
+          aria-hidden="true"
+        >
+          <img
+            src="/assets/rewards/star.webp"
+            alt=""
+          />
 
-      <p>
-        {{ getResultMessage() }}
-      </p>
-    </section>
+          <span></span>
 
-    <!-- Score -->
-    <section class="score-card">
-      <div class="score-card__stars">
-        <span>★</span>
-        <span>★</span>
-        <span>★</span>
+          <img
+            src="/assets/rewards/star.webp"
+            alt=""
+          />
+        </div>
+
+        <h1 id="result-title">
+          {{ getResultTitle() }}
+        </h1>
+
+        <p>
+          {{ getResultMessage() }}
+        </p>
       </div>
 
-      <div class="score-card__score">
-        <strong>
+      <!-- Puntuación -->
+      <div class="score-card">
+
+        <div
+          class="score-card__stars"
+          aria-hidden="true"
+        >
+          @for (star of [1, 2, 3]; track star) {
+            <img
+              src="/assets/rewards/star.webp"
+              alt=""
+              [class.score-star--active]="
+                score() >= star * 2
+              "
+            />
+          }
+        </div>
+
+        <div class="score-card__score">
+          <strong>
+            {{ score() }}
+          </strong>
+
+          <span>
+            / {{ totalQuestions() }}
+          </span>
+        </div>
+
+        <p>
+          respuestas correctas
+        </p>
+      </div>
+
+      <!-- Frase de progreso -->
+      <div class="result-summary__progress">
+        <span>
           {{ score() }}
-        </strong>
+        </span>
+
+        <span class="result-summary__progress-dot">
+          ◆
+        </span>
 
         <span>
-          / {{ totalQuestions() }}
+          de {{ totalQuestions() }} retos
         </span>
       </div>
 
-      <p>
-        respuestas correctas
-      </p>
     </section>
 
-    <!-- Earned badge -->
-    <section class="result-badge">
-      <span class="result-badge__label">
-        ✦ INSIGNIA OBTENIDA ✦
-      </span>
+    <!-- =========================================
+         INSIGNIA OBTENIDA
+         ========================================= -->
+    <section
+      class="result-badge"
+      aria-labelledby="badge-title"
+    >
+
+      <div class="result-badge__heading">
+
+        <img
+          src="/assets/rewards/star.webp"
+          alt=""
+          aria-hidden="true"
+        />
+
+        <span>
+          INSIGNIA OBTENIDA
+        </span>
+
+        <img
+          src="/assets/rewards/star.webp"
+          alt=""
+          aria-hidden="true"
+        />
+
+      </div>
 
       <div class="result-badge__image-wrapper">
+
         <div
           class="result-badge__glow"
           aria-hidden="true"
@@ -115,19 +207,27 @@
           [src]="getBadgeImage()"
           [alt]="getBadge().name"
         />
+
       </div>
 
-      <h2>
+      <h2 id="badge-title">
         {{ getBadge().name }}
       </h2>
 
       <p>
         {{ getBadge().description }}
       </p>
+
     </section>
 
-    <!-- Actions -->
-    <section class="result-actions">
+    <!-- =========================================
+         ACCIONES
+         ========================================= -->
+    <section
+      class="result-actions"
+      aria-label="Acciones del resultado"
+    >
+
       <a
         routerLink="/insignias"
         class="claim-button"
@@ -135,7 +235,7 @@
         <span>✦</span>
 
         <span>
-          Reclamar insignia
+          Ver mi insignia
         </span>
 
         <span>→</span>
@@ -152,17 +252,31 @@
           Volver a jugar
         </span>
       </button>
+
     </section>
 
-    <!-- Footer -->
+    <!-- =========================================
+         FOOTER
+         ========================================= -->
     <footer class="result-footer">
-      <span>🌿</span>
+
+      <img
+        src="/assets/rewards/star.webp"
+        alt=""
+        aria-hidden="true"
+      />
 
       <p>
         ¡Sigue explorando y aprendiendo!
       </p>
 
-      <span>🌿</span>
+      <img
+        src="/assets/rewards/star.webp"
+        alt=""
+        aria-hidden="true"
+      />
+
     </footer>
+
   </section>
 </main>
