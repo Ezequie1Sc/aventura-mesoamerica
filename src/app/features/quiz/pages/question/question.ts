@@ -8,6 +8,7 @@ import {
 import { Router } from '@angular/router';
 
 import { QuizService } from '../../../../core/services/quiz.service';
+import { AudioService } from '../../../../core/services/audio.service';
 
 @Component({
   selector: 'app-question',
@@ -19,6 +20,7 @@ import { QuizService } from '../../../../core/services/quiz.service';
 export class Question implements OnInit, OnDestroy {
   readonly quizService = inject(QuizService);
   readonly router = inject(Router);
+  readonly audioService = inject(AudioService);
 
   readonly currentQuestion =
     this.quizService.currentQuestion;
@@ -57,13 +59,6 @@ export class Question implements OnInit, OnDestroy {
     }
 
     this.quizService.startQuiz();
-
-    /*
-     * Si el usuario regresa al mapa después de contestar
-     * una pregunta, NO programamos otro temporizador aquí.
-     *
-     * La siguiente pregunta se abrirá desde el mapa.
-     */
   }
 
   answerQuestion(answerId: string): void {
@@ -84,8 +79,29 @@ export class Question implements OnInit, OnDestroy {
       return;
     }
 
+    /*
+     * Sonido de selección.
+     */
+    this.audioService.playSelect();
+
+    /*
+     * Registramos la respuesta.
+     */
     this.quizService.answerQuestion(answerId);
 
+    /*
+     * Reproducimos el sonido dependiendo
+     * de si la respuesta fue correcta o incorrecta.
+     */
+    if (this.isCorrectAnswer(answerId)) {
+      this.audioService.playCorrect();
+    } else {
+      this.audioService.playIncorrect();
+    }
+
+    /*
+     * Programamos el avance automático.
+     */
     if (this.isAnswered()) {
       this.scheduleNextQuestion();
     }
@@ -134,16 +150,18 @@ export class Question implements OnInit, OnDestroy {
     }
 
     /*
-     * Primero avanzamos el estado interno del quiz.
-     *
-     * Ejemplo:
-     * pregunta 1 -> pregunta 2
-     * currentQuestionIndex: 0 -> 1
+     * Sonido de transición.
+     */
+    this.audioService.playNext();
+
+    /*
+     * Avanzamos el estado interno del quiz.
      */
     this.quizService.nextQuestion();
 
     /*
-     * Si terminamos el quiz, mostramos el resultado.
+     * Si terminamos el quiz,
+     * vamos directamente al resultado.
      */
     if (this.isFinished()) {
       void this.router.navigate(['/resultado']);
@@ -151,13 +169,7 @@ export class Question implements OnInit, OnDestroy {
     }
 
     /*
-     * IMPORTANTE:
-     *
-     * Ya no intentamos mostrar la siguiente pregunta
-     * directamente dentro de este componente.
-     *
-     * Regresamos al mapa para que el usuario vea que
-     * la siguiente estación está desbloqueada.
+     * Volvemos al mapa.
      */
     void this.router.navigate(['/mapa']);
   }
