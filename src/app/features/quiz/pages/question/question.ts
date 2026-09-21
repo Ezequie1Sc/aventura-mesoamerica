@@ -3,6 +3,7 @@ import {
   OnDestroy,
   OnInit,
   inject,
+  signal,
 } from '@angular/core';
 
 import { Router } from '@angular/router';
@@ -17,10 +18,29 @@ import { AudioService } from '../../../../core/services/audio.service';
   templateUrl: './question.html',
   styleUrl: './question.scss',
 })
-export class Question implements OnInit, OnDestroy {
-  readonly quizService = inject(QuizService);
-  readonly router = inject(Router);
-  readonly audioService = inject(AudioService);
+export class Question
+  implements OnInit, OnDestroy
+{
+  /*
+   * ========================================
+   * DEPENDENCIES
+   * ========================================
+   */
+
+  readonly quizService =
+    inject(QuizService);
+
+  readonly router =
+    inject(Router);
+
+  readonly audioService =
+    inject(AudioService);
+
+  /*
+   * ========================================
+   * QUIZ STATE
+   * ========================================
+   */
 
   readonly currentQuestion =
     this.quizService.currentQuestion;
@@ -46,26 +66,54 @@ export class Question implements OnInit, OnDestroy {
   readonly isFinished =
     this.quizService.isFinished;
 
-  readonly autoAdvanceSeconds = 6;
+  /*
+   * ========================================
+   * CONFETTI
+   * ========================================
+   */
 
-  private advanceTimer?: ReturnType<typeof setTimeout>;
+  readonly showConfetti =
+    signal(false);
 
-  private destroyed = false;
+  readonly confettiPieces =
+    Array.from(
+      {
+        length: 64,
+      },
+      (_, index) => index
+    );
+
+  private confettiTimer?:
+    ReturnType<typeof setTimeout>;
+
+  /*
+   * ========================================
+   * INIT
+   * ========================================
+   */
 
   ngOnInit(): void {
+
     if (this.isFinished()) {
-      void this.router.navigate(['/resultado']);
+
+      void this.router.navigate([
+        '/resultado',
+      ]);
+
       return;
     }
 
     this.quizService.startQuiz();
   }
 
-  /**
-   * Reproduce el sonido cuando el cursor
-   * entra sobre una respuesta.
+  /*
+   * ========================================
+   * BUTTON HOVER SOUND
+   * ========================================
    */
-  playAnswerHover(): void {
+
+  playButtonHover(): void {
+
     if (
       this.isAnswered() ||
       this.isFinished()
@@ -76,9 +124,17 @@ export class Question implements OnInit, OnDestroy {
     this.audioService.playSelect();
   }
 
-  answerQuestion(answerId: string): void {
+  /*
+   * ========================================
+   * ANSWER
+   * ========================================
+   */
+
+  answerQuestion(
+    answerId: string
+  ): void {
+
     if (
-      this.destroyed ||
       this.isAnswered() ||
       this.isFinished()
     ) {
@@ -86,66 +142,68 @@ export class Question implements OnInit, OnDestroy {
     }
 
     const optionExists =
-      this.currentQuestion().options.some(
-        (option) => option.id === answerId
-      );
+      this.currentQuestion()
+        .options
+        .some(
+          (option) =>
+            option.id === answerId
+        );
 
     if (!optionExists) {
       return;
     }
 
+    /*
+     * Sonido de selección.
+     */
+
     this.audioService.playSelect();
 
-    this.quizService.answerQuestion(answerId);
+    /*
+     * Registrar respuesta.
+     */
 
-    if (this.isCorrectAnswer(answerId)) {
+    this.quizService.answerQuestion(
+      answerId
+    );
+
+    /*
+     * Respuesta correcta.
+     */
+
+    if (
+      this.isCorrectAnswer(answerId)
+    ) {
+
       this.audioService.playCorrect();
+
+      this.startConfetti();
+
     } else {
+
+      /*
+       * Respuesta incorrecta.
+       */
+
       this.audioService.playIncorrect();
-    }
 
-    if (this.isAnswered()) {
-      this.scheduleNextQuestion();
     }
   }
 
-  private scheduleNextQuestion(): void {
-    this.clearAdvanceTimer();
-
-    const answeredIndex =
-      this.currentQuestionIndex();
-
-    const answeredQuestion =
-      this.currentQuestion();
-
-    this.advanceTimer = setTimeout(() => {
-      this.advanceTimer = undefined;
-
-      if (
-        this.destroyed ||
-        this.isFinished() ||
-        !this.isAnswered() ||
-        this.currentQuestionIndex() !==
-          answeredIndex ||
-        this.currentQuestion() !==
-          answeredQuestion
-      ) {
-        return;
-      }
-
-      this.nextQuestion();
-    }, this.autoAdvanceSeconds * 1000);
-  }
+  /*
+   * ========================================
+   * NEXT QUESTION
+   * ========================================
+   */
 
   nextQuestion(): void {
-    this.clearAdvanceTimer();
-
-    if (this.destroyed) {
-      return;
-    }
 
     if (this.isFinished()) {
-      void this.router.navigate(['/resultado']);
+
+      void this.router.navigate([
+        '/resultado',
+      ]);
+
       return;
     }
 
@@ -153,83 +211,185 @@ export class Question implements OnInit, OnDestroy {
       return;
     }
 
+    /*
+     * Sonido del botón.
+     */
+
     this.audioService.playNext();
+
+    /*
+     * Limpiar confeti.
+     */
+
+    this.clearConfettiTimer();
+
+    this.showConfetti.set(false);
+
+    /*
+     * Avanzar en el servicio.
+     */
 
     this.quizService.nextQuestion();
 
+    /*
+     * Última pregunta.
+     */
+
     if (this.isFinished()) {
-      void this.router.navigate(['/resultado']);
+
+      void this.router.navigate([
+        '/resultado',
+      ]);
+
       return;
     }
 
-    void this.router.navigate(['/mapa']);
+    /*
+     * Regresar al mapa.
+     */
+
+    void this.router.navigate([
+      '/mapa',
+    ]);
   }
+
+  /*
+   * ========================================
+   * MAP
+   * ========================================
+   */
 
   goToMap(): void {
-    this.clearAdvanceTimer();
 
-    void this.router.navigate(['/mapa']);
+    this.clearConfettiTimer();
+
+    this.showConfetti.set(false);
+
+    void this.router.navigate([
+      '/mapa',
+    ]);
   }
 
-  isCorrectAnswer(answerId: string): boolean {
-    return this.quizService.isCorrectAnswer(answerId);
+  /*
+   * ========================================
+   * ANSWER VALIDATION
+   * ========================================
+   */
+
+  isCorrectAnswer(
+    answerId: string
+  ): boolean {
+
+    return this.quizService
+      .isCorrectAnswer(
+        answerId
+      );
   }
 
-  getAnswerClass(answerId: string): string {
+  getAnswerClass(
+    answerId: string
+  ): string {
+
     if (!this.isAnswered()) {
       return '';
     }
 
-    if (this.isCorrectAnswer(answerId)) {
+    if (
+      this.isCorrectAnswer(
+        answerId
+      )
+    ) {
       return 'answer-card--correct';
     }
 
-    if (this.selectedAnswer() === answerId) {
+    if (
+      this.selectedAnswer() ===
+      answerId
+    ) {
       return 'answer-card--incorrect';
     }
 
     return 'answer-card--disabled';
   }
 
+  /*
+   * ========================================
+   * CHARACTER
+   * ========================================
+   */
+
   getCharacterImage(): string {
+
     if (!this.isAnswered()) {
-      return '/assets/characters/thinking.webp';
+
+      return (
+        '/assets/characters/thinking.webp'
+      );
     }
 
-    const answer = this.selectedAnswer();
+    const answer =
+      this.selectedAnswer();
 
     if (
       answer !== null &&
       this.isCorrectAnswer(answer)
     ) {
-      return '/assets/characters/happy.webp';
+
+      return (
+        '/assets/characters/celebrating.webp'
+      );
     }
 
-    return '/assets/characters/sad.webp';
+    return (
+      '/assets/characters/sad.webp'
+    );
   }
 
+  /*
+   * ========================================
+   * FEEDBACK TITLE
+   * ========================================
+   */
+
   getFeedbackTitle(): string {
-    const answer = this.selectedAnswer();
+
+    const answer =
+      this.selectedAnswer();
 
     if (
       answer !== null &&
       this.isCorrectAnswer(answer)
     ) {
+
       return '¡Muy bien!';
     }
 
     return '¡Casi!';
   }
 
+  /*
+   * ========================================
+   * FEEDBACK TEXT
+   * ========================================
+   */
+
   getFeedbackText(): string {
-    const answer = this.selectedAnswer();
+
+    const answer =
+      this.selectedAnswer();
 
     if (answer === null) {
       return '';
     }
 
-    if (this.isCorrectAnswer(answer)) {
-      return '¡Respuesta correcta! Sigue explorando.';
+    if (
+      this.isCorrectAnswer(answer)
+    ) {
+
+      return (
+        '¡Respuesta correcta! ' +
+        'Sigue explorando.'
+      );
     }
 
     const question =
@@ -238,25 +398,239 @@ export class Question implements OnInit, OnDestroy {
     const correctOption =
       question.options.find(
         (option) =>
-          option.id === question.correctAnswer
+          option.id ===
+          question.correctAnswer
       );
 
-    return `La respuesta correcta era: ${
-      correctOption?.text ?? ''
-    }`;
+    return (
+      `La respuesta correcta era: ${
+        correctOption?.text ?? ''
+      }`
+    );
   }
 
-  private clearAdvanceTimer(): void {
-    if (this.advanceTimer !== undefined) {
-      clearTimeout(this.advanceTimer);
+  /*
+   * ========================================
+   * CONFETTI
+   * ========================================
+   */
 
-      this.advanceTimer = undefined;
-    }
+  private startConfetti(): void {
+
+    this.clearConfettiTimer();
+
+    /*
+     * Reiniciar la animación.
+     */
+
+    this.showConfetti.set(false);
+
+    requestAnimationFrame(() => {
+
+      if (
+        this.isAnswered()
+      ) {
+
+        this.showConfetti.set(
+          true
+        );
+
+      }
+
+    });
+
+    /*
+     * Mantener el confeti visible
+     * durante unos segundos.
+     */
+
+    this.confettiTimer =
+      setTimeout(() => {
+
+        this.showConfetti.set(
+          false
+        );
+
+        this.confettiTimer =
+          undefined;
+
+      }, 4800);
   }
+
+  /*
+   * ========================================
+   * CONFETTI POSITIONS
+   * ========================================
+   */
+
+  getConfettiLeft(
+    index: number
+  ): number {
+
+    const positions = [
+      1,
+      4,
+      7,
+      11,
+      15,
+      19,
+      23,
+      27,
+      31,
+      35,
+      39,
+      43,
+      47,
+      51,
+      55,
+      59,
+      63,
+      67,
+      71,
+      75,
+      79,
+      83,
+      87,
+      91,
+      95,
+
+      3,
+      9,
+      14,
+      21,
+      28,
+      34,
+      41,
+      48,
+      54,
+      61,
+      69,
+      76,
+      82,
+      89,
+      94,
+      6,
+      17,
+      26,
+      37,
+      46,
+      58,
+      65,
+      73,
+      86,
+      97,
+      12,
+      32,
+      52,
+      68,
+      88,
+      24,
+      44,
+      64,
+      80,
+      92,
+      56,
+      18,
+      38,
+      78,
+      98,
+    ];
+
+    return (
+      positions[index] ??
+      50
+    );
+  }
+
+  /*
+   * ========================================
+   * CONFETTI DELAY
+   * ========================================
+   */
+
+  getConfettiDelay(
+    index: number
+  ): number {
+
+    const delays = [
+      0,
+      120,
+      240,
+      360,
+      80,
+      190,
+      310,
+      430,
+      150,
+      270,
+      390,
+      510,
+      60,
+      220,
+      340,
+      470,
+      130,
+      290,
+      410,
+      540,
+      30,
+      170,
+      300,
+      450,
+      100,
+      250,
+      370,
+      490,
+      140,
+      330,
+      460,
+      580,
+    ];
+
+    return (
+      delays[
+        index %
+        delays.length
+      ] +
+      Math.floor(index / 32) *
+        80
+    );
+  }
+
+  /*
+   * ========================================
+   * DESTROY
+   * ========================================
+   */
 
   ngOnDestroy(): void {
-    this.destroyed = true;
 
-    this.clearAdvanceTimer();
+    this.clearConfettiTimer();
+
+    this.showConfetti.set(
+      false
+    );
+  }
+
+  /*
+   * ========================================
+   * CLEAR CONFETTI TIMER
+   * ========================================
+   */
+
+  private clearConfettiTimer(): void {
+
+    if (
+      this.confettiTimer !==
+      undefined
+    ) {
+
+      clearTimeout(
+        this.confettiTimer
+      );
+
+      this.confettiTimer =
+        undefined;
+    }
   }
 }
