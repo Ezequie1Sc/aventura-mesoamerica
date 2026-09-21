@@ -10,79 +10,141 @@ import { QuizService } from '../../../../core/services/quiz.service';
   styleUrl: './question.scss',
 })
 export class Question {
+  // =========================================================
+  // DEPENDENCIAS
+  // =========================================================
+
   readonly quizService = inject(QuizService);
   readonly router = inject(Router);
 
-  readonly currentQuestion = this.quizService.currentQuestion;
+  // =========================================================
+  // ESTADO DEL QUIZ
+  // =========================================================
+
+  readonly currentQuestion =
+    this.quizService.currentQuestion;
+
   readonly currentQuestionIndex =
     this.quizService.currentQuestionIndex;
+
   readonly totalQuestions =
     this.quizService.totalQuestions;
+
   readonly progress =
     this.quizService.progress;
+
   readonly score =
     this.quizService.score;
+
   readonly selectedAnswer =
     this.quizService.selectedAnswer;
+
   readonly isAnswered =
     this.quizService.isAnswered;
+
   readonly isFinished =
     this.quizService.isFinished;
 
+  // =========================================================
+  // RESPONDER PREGUNTA
+  // =========================================================
+
   answerQuestion(answerId: string): void {
+    // Evitar respuestas cuando el quiz ya terminó
+    if (this.isFinished()) {
+      return;
+    }
+
     this.quizService.answerQuestion(answerId);
   }
 
-  nextQuestion(): void {
-    const isLastQuestion =
-      this.currentQuestionIndex() ===
-      this.totalQuestions() - 1;
+  // =========================================================
+  // SIGUIENTE PREGUNTA
+  // =========================================================
 
+  nextQuestion(): void {
+    // No avanzar si todavía no respondió
+    if (!this.isAnswered()) {
+      return;
+    }
+
+    // Avanzar usando únicamente la lógica del servicio
     this.quizService.nextQuestion();
 
-    if (isLastQuestion) {
+    // El servicio es quien determina si terminó
+    if (this.isFinished()) {
       this.router.navigate(['/resultado']);
     }
   }
 
+  // =========================================================
+  // VERIFICAR RESPUESTA
+  // =========================================================
+
   isCorrectAnswer(answerId: string): boolean {
-    return this.quizService.isCorrectAnswer(answerId);
+    return this.quizService.isCorrectAnswer(
+      answerId
+    );
   }
 
+  // =========================================================
+  // CLASE VISUAL DE RESPUESTA
+  // =========================================================
+
   getAnswerClass(answerId: string): string {
+    // Antes de responder no hay ninguna clase especial
     if (!this.isAnswered()) {
       return '';
     }
 
+    // Respuesta correcta
     if (this.isCorrectAnswer(answerId)) {
       return 'answer-card--correct';
     }
 
+    // Respuesta seleccionada pero incorrecta
     if (this.selectedAnswer() === answerId) {
       return 'answer-card--incorrect';
     }
 
+    // Las demás opciones quedan deshabilitadas visualmente
     return 'answer-card--disabled';
   }
 
+  // =========================================================
+  // IMAGEN DEL PERSONAJE
+  // =========================================================
+
   getCharacterImage(): string {
+    // Mientras no responda
     if (!this.isAnswered()) {
       return '/assets/characters/thinking.webp';
     }
 
+    const answer = this.selectedAnswer();
+
+    // Respuesta correcta
     if (
-      this.selectedAnswer() &&
-      this.isCorrectAnswer(this.selectedAnswer()!)
+      answer !== null &&
+      this.isCorrectAnswer(answer)
     ) {
       return '/assets/characters/happy.webp';
     }
 
+    // Respuesta incorrecta
     return '/assets/characters/sad.webp';
   }
 
+  // =========================================================
+  // TÍTULO DEL FEEDBACK
+  // =========================================================
+
   getFeedbackTitle(): string {
+    const answer = this.selectedAnswer();
+
     if (
-      this.isCorrectAnswer(this.selectedAnswer()!)
+      answer !== null &&
+      this.isCorrectAnswer(answer)
     ) {
       return '¡Muy bien!';
     }
@@ -90,13 +152,24 @@ export class Question {
     return '¡Casi!';
   }
 
+  // =========================================================
+  // TEXTO DEL FEEDBACK
+  // =========================================================
+
   getFeedbackText(): string {
-    if (
-      this.isCorrectAnswer(this.selectedAnswer()!)
-    ) {
+    const answer = this.selectedAnswer();
+
+    // Seguridad: todavía no hay respuesta
+    if (answer === null) {
+      return '';
+    }
+
+    // Respuesta correcta
+    if (this.isCorrectAnswer(answer)) {
       return '¡Respuesta correcta! Sigue explorando.';
     }
 
+    // Buscar la respuesta correcta
     const correctOption =
       this.currentQuestion().options.find(
         (option) =>
@@ -104,6 +177,8 @@ export class Question {
           this.currentQuestion().correctAnswer
       );
 
-    return `La respuesta correcta era: ${correctOption?.text}`;
+    return `La respuesta correcta era: ${
+      correctOption?.text ?? ''
+    }`;
   }
 }
