@@ -173,7 +173,7 @@
         class="download-button"
         [class.download-button--success]="downloadCompleted()"
         [disabled]="isDownloading()"
-        (click)="downloadCard()"
+        (click)="openNameDialog()"
       >
         @if (isDownloading()) {
           <span class="download-button__icon">
@@ -262,4 +262,96 @@
     </footer>
 
   </section>
+
+  <!-- ========================================
+       NAME DIALOG
+       ======================================== -->
+
+  <dialog
+    #nameDialog
+    class="badge-name-dialog"
+    aria-labelledby="name-dialog-title"
+    aria-describedby="name-dialog-description"
+    (cancel)="onDialogCancel($event)"
+  >
+    <form
+      class="badge-name-form"
+      (submit)="confirmDownload($event)"
+      [attr.aria-busy]="isDownloading()"
+    >
+      <span
+        class="badge-name-icon"
+        aria-hidden="true"
+      >
+        ★
+      </span>
+
+      <h2 id="name-dialog-title">
+        ¡Este logro lleva tu nombre!
+      </h2>
+
+      <p id="name-dialog-description">
+        Escribe cómo quieres aparecer en tu insignia.
+      </p>
+
+      <label for="explorer-name">
+        Tu nombre
+      </label>
+
+      <input
+        #nameInput
+        id="explorer-name"
+        name="explorerName"
+        type="text"
+        autocomplete="given-name"
+        placeholder="Ejemplo: Sofía Martínez"
+        maxlength="60"
+        required
+        autofocus
+        [value]="explorerName()"
+        [disabled]="isDownloading()"
+        (input)="updateName(nameInput.value)"
+        aria-describedby="explorer-name-help"
+      />
+
+      <small id="explorer-name-help">
+        Puedes escribir solo tu nombre. Máximo 60 caracteres.
+      </small>
+
+      @if (downloadError()) {
+        <p
+          class="badge-name-error"
+          role="alert"
+        >
+          {{ downloadError() }}
+        </p>
+      }
+
+      <div class="badge-name-actions">
+
+        <button
+          type="button"
+          class="badge-name-cancel"
+          [disabled]="isDownloading()"
+          (click)="closeNameDialog()"
+        >
+          Cancelar
+        </button>
+
+        <button
+          type="submit"
+          class="badge-name-confirm"
+          [disabled]="!validName() || isDownloading()"
+        >
+          @if (isDownloading()) {
+            Preparando…
+          } @else {
+            Descargar mi insignia
+          }
+        </button>
+
+      </div>
+    </form>
+  </dialog>
+
 </main>
