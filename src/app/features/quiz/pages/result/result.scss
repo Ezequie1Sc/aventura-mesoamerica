@@ -883,3 +883,146 @@
     transition: none !important;
   }
 }
+/* ========================================
+   CONFETI DE CELEBRACIÓN
+   ======================================== */
+
+.result-confetti {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.result-content {
+  position: relative;
+  z-index: 2;
+}
+
+.confetti-piece {
+  position: absolute;
+  top: -30px;
+  left: calc(
+    var(--confetti-index) * 2.8%
+  );
+
+  width: 9px;
+  height: 16px;
+
+  border-radius: 2px;
+
+  background: #f4c542;
+
+  opacity: 0;
+
+  transform:
+    rotate(calc(
+      var(--confetti-index) * 37deg
+    ));
+
+  animation:
+    confetti-fall
+    calc(3.2s + (var(--confetti-index) * 0.05s))
+    ease-in
+    calc(var(--confetti-index) * 0.08s)
+    infinite;
+}
+
+/* Variación de tamaños y formas */
+
+.confetti-piece:nth-child(3n) {
+  width: 7px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.confetti-piece:nth-child(4n) {
+  width: 12px;
+  height: 7px;
+  border-radius: 2px;
+}
+
+.confetti-piece:nth-child(5n) {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.confetti-piece:nth-child(6n) {
+  width: 6px;
+  height: 18px;
+}
+
+/* Variación de tonos */
+
+.confetti-piece:nth-child(2n) {
+  background: #e85d75;
+}
+
+.confetti-piece:nth-child(3n) {
+  background: #4caf78;
+}
+
+.confetti-piece:nth-child(4n) {
+  background: #5b8def;
+}
+
+.confetti-piece:nth-child(5n) {
+  background: #f4c542;
+}
+
+.confetti-piece:nth-child(7n) {
+  background: #e98a3a;
+}
+
+/* Animación */
+
+@keyframes confetti-fall {
+  0% {
+    opacity: 0;
+    transform:
+      translate3d(0, -30px, 0)
+      rotate(0deg);
+  }
+
+  10% {
+    opacity: 1;
+  }
+
+  50% {
+    transform:
+      translate3d(
+        calc(
+          (var(--confetti-index) % 2) * 80px - 40px
+        ),
+        50vh,
+        0
+      )
+      rotate(360deg);
+  }
+
+  100% {
+    opacity: 0;
+    transform:
+      translate3d(
+        calc(
+          (var(--confetti-index) % 2) * 120px - 60px
+        ),
+        110vh,
+        0
+      )
+      rotate(720deg);
+  }
+}
+
+/* ========================================
+   REDUCCIÓN DE MOVIMIENTO
+   ======================================== */
+
+@media (prefers-reduced-motion: reduce) {
+  .confetti-piece {
+    animation: none;
+    opacity: 0;
+  }
+}
