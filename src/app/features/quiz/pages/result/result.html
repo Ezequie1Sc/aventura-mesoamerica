@@ -38,6 +38,7 @@
          ======================================== -->
 
     <header class="result-header">
+
       <a
         routerLink="/"
         class="back-button"
@@ -61,11 +62,19 @@
       </a>
 
       <div class="adventure-sign">
-        <span>AVENTURA</span>
-        <strong>MESOAMÉRICA</strong>
+
+        <span>
+          AVENTURA
+        </span>
+
+        <strong>
+          MESOAMÉRICA
+        </strong>
+
       </div>
 
       <div aria-hidden="true"></div>
+
     </header>
 
     <!-- ========================================
@@ -76,7 +85,9 @@
       class="result-hero"
       aria-labelledby="result-title"
     >
+
       <div class="result-character">
+
         <div
           class="result-character__glow"
           aria-hidden="true"
@@ -90,9 +101,11 @@
           height="340"
           fetchpriority="high"
         />
+
       </div>
 
       <div class="result-speech">
+
         <span class="result-speech__label">
           ¡LO ESTÁS LOGRANDO!
         </span>
@@ -111,7 +124,9 @@
         >
           ✦
         </span>
+
       </div>
+
     </section>
 
     <!-- ========================================
@@ -122,6 +137,7 @@
       class="result-summary"
       aria-label="Tu puntuación"
     >
+
       <span
         class="result-summary__corner result-summary__corner--left"
         aria-hidden="true"
@@ -136,10 +152,12 @@
         class="score-stars"
         aria-hidden="true"
       >
+
         @for (
           star of [1, 2, 3];
           track star
         ) {
+
           <img
             src="/assets/rewards/star.webp"
             alt=""
@@ -149,10 +167,13 @@
               score() >= star * 2
             "
           />
+
         }
+
       </div>
 
       <div class="score-value">
+
         <strong>
           {{ score() }}
         </strong>
@@ -160,6 +181,7 @@
         <span>
           / {{ totalQuestions() }}
         </span>
+
       </div>
 
       <p class="score-caption">
@@ -174,6 +196,7 @@
       ></progress>
 
       <div class="score-detail">
+
         <span
           class="score-detail__line"
           aria-hidden="true"
@@ -188,17 +211,21 @@
         />
 
         <span>
+
           <strong>
             {{ score() }}
           </strong>
 
-          de {{ totalQuestions() }} retos
+          de {{ totalQuestions() }}
+          retos
+
         </span>
 
         <span
           class="score-detail__line"
           aria-hidden="true"
         ></span>
+
       </div>
 
       <img
@@ -218,6 +245,7 @@
         width="90"
         height="100"
       />
+
     </section>
 
     <!-- ========================================
@@ -228,7 +256,9 @@
       class="result-badge"
       aria-labelledby="badge-title"
     >
+
       <div class="result-badge__heading">
+
         <span aria-hidden="true">
           ✦
         </span>
@@ -240,25 +270,47 @@
         <span aria-hidden="true">
           ✦
         </span>
+
       </div>
 
       <div class="result-badge__body">
+
+        <!-- ====================================
+             BADGE IMAGE
+             ==================================== -->
+
         <div class="result-badge__image-wrapper">
+
           <div
             class="result-badge__glow"
             aria-hidden="true"
           ></div>
 
-          <img
-            class="result-badge__image"
-            [src]="getBadgeImage()"
-            [alt]="getBadge().name"
-            width="180"
-            height="180"
-          />
+          <button
+            type="button"
+            class="result-badge__image-button"
+            aria-label="Escuchar sonido de tu insignia"
+            (click)="playBadgeSound()"
+          >
+
+            <img
+              class="result-badge__image"
+              [src]="getBadgeImage()"
+              [alt]="getBadge().name"
+              width="180"
+              height="180"
+            />
+
+          </button>
+
         </div>
 
+        <!-- ====================================
+             BADGE INFORMATION
+             ==================================== -->
+
         <div class="result-badge__copy">
+
           <span class="result-badge__eyebrow">
             Tu nuevo logro
           </span>
@@ -270,24 +322,31 @@
           <p>
             {{ getBadge().description }}
           </p>
+
         </div>
+
       </div>
+
     </section>
 
     <!-- ========================================
-         ACCIONES
+         ACTIONS
          ======================================== -->
 
     <nav
       class="result-actions"
       aria-label="Acciones del resultado"
     >
+
+      <!-- Ver insignia -->
+
       <a
         routerLink="/insignias"
         class="claim-button"
         (mouseenter)="audioService.playSelect()"
         (click)="audioService.playSelect()"
       >
+
         <img
           src="/assets/rewards/medal.webp"
           alt=""
@@ -303,7 +362,10 @@
         <span aria-hidden="true">
           →
         </span>
+
       </a>
+
+      <!-- Reiniciar -->
 
       <button
         type="button"
@@ -311,6 +373,7 @@
         (mouseenter)="audioService.playSelect()"
         (click)="restartQuiz()"
       >
+
         <span aria-hidden="true">
           ↻
         </span>
@@ -318,7 +381,9 @@
         <span>
           Volver a jugar
         </span>
+
       </button>
+
     </nav>
 
     <!-- ========================================
@@ -326,10 +391,13 @@
          ======================================== -->
 
     <footer class="result-footer">
+
       <p>
         ¡Sigue explorando y aprendiendo!
       </p>
+
     </footer>
 
   </div>
+
 </main>
