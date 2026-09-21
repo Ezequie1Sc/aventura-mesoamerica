@@ -40,6 +40,12 @@ export class Badges implements OnDestroy {
   @ViewChild('nameDialog')
   private nameDialog!: ElementRef<HTMLDialogElement>;
 
+  /*
+   * ========================================
+   * ESTADO DEL QUIZ
+   * ========================================
+   */
+
   readonly isFinished =
     this.quizService.isFinished;
 
@@ -48,6 +54,12 @@ export class Badges implements OnDestroy {
 
   readonly totalQuestions =
     this.quizService.totalQuestions;
+
+  /*
+   * ========================================
+   * ESTADO DE DESCARGA
+   * ========================================
+   */
 
   readonly isDownloading =
     signal(false);
@@ -62,9 +74,13 @@ export class Badges implements OnDestroy {
     signal(this.readSavedName());
 
   /*
-   * ==========================================
+   * ========================================
    * CONFETI
-   * ==========================================
+   * ========================================
+   *
+   * 42 piezas.
+   * Se distribuyen mediante CSS para que
+   * cubran prácticamente toda la pantalla.
    */
 
   readonly showConfetti =
@@ -77,41 +93,49 @@ export class Badges implements OnDestroy {
     );
 
   /*
-   * ==========================================
+   * ========================================
    * NOMBRE
-   * ==========================================
+   * ========================================
    */
 
-  readonly cleanName = computed(() =>
-    this.explorerName()
-      .replace(/\s+/g, ' ')
-      .trim()
-  );
-
-  readonly validName = computed(() => {
-    const name =
-      this.cleanName();
-
-    return (
-      name.length > 0 &&
-      name.length <= 60 &&
-      /\p{L}/u.test(name)
+  readonly cleanName =
+    computed(() =>
+      this.explorerName()
+        .replace(/\s+/g, ' ')
+        .trim()
     );
-  });
 
-  private downloadResetTimer?: ReturnType<
-    typeof setTimeout
-  >;
+  readonly validName =
+    computed(() => {
+      const name =
+        this.cleanName();
 
-  private confettiResetTimer?: ReturnType<
-    typeof setTimeout
-  >;
+      return (
+        name.length > 0 &&
+        name.length <= 60 &&
+        /\p{L}/u.test(name)
+      );
+    });
+
+  /*
+   * ========================================
+   * TIMERS
+   * ========================================
+   */
+
+  private downloadResetTimer?:
+    ReturnType<typeof setTimeout>;
+
+  private confettiResetTimer?:
+    ReturnType<typeof setTimeout>;
 
   private destroyed = false;
 
-  // ==========================================
-  // NOMBRE GUARDADO
-  // ==========================================
+  /*
+   * ========================================
+   * STORAGE
+   * ========================================
+   */
 
   private readSavedName(): string {
     try {
@@ -137,43 +161,50 @@ export class Badges implements OnDestroy {
   ): void {
     try {
       if (
-        typeof localStorage !==
+        typeof localStorage ===
         'undefined'
       ) {
-        localStorage.setItem(
-          this.nameStorageKey,
-          name
-        );
+        return;
       }
+
+      localStorage.setItem(
+        this.nameStorageKey,
+        name
+      );
     } catch {
-      // La descarga funciona aunque
-      // el almacenamiento no esté disponible.
+      // No interrumpimos la descarga.
     }
   }
 
   private removeSavedName(): void {
     try {
       if (
-        typeof localStorage !==
+        typeof localStorage ===
         'undefined'
       ) {
-        localStorage.removeItem(
-          this.nameStorageKey
-        );
+        return;
       }
+
+      localStorage.removeItem(
+        this.nameStorageKey
+      );
     } catch {
-      // El estado del componente se reinicia igualmente.
+      // No interrumpimos el reinicio.
     }
   }
 
-  // ==========================================
-  // RESULTADO
-  // ==========================================
+  /*
+   * ========================================
+   * INFORMACIÓN DE LA INSIGNIA
+   * ========================================
+   */
 
   getCurrentScore(): number {
-    return this.isFinished()
-      ? this.score()
-      : this.storageService.getBestScore();
+    if (this.isFinished()) {
+      return this.score();
+    }
+
+    return this.storageService.getBestScore();
   }
 
   getBadge() {
@@ -183,6 +214,9 @@ export class Badges implements OnDestroy {
   }
 
   getBadgeImage(): string {
+    const badgeId =
+      this.getBadge().id;
+
     const images: Record<
       string,
       string
@@ -201,7 +235,7 @@ export class Badges implements OnDestroy {
     };
 
     return (
-      images[this.getBadge().id] ??
+      images[badgeId] ??
       '/assets/badges/semilla-conocimiento.webp'
     );
   }
@@ -239,19 +273,22 @@ export class Badges implements OnDestroy {
 
     if (score >= 2) {
       return '¡Ya conoces muchos secretos de Mesoamérica!';
+
     }
 
     return 'Toda gran aventura comienza con un primer paso.';
   }
 
-  // ==========================================
-  // SONIDOS DE INTERACCIÓN
-  // ==========================================
+  /*
+   * ========================================
+   * SONIDO DE BOTONES
+   * ========================================
+   */
 
   playButtonHover(): void {
     if (
-      this.isDownloading() ||
-      this.destroyed
+      this.destroyed ||
+      this.isDownloading()
     ) {
       return;
     }
@@ -259,9 +296,11 @@ export class Badges implements OnDestroy {
     this.audioService.playSelect();
   }
 
-  // ==========================================
-  // NUEVA AVENTURA
-  // ==========================================
+  /*
+   * ========================================
+   * REINICIAR QUIZ
+   * ========================================
+   */
 
   restartQuiz(): void {
     if (this.isDownloading()) {
@@ -280,21 +319,35 @@ export class Badges implements OnDestroy {
 
     this.quizService.restartQuiz();
 
-    void this.router.navigate(['/mapa']);
+    void this.router.navigate([
+      '/mapa',
+    ]);
   }
 
+  /*
+   * ========================================
+   * VOLVER AL INICIO
+   * ========================================
+   */
+
   goToHome(): void {
+    if (this.isDownloading()) {
+      return;
+    }
+
     void this.router.navigate(['/']);
   }
 
-  // ==========================================
-  // DIÁLOGO DEL NOMBRE
-  // ==========================================
+  /*
+   * ========================================
+   * DIÁLOGO DEL NOMBRE
+   * ========================================
+   */
 
   openNameDialog(): void {
     if (
-      this.isDownloading() ||
-      this.destroyed
+      this.destroyed ||
+      this.isDownloading()
     ) {
       return;
     }
@@ -313,11 +366,13 @@ export class Badges implements OnDestroy {
       dialog.showModal();
     }
 
-    dialog
-      .querySelector<HTMLInputElement>(
-        'input'
-      )
-      ?.focus();
+    requestAnimationFrame(() => {
+      dialog
+        .querySelector<HTMLInputElement>(
+          'input'
+        )
+        ?.focus();
+    });
   }
 
   closeNameDialog(): void {
@@ -347,6 +402,12 @@ export class Badges implements OnDestroy {
     this.downloadError.set('');
   }
 
+  /*
+   * ========================================
+   * CONFIRMAR DESCARGA
+   * ========================================
+   */
+
   confirmDownload(
     event: Event
   ): void {
@@ -367,14 +428,16 @@ export class Badges implements OnDestroy {
     void this.downloadCard();
   }
 
-  // ==========================================
-  // GENERAR Y DESCARGAR INSIGNIA
-  // ==========================================
+  /*
+   * ========================================
+   * GENERAR INSIGNIA
+   * ========================================
+   */
 
   async downloadCard(): Promise<void> {
     if (
-      this.isDownloading() ||
-      this.destroyed
+      this.destroyed ||
+      this.isDownloading()
     ) {
       return;
     }
@@ -442,7 +505,12 @@ export class Badges implements OnDestroy {
       context.textAlign = 'center';
       context.textBaseline = 'middle';
 
-      // Fondo
+      /*
+       * ======================================
+       * FONDO
+       * ======================================
+       */
+
       const gradient =
         context.createLinearGradient(
           0,
@@ -476,7 +544,12 @@ export class Badges implements OnDestroy {
         canvas.height
       );
 
-      // Resplandor
+      /*
+       * ======================================
+       * RESPLANDOR
+       * ======================================
+       */
+
       context.fillStyle =
         'rgba(244, 198, 72, 0.12)';
 
@@ -492,7 +565,12 @@ export class Badges implements OnDestroy {
 
       context.fill();
 
-      // Marco
+      /*
+       * ======================================
+       * MARCO
+       * ======================================
+       */
+
       context.strokeStyle =
         '#e6b84b';
 
@@ -505,7 +583,12 @@ export class Badges implements OnDestroy {
         1266
       );
 
-      // Encabezado
+      /*
+       * ======================================
+       * ENCABEZADO
+       * ======================================
+       */
+
       this.drawFittedText(
         context,
         'AVENTURA',
@@ -522,7 +605,12 @@ export class Badges implements OnDestroy {
         '#fff4ce'
       );
 
-      // Insignia
+      /*
+       * ======================================
+       * INSIGNIA
+       * ======================================
+       */
+
       const maxWidth = 580;
       const maxHeight = 500;
 
@@ -567,7 +655,12 @@ export class Badges implements OnDestroy {
         '#ffffff'
       );
 
-      // Nombre
+      /*
+       * ======================================
+       * NOMBRE
+       * ======================================
+       */
+
       context.fillStyle =
         '#fff4d8';
 
@@ -595,7 +688,12 @@ export class Badges implements OnDestroy {
         800
       );
 
-      // Puntuación
+      /*
+       * ======================================
+       * PUNTUACIÓN
+       * ======================================
+       */
+
       this.drawFittedText(
         context,
         `${score} / ${total}`,
@@ -620,9 +718,11 @@ export class Badges implements OnDestroy {
         '#c9e2d0'
       );
 
-      // ======================================
-      // DESCARGA
-      // ======================================
+      /*
+       * ======================================
+       * GENERAR PNG
+       * ======================================
+       */
 
       const imageData =
         canvas.toDataURL(
@@ -637,7 +737,8 @@ export class Badges implements OnDestroy {
       link.download =
         `${badge.id}-aventura-mesoamerica.png`;
 
-      link.href = imageData;
+      link.href =
+        imageData;
 
       document.body.appendChild(
         link
@@ -649,9 +750,11 @@ export class Badges implements OnDestroy {
         link.remove();
       }
 
-      // ======================================
-      // ÉXITO
-      // ======================================
+      /*
+       * ======================================
+       * ÉXITO
+       * ======================================
+       */
 
       this.saveName(name);
       this.explorerName.set(name);
@@ -663,32 +766,37 @@ export class Badges implements OnDestroy {
       );
 
       /*
-       * Reproducir Piplup una sola vez
-       * al completar la descarga.
+       * Sonido de celebración.
        */
+
       this.audioService.playPiplup();
 
       /*
-       * Mostrar confeti.
+       * Confeti.
        */
-      this.showConfetti.set(true);
+
+      this.showConfetti.set(
+        true
+      );
 
       this.clearConfettiTimer();
 
       this.confettiResetTimer =
         setTimeout(() => {
           if (!this.destroyed) {
-            this.showConfetti.set(false);
+            this.showConfetti.set(
+              false
+            );
           }
 
           this.confettiResetTimer =
             undefined;
-        }, 4500);
+        }, 5000);
 
       /*
-       * Mantener el estado de éxito
-       * durante unos segundos.
+       * Mantener el estado de éxito.
        */
+
       this.downloadResetTimer =
         setTimeout(() => {
           if (!this.destroyed) {
@@ -714,13 +822,19 @@ export class Badges implements OnDestroy {
         );
       }
     } finally {
-      this.isDownloading.set(false);
+      if (!this.destroyed) {
+        this.isDownloading.set(
+          false
+        );
+      }
     }
   }
 
-  // ==========================================
-  // CARGAR IMAGEN
-  // ==========================================
+  /*
+   * ========================================
+   * CARGAR IMAGEN
+   * ========================================
+   */
 
   private loadImage(
     src: string
@@ -782,9 +896,11 @@ export class Badges implements OnDestroy {
     );
   }
 
-  // ==========================================
-  // AJUSTAR TEXTO
-  // ==========================================
+  /*
+   * ========================================
+   * TEXTO PARA CANVAS
+   * ========================================
+   */
 
   private drawFittedText(
     context: CanvasRenderingContext2D,
@@ -811,6 +927,7 @@ export class Badges implements OnDestroy {
       size > 20
     ) {
       size -= 1;
+
       setFont();
     }
 
@@ -825,9 +942,11 @@ export class Badges implements OnDestroy {
     );
   }
 
-  // ==========================================
-  // LIMPIEZA
-  // ==========================================
+  /*
+   * ========================================
+   * LIMPIAR TIMER DESCARGA
+   * ========================================
+   */
 
   private clearDownloadTimer(): void {
     if (
@@ -843,6 +962,12 @@ export class Badges implements OnDestroy {
     }
   }
 
+  /*
+   * ========================================
+   * LIMPIAR TIMER CONFETI
+   * ========================================
+   */
+
   private clearConfettiTimer(): void {
     if (
       this.confettiResetTimer !==
@@ -856,6 +981,12 @@ export class Badges implements OnDestroy {
         undefined;
     }
   }
+
+  /*
+   * ========================================
+   * DESTROY
+   * ========================================
+   */
 
   ngOnDestroy(): void {
     this.destroyed = true;
