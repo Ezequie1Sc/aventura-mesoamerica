@@ -3,7 +3,11 @@ import {
   OnInit,
   inject,
 } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
+
+import {
+  Router,
+  RouterLink,
+} from '@angular/router';
 
 import { QuizService } from '../../../../core/services/quiz.service';
 import { AudioService } from '../../../../core/services/audio.service';
@@ -16,6 +20,7 @@ import { AudioService } from '../../../../core/services/audio.service';
   styleUrl: './result.scss',
 })
 export class Result implements OnInit {
+
   // =========================================================
   // DEPENDENCIAS
   // =========================================================
@@ -33,10 +38,13 @@ export class Result implements OnInit {
   // CONFETI
   // =========================================================
 
-  readonly confettiPieces = Array.from(
-    { length: 36 },
-    (_, index) => index
-  );
+  readonly confettiPieces =
+    Array.from(
+      {
+        length: 36,
+      },
+      (_, index) => index
+    );
 
   // =========================================================
   // ESTADO DEL QUIZ
@@ -56,11 +64,34 @@ export class Result implements OnInit {
   // =========================================================
 
   ngOnInit(): void {
+
     /*
-     * Sonido especial al mostrar
-     * la pantalla de resultados.
+     * Al entrar al resultado solamente
+     * reproducimos el sonido de victoria.
+     *
+     * Piplup NO se reproduce aquí.
+     *
+     * La música de fondo de /resultado
+     * es controlada por AudioService y
+     * utiliza home.mp3.
      */
+
     this.audioService.playWin();
+  }
+
+  // =========================================================
+  // SONIDO DE LA INSIGNIA
+  // =========================================================
+
+  playBadgeSound(): void {
+
+    /*
+     * Piplup solamente suena cuando
+     * el usuario presiona la imagen
+     * de la insignia.
+     */
+
+    this.audioService.playPiplup();
   }
 
   // =========================================================
@@ -74,6 +105,7 @@ export class Result implements OnInit {
   }
 
   getBadgeImage(): string {
+
     const badgeId =
       this.getBadge().id;
 
@@ -81,6 +113,7 @@ export class Result implements OnInit {
       string,
       string
     > = {
+
       semilla:
         '/assets/badges/semilla-conocimiento.webp',
 
@@ -92,6 +125,7 @@ export class Result implements OnInit {
 
       'pase-aventura':
         '/assets/badges/pase-aventura-mesoamerica.webp',
+
     };
 
     return (
@@ -105,22 +139,34 @@ export class Result implements OnInit {
   // =========================================================
 
   getCharacterImage(): string {
+
     const score =
       this.score();
 
     if (score === 6) {
-      return '/assets/characters/victory.webp';
+
+      return (
+        '/assets/characters/victory.webp'
+      );
     }
 
     if (score >= 4) {
-      return '/assets/characters/celebrating.webp';
+
+      return (
+        '/assets/characters/celebrating.webp'
+      );
     }
 
     if (score >= 2) {
-      return '/assets/characters/happy.webp';
+
+      return (
+        '/assets/characters/happy.webp'
+      );
     }
 
-    return '/assets/characters/welcome.webp';
+    return (
+      '/assets/characters/welcome.webp'
+    );
   }
 
   // =========================================================
@@ -128,22 +174,34 @@ export class Result implements OnInit {
   // =========================================================
 
   getResultTitle(): string {
+
     const score =
       this.score();
 
     if (score === 6) {
-      return '¡Aventura completada!';
+
+      return (
+        '¡Aventura completada!'
+      );
     }
 
     if (score >= 4) {
-      return '¡Gran explorador!';
+
+      return (
+        '¡Gran explorador!'
+      );
     }
 
     if (score >= 2) {
-      return '¡Buen comienzo!';
+
+      return (
+        '¡Buen comienzo!'
+      );
     }
 
-    return '¡Sigue explorando!';
+    return (
+      '¡Sigue explorando!'
+    );
   }
 
   // =========================================================
@@ -151,22 +209,34 @@ export class Result implements OnInit {
   // =========================================================
 
   getResultMessage(): string {
+
     const score =
       this.score();
 
     if (score === 6) {
-      return '¡Demostraste que eres un gran conocedor de Mesoamérica!';
+
+      return (
+        '¡Demostraste que eres un gran conocedor de Mesoamérica!'
+      );
     }
 
     if (score >= 4) {
-      return '¡Descubriste muchos secretos de las culturas mesoamericanas!';
+
+      return (
+        '¡Descubriste muchos secretos de las culturas mesoamericanas!'
+      );
     }
 
     if (score >= 2) {
-      return '¡Ya conoces algunos secretos de Mesoamérica! Sigue aprendiendo.';
+
+      return (
+        '¡Ya conoces algunos secretos de Mesoamérica! Sigue aprendiendo.'
+      );
     }
 
-    return 'Toda gran aventura comienza con un primer paso. ¡Sigue aprendiendo!';
+    return (
+      'Toda gran aventura comienza con un primer paso. ¡Sigue aprendiendo!'
+    );
   }
 
   // =========================================================
@@ -174,8 +244,11 @@ export class Result implements OnInit {
   // =========================================================
 
   restartQuiz(): void {
+
     this.quizService.restartQuiz();
 
-    void this.router.navigate(['/']);
+    void this.router.navigate([
+      '/',
+    ]);
   }
 }
