@@ -1,4 +1,6 @@
 import { Injectable } from '@angular/core';
+import { NavigationEnd, Router } from '@angular/router';
+import { filter } from 'rxjs';
 
 type BackgroundMusic =
   | 'home'
@@ -54,6 +56,97 @@ export class AudioService {
 
   /*
    * ========================================
+   * CONSTRUCTOR
+   * ========================================
+   */
+
+  constructor(
+    private readonly router: Router
+  ) {
+    this.listenToNavigation();
+  }
+
+  /*
+   * ========================================
+   * ROUTE MUSIC
+   * ========================================
+   */
+
+  private listenToNavigation(): void {
+    this.router.events
+      .pipe(
+        filter(
+          (event): event is NavigationEnd =>
+            event instanceof NavigationEnd
+        )
+      )
+      .subscribe((event) => {
+        this.handleRouteMusic(
+          event.urlAfterRedirects
+        );
+      });
+  }
+
+  private handleRouteMusic(
+    url: string
+  ): void {
+    /*
+     * ========================================
+     * HOME + INSTRUCTIONS + BADGES
+     * ========================================
+     *
+     * Estas páginas utilizan la música
+     * principal de la aventura.
+     */
+
+    if (
+      url === '/' ||
+      url.startsWith('/instrucciones') ||
+      url.startsWith('/insignias')
+    ) {
+      this.playHomeMusic();
+      return;
+    }
+
+    /*
+     * ========================================
+     * MAP
+     * ========================================
+     */
+
+    if (url.startsWith('/mapa')) {
+      this.playMapMusic();
+      return;
+    }
+
+    /*
+     * ========================================
+     * QUIZ
+     * ========================================
+     */
+
+    if (url.startsWith('/quiz')) {
+      this.playQuizMusic();
+      return;
+    }
+
+    /*
+     * ========================================
+     * RESULT
+     * ========================================
+     *
+     * En resultado no utilizamos música
+     * de fondo porque aquí se reproducen
+     * los efectos de victoria/recompensa.
+     */
+
+    if (url.startsWith('/resultado')) {
+      this.stopBackground();
+    }
+  }
+
+  /*
+   * ========================================
    * SOUND EFFECTS
    * ========================================
    */
@@ -81,7 +174,7 @@ export class AudioService {
        * si no existe una interacción del usuario.
        *
        * No hacemos nada en ese caso para evitar
-       * errores en consola que interrumpan el quiz.
+       * errores en consola.
        */
     });
 
@@ -143,7 +236,7 @@ export class AudioService {
   ): void {
     /*
      * Si ya está reproduciéndose la misma música,
-     * no hacemos nada.
+     * no la reiniciamos.
      */
     if (
       this.currentBackgroundMusic === music &&
@@ -162,6 +255,9 @@ export class AudioService {
       this.music[music]
     );
 
+    /*
+     * La música se repite indefinidamente.
+     */
     audio.loop = true;
 
     audio.volume = Math.min(
@@ -172,40 +268,70 @@ export class AudioService {
     this.backgroundAudio = audio;
     this.currentBackgroundMusic = music;
 
+    /*
+     * Intentar reproducir.
+     *
+     * Algunos navegadores, especialmente
+     * en dispositivos móviles, pueden bloquear
+     * autoplay hasta que exista interacción.
+     */
     void audio.play().catch(() => {
       /*
-       * El navegador puede bloquear el autoplay
-       * hasta que exista una interacción del usuario.
-       *
-       * La música podrá iniciarse posteriormente
-       * desde una acción del usuario.
+       * No mostramos el error para evitar
+       * errores innecesarios en consola.
        */
     });
   }
 
+  /*
+   * ========================================
+   * INDIVIDUAL BACKGROUND MUSIC
+   * ========================================
+   */
+
   playHomeMusic(): void {
-    this.playBackground('home', 0.25);
+    this.playBackground(
+      'home',
+      0.25
+    );
   }
 
   playMapMusic(): void {
-    this.playBackground('map', 0.25);
+    this.playBackground(
+      'map',
+      0.25
+    );
   }
 
   playQuizMusic(): void {
-    this.playBackground('quiz', 0.22);
+    this.playBackground(
+      'quiz',
+      0.22
+    );
   }
+
+  /*
+   * ========================================
+   * STOP BACKGROUND MUSIC
+   * ========================================
+   */
 
   stopBackground(): void {
     if (!this.backgroundAudio) {
-      this.currentBackgroundMusic = undefined;
+      this.currentBackgroundMusic =
+        undefined;
+
       return;
     }
 
     this.backgroundAudio.pause();
+
     this.backgroundAudio.currentTime = 0;
 
     this.backgroundAudio = undefined;
-    this.currentBackgroundMusic = undefined;
+
+    this.currentBackgroundMusic =
+      undefined;
   }
 
   /*
@@ -220,7 +346,9 @@ export class AudioService {
     }
 
     this.currentAudio.pause();
+
     this.currentAudio.currentTime = 0;
+
     this.currentAudio = undefined;
   }
 }
