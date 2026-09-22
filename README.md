@@ -46,11 +46,11 @@ La aplicación utiliza una temática de exploración para presentar un recorrido
 
 ### 🗺️ Mapa de aventura
 
-<img src="public/assets/readme/aventura_mesoamerica_06.webp" alt="Mapa de aventura" width="320">
+<img src="public/assets/readme/aventura_mesoamerica_07.webp" alt="Mapa de aventura" width="320">
 
 ### ❓ Pregunta
 
-<img src="public/assets/readme/aventura_mesoamerica_07.webp" alt="Pregunta del quiz" width="320">
+<img src="public/assets/readme/aventura_mesoamerica_08.webp" alt="Pregunta del quiz" width="320">
 
 ### ✅ Respuesta correcta
 
