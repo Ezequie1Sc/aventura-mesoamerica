@@ -54,7 +54,7 @@ La aplicación utiliza una temática de exploración para presentar un recorrido
 
 ### ✅ Respuesta correcta
 
-<img src="public/assets/readme/aventura_mesoamerica_08.webp" alt="Respuesta correcta" width="320">
+<img src="public/assets/readme/aventura_mesoamerica_09.webp" alt="Respuesta correcta" width="320">
 
 ### ❌ Respuesta incorrecta
 
